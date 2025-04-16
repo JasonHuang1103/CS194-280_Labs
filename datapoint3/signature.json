@@ -1,0 +1,60 @@
+[
+    {
+        "name": "hasEnoughDistinct",
+        "parameters": [
+            {
+                "param_name": "nums",
+                "param_type": "Array Nat"
+            },
+            {
+                "param_name": "start",
+                "param_type": "Nat"
+            },
+            {
+                "param_name": "len",
+                "param_type": "Nat"
+            },
+            {
+                "param_name": "m",
+                "param_type": "Nat"
+            }
+        ],
+        "return_type": "Bool"
+    },
+    {
+        "name": "sliceSum",
+        "parameters": [
+            {
+                "param_name": "nums",
+                "param_type": "Array Nat"
+            },
+            {
+                "param_name": "start",
+                "param_type": "Nat"
+            },
+            {
+                "param_name": "len",
+                "param_type": "Nat"
+            }
+        ],
+        "return_type": "Nat"
+    },
+    {
+        "name": "maxSum",
+        "parameters": [
+            {
+                "param_name": "nums",
+                "param_type": "Array Nat"
+            },
+            {
+                "param_name": "m",
+                "param_type": "Nat"
+            },
+            {
+                "param_name": "k",
+                "param_type": "Nat"
+            }
+        ],
+        "return_type": "Nat"
+    }
+]

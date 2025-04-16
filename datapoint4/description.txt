@@ -1,0 +1,10 @@
+-----Description----- 
+This task requires writing a Lean 4 method that finds the maximum sum of a balanced subsequence from an array of integers. A balanced subsequence is one where for every consecutive pair of elements at positions i_j and i_j-1, the difference between their values is greater than or equal to the difference between their indices.
+
+-----Input-----
+The input consists of one parameter:
+- nums: An array of integers (1 <= nums.length <= 10^5, -10^9 <= nums[i] <= 10^9)
+
+-----Output-----
+The output is a single integer:
+Returns the maximum possible sum of elements in a balanced subsequence of nums. A subsequence of length 1 is always considered balanced.

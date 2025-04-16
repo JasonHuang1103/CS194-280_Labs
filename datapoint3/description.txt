@@ -1,0 +1,12 @@
+-----Description----- 
+This task requires writing a Lean 4 method that finds the maximum sum of "almost unique" subarrays. Given an array of integers and two parameters m and k, the method needs to identify all subarrays of length k that contain at least m distinct elements (making them "almost unique"), and return the maximum sum among these subarrays.
+
+-----Input-----
+The input consists of three parameters:
+- nums: An array of integers (1 <= nums.length <= 2 * 10^4, 1 <= nums[i] <= 10^9)
+- m: The minimum number of distinct elements required for a subarray to be considered "almost unique" (1 <= m <= k)
+- k: The length of the subarrays to consider (1 <= k <= nums.length)
+
+-----Output-----
+The output is a single integer:
+Returns the maximum sum among all "almost unique" subarrays of length k. If no such subarray exists, return 0.

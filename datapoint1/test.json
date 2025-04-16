@@ -1,28 +1,27 @@
-{
-  "testCases": [
+[
     {
-      "input": [[2, 3, 6]],
-      "output": true
+        "input": 10,
+        "expected": 182,
+        "unexpected": [180, 181, 0]
     },
     {
-      "input": [[3, 9, 5]],
-      "output": false
+        "input": 37,
+        "expected": 1478,
+        "unexpected": [1477, 0]
     },
     {
-      "input": [[4, 3, 12, 8]],
-      "output": true
+        "input": 99,
+        "expected": 31334,
+        "unexpected": [31333, 0]
     },
     {
-      "input": [[1, 2, 3]],
-      "output": false
+        "input": 489,
+        "expected": 772866,
+        "unexpected": [772865, 0]
     },
     {
-      "input": [[7]],
-      "output": true
-    },
-    {
-      "input": [[6, 10, 15]],
-      "output": true
+        "input": 1000,
+        "expected": 10804657,
+        "unexpected": [10804656, 10000000, 0]
     }
-  ]
-}
+]

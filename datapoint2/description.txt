@@ -1,0 +1,10 @@
+-----Description----- 
+This task requires writing a Lean 4 method that counts the number of special permutations of an integer array. A permutation of the array is considered special if for all adjacent elements, one divides the other (i.e., for each pair of adjacent elements, either one is divisible by the other).
+
+-----Input-----
+The input consists of an array:
+nums: An array of distinct positive integers (2 <= nums.length <= 14, 1 <= nums[i] <= 10^9)
+
+-----Output-----
+The output is an integer:
+Returns the total number of special permutations of the input array, modulo 10^9 + 7.

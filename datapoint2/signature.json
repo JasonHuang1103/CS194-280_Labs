@@ -1,0 +1,44 @@
+[
+    {
+        "name": "isDivisible",
+        "parameters": [
+            {
+                "param_name": "a",
+                "param_type": "Nat"
+            },
+            {
+                "param_name": "b",
+                "param_type": "Nat"
+            }
+        ],
+        "return_type": "Bool"
+    },
+    {
+        "name": "countPermutations",
+        "parameters": [
+            {
+                "param_name": "nums",
+                "param_type": "Array Nat"
+            },
+            {
+                "param_name": "mask",
+                "param_type": "Nat"
+            },
+            {
+                "param_name": "last",
+                "param_type": "Nat"
+            }
+        ],
+        "return_type": "Nat"
+    },
+    {
+        "name": "specialPermutations",
+        "parameters": [
+            {
+                "param_name": "nums",
+                "param_type": "Array Nat"
+            }
+        ],
+        "return_type": "Nat"
+    }
+]

@@ -1,0 +1,12 @@
+[
+    {
+        "name": "maxBalancedSubsequenceSum",
+        "parameters": [
+            {
+                "param_name": "nums",
+                "param_type": "Array Int"
+            }
+        ],
+        "return_type": "Int"
+    }
+]

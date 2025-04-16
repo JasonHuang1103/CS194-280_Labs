@@ -1,10 +1,26 @@
-{
-    "name": "canTraverseAllPairs",
-    "parameters": [
-      {
-        "param_name": "nums",
-        "param_type": "List Int"
-      }
-    ],
-    "return_type": "Bool"
-}
+[
+    {
+        "name": "canPartition",
+        "parameters": [
+            {
+                "param_name": "numStr",
+                "param_type": "String"
+            },
+            {
+                "param_name": "target",
+                "param_type": "Nat"
+            }
+        ],
+        "return_type": "Bool"
+    },
+    {
+        "name": "punishmentNumber",
+        "parameters": [
+            {
+                "param_name": "n",
+                "param_type": "Nat"
+            }
+        ],
+        "return_type": "Nat"
+    }
+]
