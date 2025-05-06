@@ -1,0 +1,4 @@
+{
+  "code": "a.map (\u03bb x => x * x * x)",
+  "proof": "apply And.intro\nexact Array.size_map a (\u03bb x => x * x * x)\nintro i hi\nexact Array.get_map (\u03bb x => x * x * x) a i"
+}

@@ -1,0 +1,42 @@
+Below is an analysis of what is going wrong. (Keep in mind that Lean 4 is quite picky about both tactic usage and indentation.) In our example, two main problems occur:
+
+──────────────────────────── Step 1. The failing tactic (and its symptoms)
+• The error message “unsolved goals” tells us that after doing a case split with “by_cases h : a ≤ b” and then “apply And.intro” in each branch, Lean still has a goal that has not been closed.
+• In addition, the “unexpected token '·'; expected command” error means that Lean is not happy with how the bullet markers (the “·”) have been used. (This is typically a sign of an indentation or structure problem.)
+
+──────────────────────────── Step 2. What is going on in the proof state?
+After you do
+  unfold myMin myMin_spec
+the goal becomes
+  ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧ ((if a ≤ b then a else b) = a ∨ (if a ≤ b then a else b) = b).
+Then you do “by_cases h : a ≤ b” so that you rely on the decidability of “a ≤ b”. In theory, when h is true the “if” should simplify so that
+  if a ≤ b then a else b
+computes to a—and in the other branch to b. However, when you simply “unfold” the definitions (instead of “simp‐ing” or “dsimp‐ing”), the if–expression remains in the goal. (Without further rewriting or computation, Lean does not “reduce” the if–expression automatically in the inner subgoals.) This is why your goal contains an “if a ≤ b then …” rather than the number a or b.
+
+──────────────────────────── Step 3. Does the proof approach match the specification?
+The specification “myMin_spec” says that the returned result is (a) less than or equal to both a and b and (b) equal to a or b. And the natural idea is to do a case split on “a ≤ b” and then argue that in one case the “if” reduces to a and in the other to b. That is exactly the right approach. (So conceptually your proof strategy is on track.)
+
+──────────────────────────── Step 4. Look for type mismatches or incorrect assumptions
+Inside your “else” branch (when h : ¬ (a ≤ b) holds) you write
+
+  have h' : b ≤ a := Int.le_of_lt (Int.lt_of_not_ge h)
+  exact ⟨h', le_refl b⟩
+
+There are two related issues here:
+1. Notice that h is a proof that a ≤ b does not hold. (That is, h : ¬ (a ≤ b).) In a totally ordered type like ℤ, if a is not ≤ b then one has b < a. However, you try to call an auxiliary lemma “Int.lt_of_not_ge h”. That lemma (if it exists) is meant to take a proof of ¬ (a ≥ b) in order to conclude a < b. (Remember that “a ≤ b” is equivalent to “b ≥ a”.) In our “else” branch, h tells you ¬ (a ≤ b) or equivalently ¬ (b ≥ a) but then “Int.lt_of_not_ge h” probably expects a different inequality. In other words, the names “le_of_lt” and “lt_of_not_ge” look like they are being “flipped” and this may lead to a type mismatch or an unintended use.
+2. Consequently, this leads to one of the subgoals being left unsolved because Lean cannot “apply” the lemma on h when h has the wrong shape.
+
+──────────────────────────── Step 5. Alternative strategies and what to try instead
+To fix the situation you might consider the following remedies:
+• Use a tactic (or simp lemma) to simplify the “if” expression. For example, after the “by_cases” split you can add a “simp only [myMin]” or “dsimp” command so that in the branch where h is true the expression “if a ≤ b then a else b” reduces to a and in the other branch it reduces to b.
+• Revise the “have h'…” line. Instead of trying to use “Int.lt_of_not_ge h”, note that if h gives ¬ (a ≤ b) then a > b (or equivalently b < a) by totality. One might use a lemma such as “if ¬ (a ≤ b) then b < a” (or prove this fact directly). Then, using that b < a you can conclude b ≤ a by “Int.le_of_lt”.
+• Finally, check your bullet markers and indentation. In Lean 4 the “·” bullets must appear at the correct indentation level. The error “unexpected token '·'” typically means that a bullet is being parsed out of the expected block. Ensure that every bullet has the proper indentation and that you are not accidentally starting a new top‐level block.
+
+──────────────────────────── Conclusion: Root cause and recommended direction
+There are essentially two intertwined problems:
+1. The if–expression in the goal is not reducing as expected because “unfold” does not force computation; this leaves unsolved subgoals that still mention “if a ≤ b then a else b” instead of the values a or b.
+2. In the “negative” branch your conversion from “¬ (a ≤ b)” to a “b ≤ a” fact uses a lemma that expects a different kind of hypothesis (or at least is applied in the wrong direction). This, combined with some indentation/bullet issues, leaves parts of the proof unfinished.
+
+The recommended approach is to (a) after splitting on “by_cases h : a ≤ b” use “simp” or “dsimp” (or “split_ifs”) to force the “if” to evaluate; (b) replace the problematic “Int.lt_of_not_ge” call with a correct argument that derives b < a from ¬ (a ≤ b) (and then conclude b ≤ a by passing through “Int.le_of_lt”); and (c) check that each bullet (using “·”) is indented correctly within the proof block.
+
+Fixing these issues should remove the “unsolved goals” and the “unexpected token ‘·’” errors.

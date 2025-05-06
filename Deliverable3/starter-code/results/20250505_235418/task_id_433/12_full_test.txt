@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:18:40: error: unsolved goals
+n : ℤ
+a : Array ℤ
+⊢ (∀ i < a.size, a[i]! < n) ↔ ∀ (i : ℕ) (x : i < a.size), a[i] < n
+lean_playground/TempTest.lean:22:0: error: unexpected identifier; expected command

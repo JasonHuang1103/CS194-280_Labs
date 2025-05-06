@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then a else b",
+  "proof": "split_ifs with h\n\u00b7 apply And.intro\n  \u00b7 apply And.intro\n    \u00b7 exact le_refl a\n    \u00b7 exact h\n  \u00b7 exact Or.inl rfl\n\u00b7 have h' : b \u2264 a := not_le.mp h\n  apply And.intro\n  \u00b7 apply And.intro\n    \u00b7 exact h'\n    \u00b7 exact le_refl b\n  \u00b7 exact Or.inr rfl"
+}

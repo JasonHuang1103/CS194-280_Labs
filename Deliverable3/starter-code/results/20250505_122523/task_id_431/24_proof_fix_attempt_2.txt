@@ -1,0 +1,13 @@
+```
+simp only [List.any, List.contains, List.mem_iff_nthLe]
+apply Iff.intro
+· intro h
+  rcases h with ⟨_, ⟨i, j, hi, hj, h_eq⟩⟩
+  obtain ⟨x, h_mem_x⟩ := List.mem_iff_nthLe.mpr ⟨i, hi, rfl⟩
+  obtain ⟨y, h_mem_y⟩ := List.mem_iff_nthLe.mpr ⟨j, hj, rfl⟩
+  exact ⟨x, ⟨⟨i, hi, rfl⟩, h_mem_y⟩⟩
+· intro h
+  rcases h with ⟨x, ⟨⟨i, hi, hx⟩, ⟨j, hj, hy⟩⟩⟩
+  use [i, j, hi, hj]
+  rw [hx, hy]
+```

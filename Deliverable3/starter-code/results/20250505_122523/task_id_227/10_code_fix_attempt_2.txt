@@ -1,0 +1,13 @@
+The error occurs because of a precedence issue with the "if" condition. Lean is parsing
+
+  if minAB <= c then …
+
+as if you were partially applying the operator “<=” to the argument c. To fix this, simply add explicit parentheses around the comparison. Here’s the corrected version of the function implementation:
+
+------------------------------------------------------------
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  let minAB := if (a <= b) then a else b
+  if (minAB <= c) then minAB else c
+------------------------------------------------------------
+
+Now Lean will correctly interpret the conditions as Boolean expressions.

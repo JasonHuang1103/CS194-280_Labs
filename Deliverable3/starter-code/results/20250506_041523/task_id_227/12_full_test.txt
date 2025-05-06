@@ -1,0 +1,26 @@
+Lean Error: lean_playground/TempTest.lean:8:23: error: function expected at
+  c
+term has type
+  ℤ
+lean_playground/TempTest.lean:10:20: error: unexpected token 'using'; expected command
+lean_playground/TempTest.lean:25:2: error: tactic 'introN' failed, insufficient number of binders
+a b c : ℤ
+⊢ ((let m := if a ≤ b then a else b;
+        if m ≤ c then m else sorry) ≤
+        a ∧
+      (let m := if a ≤ b then a else b;
+          if m ≤ c then m else sorry) ≤
+          b ∧
+        (let m := if a ≤ b then a else b;
+          if m ≤ c then m else sorry) ≤
+          c) ∧
+    ((let m := if a ≤ b then a else b;
+        if m ≤ c then m else sorry) =
+        a ∨
+      (let m := if a ≤ b then a else b;
+          if m ≤ c then m else sorry) =
+          b ∨
+        (let m := if a ≤ b then a else b;
+          if m ≤ c then m else sorry) =
+          c)
+lean_playground/TempTest.lean:26:0: error: unexpected identifier; expected command

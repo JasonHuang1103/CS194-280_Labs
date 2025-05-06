@@ -1,0 +1,70 @@
+Below is a step‐by‐step explanation of what is going wrong in your proof. We’ll walk through the tactics and proof state, point out the mismatch between what you’re trying to prove and how you’re proving it, and finally suggest a direction for a fix.
+
+──────────────────────────────
+1. Tactic Failure
+
+• In your proof you use the command
+  by_cases h : ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+  · simp [h]
+  · simp [h]
+  
+in order to split the proof into two cases. In each branch you call simp [h]. However, Lean complains that in at least one case the goal
+
+  (a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0) ↔ (if a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 then true else false) = true
+
+remains unsolved. That means the simp tactic is not able to bridge the gap between the condition (a proposition) and the result of the if‐then‐else (a Bool equality).
+
+──────────────────────────────
+2. Proof State Analysis
+
+After unfolding the definitions (with unfold hasOppositeSign and hasOppositeSign_spec), your goal becomes an equivalence between two statements. On the left, you have a proposition:
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)
+and on the right, after the if‐then‐else, you have the boolean expression
+  (if (that same condition) then true else false) = true.
+  
+In the branch where by_cases gives you h: (a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0), the “if” reduces definitionally to true so that right side becomes “true = true”. However, the equivalence records the left hand side too. There is no built-in simp lemma to relate a proposition “P” with an equation like “(if P then true else false) = true”.
+
+──────────────────────────────
+3. Matching the Proof Approach to the Specification
+
+Your specification is
+  hasOppositeSign_spec a b result ≡ ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result.
+Since result is expected to be a Bool (namely, hasOppositeSign a b), your spec compares a proposition with a boolean equality to true. This is why there is a problem: you are mixing the world of Prop and Bool. In Lean 4 these are distinct, and while some boolean conditions can coerce to propositions, the equality “= true” on Booleans is not automatically equivalent to the original proposition.
+
+──────────────────────────────
+4. Type Mismatches and Incorrect Assumptions
+
+The core mistake is that your if–then–else definition returns a Bool, and then you are trying to prove a statement of the form “P ↔ (if … then true else false) = true”. This creates the following issues:
+
+• The left side is a proposition (of type Prop).
+• The right side is an equality between Booleans (which, although it can be turned into a Prop, does not simplify automatically using your simp [h] call).
+
+Thus, there is an implicit type mismatch: your spec is not phrased in a way that the boolean result is “brought into” the propositional world in a way that simp can see the definition.
+
+──────────────────────────────
+5. Bringing in an Alternative Strategy
+
+There are a couple of ways you might fix the issue:
+ • You can change your specification so that it compares Boolean values. For example, write
+  hasOppositeSign_spec a b : Prop := (hasOppositeSign a b = true) ↔ ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+  and then prove that.
+ • Alternatively, if you want to keep your current spec, you must add lemmas (or use a tactic) that “lift” the equality (if … then true else false) = true to the proposition that the condition holds. That is, you need a lemma saying something like:
+  lemma if_eq_true_iff {P : Prop} [Decidable P] : (if P then true else false) = true ↔ P := …
+  which can then be used by simp.
+ • Finally, you may also avoid the explicit by_cases if you structure the proof using known results about Booleans, for instance by showing that your definition of hasOppositeSign is definitionally equivalent to the predicate.
+
+──────────────────────────────
+Summary and Root Cause
+
+The unsolved goals stem from trying to prove an equivalence between a proposition and the boolean expression “(if ... then true else false) = true”. In a nutshell:
+ • The simp tactic does not “connect” the proven boolean equality (true = true, or false = true) with the original propositional condition.
+ • There is a type mismatch: Prop versus Bool equality.
+ • The specification does not relate these two worlds in a way that Lean can automatically simplify.
+
+To fix this, you should either:
+ – Adjust the specification so that it compares Boolean values (e.g. prove hasOppositeSign a b = true ↔ …),
+ – Or add the necessary lemmas that convert between a boolean “if P then true else false” and the proposition P, and then use them in your proof.
+
+This change will resolve the unsolved goals and allow the simp (or other tactics) to complete the proof.
+
+I hope this detailed analysis helps you understand the underlying error and points you in the right direction to fix your proof!

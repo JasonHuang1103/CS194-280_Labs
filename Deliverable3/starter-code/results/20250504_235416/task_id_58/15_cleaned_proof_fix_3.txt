@@ -1,0 +1,36 @@
+intro
+  split
+  · intro h
+    rcases h with ⟨ha, hb⟩ | ⟨ha, hb⟩
+    · exact mul_neg_of_neg_of_pos ha hb
+    · exact mul_neg_of_pos_of_neg ha hb
+  · intro h
+    have h' : a ≠ 0 ∧ b ≠ 0 := by
+      intro h''
+      cases h'' with ha hb
+      · rw [ha, zero_mul] at h
+        exact not_lt_zero 0 h
+      · rw [mul_zero] at h
+        exact not_lt_zero 0 h
+    rcases lt_trichotomy a 0 with ha | rfl | ha
+    · rcases lt_trichotomy b 0 with hb | hb | hb
+      · exfalso
+        have hpos : a * b > 0 := mul_pos_of_neg_of_neg ha hb
+        linarith
+      · exfalso
+        rw [hb] at h
+        exact not_lt_of_le (le_of_lt h) (lt_irrefl _)
+      · exact Or.inl ⟨ha, hb⟩
+    · exfalso
+      rcases h' with ⟨_, hb⟩
+      rw [zero_mul] at h
+      exact not_lt_zero _ h
+    · rcases lt_trichotomy b 0 with hb | rfl | hb
+      · exact Or.inr ⟨ha, hb⟩
+      · exfalso
+        rcases h' with ⟨ha, _⟩
+        rw [mul_zero] at h
+        exact not_lt_zero _ h
+      · exfalso
+        have hpos : a * b > 0 := mul_pos ha hb
+        linarith

@@ -1,0 +1,74 @@
+Below is an in‐depth analysis of what is going wrong with your proof. In brief, the issue comes from mixing the “boolean world” (with Bool values and the “= true” side conditions) with the “propositional world” (with ∃ and ↔ statements) and then trying to use the “any_spec” lemmas on a function that uses the “decide” wrapper. Let’s break down the reasoning step‐by‐step.
+
+──────────────────────────────
+1. Which tactic is failing and why
+
+• In your proof you do
+
+  apply Iff.intro  
+  intro ⟨i, j, hi, hj, heq⟩  
+  apply a.any_spec.2 ⟨i, hi, b.any_spec.2 ⟨j, hj, by simp [heq]⟩⟩
+
+Here you are trying to finish the “→” (mp) direction by feeding an existential witness into a lemma (“any_spec.2”) that turns an existence fact into the equality “a.any … = true”.
+
+• The error message says, in effect, that for the “mp” and “mpr” cases there remain unsolved goals. This is because the tactic application “apply a.any_spec.2 …” does not exactly match the goal. The lemma “Array.any_spec.2” is meant to show that if there is an index i such that P (a[i]) holds then “a.any P = true”. However, the predicate you use inside “any” is itself of the form λ x => b.any (λ y => decide (x = y)). That inner “decide” wrapper causes a mismatch with the expected type of predicate: the “any_spec” lemmas expect a predicate that is a Boolean function with a direct connection to the witness (via the decidable predicate), but here the inner decidability is “buried inside” the lambda in a way that the tactic does not automatically unfold.
+
+──────────────────────────────
+2. What is the proof state at that point?
+
+After calling “apply Iff.intro”, Lean splits the goal into two implications:
+ • In one branch, the goal is to prove that
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) →
+  a.any (λ x => b.any (λ y => decide (x = y))) = true.
+ • In the other branch, the goal is
+  a.any (λ x => b.any (λ y => decide (x = y))) = true →
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!).
+
+In each branch you try to invoke “a.any_spec” (and similarly “b.any_spec”), which themselves are equivalences between “a.any P = true” and an existential statement. However, those lemmas have as their hypothesis that the predicate “P” fits the exact form that “any_spec” expects. Because you used “λ y => decide (x = y)” rather than a predicate that is directly written as “λ y => …”, Lean does not automatically convert “decide (x = y)” to the Boolean value that the “any_spec” lemma would recognize.
+
+──────────────────────────────
+3. Does the proof approach match the specification?
+
+The specification you gave is
+
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+and you set result to be “hasCommonElement a b”, which computes
+
+  a.any (λ x => b.any (λ y => x = y)).
+
+Because x = y is a proposition (not a Bool) Lean internally uses “decide (x = y)” to get a Bool. (In other words, your implementation is really computing “a.any (λ x => b.any (λ y => decide (x = y)))”.) Thus your spec is matching a Boolean equality (≟ true) on the right but an ∃ on the left. Although this is perfectly reasonable in principle, you must connect the two worlds by using the “any_spec” lemmas correctly. The way the proof is written the connection is not coming out cleanly, so Lean ends up with “unsolved goals” that are essentially the conversion lemmas between “a.any P = true” and “∃ i, ...”.
+
+──────────────────────────────
+4. Type mismatches or incorrect assumptions
+
+There are several points where the types do not line up as expected:
+ • The predicate you give to “b.any” is “λ y => decide (x = y)”. The inner “decide” wraps a proposition (x = y) into a Bool, but the “any_spec” lemmas are formulated for predicates that already deliver a Bool.
+ • When you call “simp [heq]”, Lean does not automatically “unpack” the decide wrapper. In the end you are trying to use a lemma that expects a hypothesis of the form “(decide (a[i]! = b[j]!) = true)” while you only provided “a[i]! = b[j]!”, a proposition.
+ • There is a mismatch between a Boolean equality (“something = true”) and a logical statement (an existential). You must show that “hasCommonElement … = true” if and only if an existential holds. That connection is possible if you use the “_spec” lemmas, but only if the predicate is given in the expected form.
+
+──────────────────────────────
+5. Alternative proof strategies
+
+One alternative is to separate concerns:
+ • First, prove a lemma that states for any array A and any predicate P, one has:
+  a.any P = true ↔ ∃ i, i < a.size ∧ P (a[i]!) = true.
+ • Then prove separately that for the inner predicate, “b.any (λ y => decide (x = y)) = true ↔ ∃ j, j < b.size ∧ a[i]! = b[j]!”
+ • Finally, combine these two equivalences to obtain the equivalence required in the specification.
+
+Another approach is to “unfold” the definitions of “hasCommonElement” and “hasCommonElement_spec” manually and directly use a chain of rewriting steps with the lemmas you already have. Often one uses “rw [← ...]” to convert between a Boolean statement “p = true” and the corresponding proposition p.
+
+──────────────────────────────
+Conclusion and Root Cause
+
+The root of the problem is that your proof uses the “any_spec” lemmas in a context where the actual predicate is “λ y => decide (x = y)” rather than a plain Boolean predicate. This, together with the slight mismatch between the Boolean equality (result = true) and the intended existential proposition, leaves Lean with unsolved goals.
+
+To fix the proof you should consider one of these directions:
+
+• Adjust your implementation and/or specification so that the conversion from a Bool to a Prop is done explicitly. For example, prove and use lemmas that relate “a.any P = true” with “∃ i, P (a[i]!) = true”.  
+• Rewrite your proof to “unfold” the definitions of hasCommonElement and its spec so that the decision procedure is made explicit (using “decide_eq_true” or similar) so that Lean understands the connection between “decide (x = y) = true” and “x = y”.  
+• Alternatively, refactor your inner lambda so the predicate passed to “b.any” is directly in the Boolean form expected by “any_spec” (i.e. without the extra “decide” wrapping).
+
+By making the conversion between the Boolean and propositional statements explicit and ensuring you use the “any_spec” lemmas on predicates that match their expected types, the unsolved goals will be resolved.
+
+This should give you a clearer way forward in fixing the proof.

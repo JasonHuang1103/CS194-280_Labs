@@ -1,0 +1,4 @@
+{
+  "code": "a.foldl (fun acc x => acc && (n > x)) true",
+  "proof": "theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :\n  isGreater_spec n a (isGreater n a) := by\n  unfold isGreater isGreater_spec\n  induction a using Array.inductionOn with\n  | empty =>\n    simp\n    exact Iff.rfl  -- In an empty array case, `n > a[i]` is vacuously true for all `i`.\n  | push x a ih =>\n    rw [Array.foldl_push, ih]\n    simp\n    split\n    \u00b7 intro h\n      constructor\n      \u00b7 apply h\n        apply Nat.lt.base\n      \u00b7 intro i hi\n        apply h\n        exact Nat.succ_lt_succ hi\n    \u00b7 intro \u27e8hx, h\u27e9\n      intro i\n      apply Nat.casesOn i\n      \u00b7 exact hx\n      \u00b7 intro i\n        exact h i"
+}

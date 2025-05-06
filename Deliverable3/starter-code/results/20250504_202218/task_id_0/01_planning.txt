@@ -1,0 +1,51 @@
+Below is a detailed plan outlining the steps needed to implement the function and prove that its specification is satisfied.
+
+───────────────────────────────────────────────  
+Step 1. Implementation  
+───────────────────────────────────────────────  
+• The function is named ident and takes a natural number x.  
+• Its job is to return a natural number that equals x.  
+• The simplest implementation is to just return x.  
+
+Thus, we will set:  
+  def ident (x : Nat) : Nat := x
+
+───────────────────────────────────────────────  
+Step 2. Specifying the Contract  
+───────────────────────────────────────────────  
+• We define a predicate ident_spec that, given an x and a result, asserts that the result equals x.  
+• The specification remains:  
+  ident_spec x result := result = x  
+
+───────────────────────────────────────────────  
+Step 3. Proving the Specification  
+───────────────────────────────────────────────  
+• We need to prove that for any natural number x, ident_spec x (ident x) holds.  
+• Since ident x is defined as x, the proof should show that x equals x.  
+• Proof strategy: use the properties of equality. Lean’s reflexivity (rfl) is sufficient as x = x holds by definition.  
+• We can start by "unfolding" the definitions of ident and ident_spec to see that it reduces to x = x.   
+• Then simply apply the reflexivity tactic.  
+
+───────────────────────────────────────────────  
+Step 4. Code Insertion  
+───────────────────────────────────────────────  
+The template code will have two main parts where we insert our implementation and our proof.
+
+For the function:  
+  -- << CODE START >>  
+  x  
+  -- << CODE END >>
+
+For the theorem:  
+  -- << PROOF START >>  
+  rfl  
+  -- << PROOF END >>
+
+───────────────────────────────────────────────  
+Summary  
+───────────────────────────────────────────────  
+1. Define ident as returning the input number x.  
+2. The specification is that the output equals the input.  
+3. Prove the theorem by using reflexivity since the equality holds by definition.  
+
+This plan ensures that the function meets the specification, and the proof is as simple as showing x = x.

@@ -1,0 +1,21 @@
+```
+apply And.intro
+· apply And.intro
+  · apply Int.le_min
+  · apply Int.le_min
+· have : min a b = a ∨ min a b = b :=
+    by apply min_choice
+  cases this with
+  | inl ha =>
+    have : min (min a b) c = a ∨ min (min a b) c = c :=
+      by apply min_choice
+    cases this with
+    | inl h1 => exact Or.inl h1
+    | inr h2 => exact Or.inr (Or.inr h2)
+  | inr hb =>
+    have : min (min a b) c = b ∨ min (min a b) c = c :=
+      by apply min_choice
+    cases this with
+    | inl h1 => exact Or.inr (Or.inl h1)
+    | inr h2 => exact Or.inr (Or.inr h2)
+```

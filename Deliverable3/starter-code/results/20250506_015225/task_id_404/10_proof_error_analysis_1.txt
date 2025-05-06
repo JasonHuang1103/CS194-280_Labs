@@ -1,0 +1,67 @@
+Below is an analysis of what’s going wrong step‐by‐step. (Recall that, in Lean, “bullet notation” must be used very carefully so that each proof branch is closed; in addition, one must be sure that the lemmas used “fit” the goal.) In our case, two issues are “at play.”
+
+──────────────────────────────
+1. Failing tactic: The problematic point is in one branch of the case analysis (“by_cases”) where you write
+
+  rw [if_neg h]
+  apply Int.le_of_not_le h
+
+In that branch (the case when a ≤ b is false) the goal is to prove that 
+  (b ≤ a ∧ b ≤ b) ∧ (b = a ∨ b = b).
+More specifically, you need to prove b ≤ a, even though you only have h : ¬ a ≤ b. (Note that b ≤ b and b = b are trivially true.) The tactic call 
+  apply Int.le_of_not_le h 
+does not work correctly here for two reasons:
+ • First, it is not clear that a lemma named Int.le_of_not_le exists with the type you need. In fact, the standard idea is that when you have ¬(a ≤ b) for integers you can deduce b < a (using, say, the “not_le” lemma) and then deduce b ≤ a from that by the fact that “x < y” implies “x ≤ y.”
+ • Second, even if such a lemma existed, Lean reports “unsolved goals” in the current branch. That means after applying that tactic your branch still contains subgoals.
+
+──────────────────────────────
+2. The proof state:  
+When you start the proof, you do
+  unfold myMin myMin_spec
+so that you “see” the if–then–else structure from the definition as well as the two parts of your specification. Then you do a “split” to show that you need to prove both
+
+  (result ≤ a ∧ result ≤ b) and (result = a ∨ result = b).
+
+In each conjunct you then do a “by_cases h : a ≤ b.” For example, in the case when h is true you rewrite and get, say, “a” in place of myMin a b, so your goal becomes
+  (a ≤ a ∧ a ≤ b) ∧ (a = a ∨ a = b).
+This is trivial (since a ≤ a and a = a are true) but your proof did not actually finish the job there with an explicit “exact” or “rfl” tactic in that branch. (Some branches are left “hanging”.)
+
+Likewise, in the branch when h is false the goal becomes
+  (b ≤ a ∧ b ≤ b) ∧ (b = a ∨ b = b).
+Even though b = b is trivial, you still have to prove (b ≤ a) from the falsehood of a ≤ b (and to do that correctly, you must use the appropriate lemma).
+
+──────────────────────────────
+3. Matching the proof to the specification:  
+Your specification (“myMin_spec”) says that (result ≤ a ∧ result ≤ b) and (result = a ∨ result = b). The proof should do a case split on the condition a ≤ b, showing that in one case the result is a (hence a ≤ a and a ≤ b, and a = a is trivial) and in the other the result is b (so b ≤ b, b = b are trivial, and you must prove b ≤ a using that a ≤ b is false).
+
+The overall strategy is sound, but the way you’ve written the bullets and tactics leaves some branches incomplete.
+
+──────────────────────────────
+4. Type mismatches and incorrect assumptions:  
+(a) The use of “apply Int.le_of_not_le h” is suspect. (If you meant to say that ¬(a ≤ b) implies b < a—and hence b ≤ a—you should use the proper lemma. For instance, one common method is to obtain “b < a” from ¬(a ≤ b) (by a lemma named something like Int.not_le.mp) and then conclude b ≤ a from b < a using, for example, a “le_of_lt” lemma.)
+
+(b) The bullet notation “·” in several places is not correctly balanced. In Lean 4 the bullet (or “dot”) notation requires that each branch be indented consistently. The message “unexpected token ‘·’; expected command” indicates that at least one bullet was not in the proper context.
+
+──────────────────────────────
+5. Alternative proof strategies and suggestion for a fix:  
+One possible remedy is to avoid repeating “by_cases” inside each sub-proof and instead use tactics that automatically split the “if”–expression. For example, you might consider using the tactic “split_ifs” which will automatically create two subgoals corresponding to the condition. Then in each branch you’d finish with:
+ – In the “if_true” branch, use reflexivity and the obvious inequality proofs.
+ – In the “if_false” branch, first convert ¬(a ≤ b) into b < a (using a lemma such as Int.not_le.mp, if available), then use the fact that b < a implies b ≤ a.
+
+Also, it is best to be explicit in each branch. Rather than leaving a “by_cases” branch with only a rewrite and a tactic call, follow it with explicit “exact” or “rfl” for those trivial parts of the conjunction/disjunction.
+
+──────────────────────────────
+Summary of the root cause and directions for fixing:
+
+• The error arises because one branch (or several branches) created by your “by_cases” on a ≤ b is left incomplete. In particular, after rewriting with if_pos/if_neg and calling “apply Int.le_of_not_le”, there remain unsolved subgoals.  
+• In addition, the particular lemma “Int.le_of_not_le” does not appear to be a correct or type‐compatible way to obtain the inequality you need; you must instead derive “b < a” from ¬(a ≤ b) and then conclude b ≤ a.
+• Finally, the bullet (“·”) notation is mis‐aligned in your proof. This causes Lean to think that some tokens are “unexpected.”
+
+To fix these issues, you may:  
+ – Replace your case analysis with “split_ifs”, or else be very careful with indentation when using “by_cases”.  
+ – Replace “apply Int.le_of_not_le h” with a sequence that uses the proper lemma to deduce b < a from ¬ a ≤ b (for example, using “have : b < a := Int.not_le.mp h” if such a lemma is available) and then use an appropriate “le_of_lt” to conclude b ≤ a.  
+ – Ensure that every branch is completely closed (for example, concluding obvious parts by “exact le_refl a” or “rfl”) so that Lean sees no “unsolved goals.”
+
+By adjusting the bullet structure and using the correct lemma to pass from ¬(a ≤ b) to b ≤ a, the proof should go through.
+
+This detailed analysis points to both an issue with tactic/bullet structure and with the misuse (or misapplication) of an inequality lemma.

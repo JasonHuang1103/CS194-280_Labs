@@ -1,0 +1,14 @@
+```lean
+simp
+split
+· split
+  · by_cases h : a ≤ b
+    · simp [h]
+    · simp [h, not_le.1 h]
+  · by_cases h : a ≤ b
+    · simp [h, le_of_lt (not_le.1 h)]
+    · simp [h]
+· by_cases h : a ≤ b
+  · simp [h]
+  · simp [h]
+```

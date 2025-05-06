@@ -1,0 +1,8 @@
+rw [Array.size_eq_length, List.toArray_toList, List.ofFn],
+simp_rw [List.get_ofFn],
+constructor
+· intro h i hi
+  apply h i hi
+· intro h i hi
+  apply h i
+  assumption

@@ -1,0 +1,28 @@
+The logical idea behind your proof is fine—it correctly shows that isGreater returns true exactly when every element in a is less than n. However, the error comes from the use of the Array indexing “bang” notation (that is, a[i]!) versus the “plain” version (a[i]). In the spec you wrote
+
+  (∀ i, i < a.size → n > a[i]!) ↔ result
+
+while after unfolding and simplifying (using simp [List.all]) Lean ends up comparing two statements that use different ways of “getting” elements from the array. In particular, it shows that the goal is
+
+  (∀ i < a.size, a[i]! < n) ↔ ∀ (i : ℕ) (x : i < a.size), a[i] < n
+
+Even though these two sides are “logically” equivalent, they are not definitionally the same: a[i]! and a[i] are not seen as identical by Lean. (The notation a[i]! is a shortcut for an array-get operation that promises the index is valid, whereas a[i] in the other context comes from the conversion using List.get_ofFn.) As a result, simple tactics like simp cannot close the goal because it cannot “reconcile” the differences between these two expressions.
+
+A promising way to fix this issue is to be consistent in your definitions. For example, you might define your spec (and possibly even your implementation) without using the “!” notation, e.g.
+
+  def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+    (∀ i : ℕ, i < a.size → n > a[i]) ↔ result
+
+or, alternatively, use the “!” version in both places (by providing the appropriate coercions or rewriting lemmas to show the two forms are equivalent). In other words, you’ll need to either supply a lemma that rewrites one form into the other (so that simp or your future tactics can close the goal) or rephrase your spec to use one style of indexing consistently.
+
+To summarize:
+
+• The error is not from a logical mistake but from the fact that after unfolding and simplifying, Lean is left with a goal comparing
+  (∀ i, i < a.size → a[i]! < n)
+to
+  (∀ i : ℕ, (∀ x, i < a.size → a[i] < n)),
+and the pieces a[i]! and a[i] are not definitionally equal.
+
+• The remedy is to make your definitions use the same (or definitionally equivalent) notion of “getting” an element from an Array so that the rewriting works seamlessly.
+
+Once you adjust your spec (or add the proper rewriting lemmas), Lean should be happy with the proof.

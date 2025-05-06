@@ -1,0 +1,12 @@
+split_ifs with h
+· apply And.intro
+  · apply And.intro
+    · exact le_refl a
+    · exact h
+  · exact Or.inl rfl
+· have h' : b ≤ a := not_le.mp h
+  apply And.intro
+  · apply And.intro
+    · exact h'
+    · exact le_refl b
+  · exact Or.inr rfl

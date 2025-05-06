@@ -1,0 +1,3 @@
+apply And.intro
+  · exact Array.size_map a (fun x => x * x * x)
+  · intro i hi; exact Array.getElem_map a (fun x => x * x * x) i hi

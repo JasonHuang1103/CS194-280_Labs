@@ -1,0 +1,14 @@
+The root issue is that your proof is trying to refer to the local identifier minAB that appears only inside the definition of minOfThree. When you unfold minOfThree in the proof, the let‐binding for minAB is inlined and its name is lost, so later references like
+
+  simp only [minAB]  
+  cases h₁ with | inl hminAB => …  
+
+fail because minAB is not in scope. In other words, pattern matching on “minAB = a ∨ minAB = b” doesn’t work because minAB was only a locally bound name inside the implementation of minOfThree. Lean then issues errors such as “unknown identifier 'minAB'” and even confuses parts of the code expecting a function (e.g. at ‘c’).
+
+To fix the problem you have two main directions:
+
+1. Change the proof so that it does not refer to the internal variable minAB. Instead, work directly with the definition of minOfThree (using its conditional structure) rather than naming its intermediate let–binding.
+
+2. Alternatively, refactor your definition so that the intermediate minimum (minAB) is defined at a level accessible to both your implementation and your proof. For example, you could define an auxiliary function or a “where” clause that names the minimum of a and b outside of the inline let–binding. Then you can refer to that name in your proof.
+
+In summary, the error comes from trying to use a let–bound variable (minAB) from the definition of minOfThree in your proof after unfolding it, but that name is no longer available. Adjust your proof so it does not rely on that internal name, or refactor the definition so that the needed name is explicitly provided in the global context.

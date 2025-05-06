@@ -1,0 +1,65 @@
+Below is a “play‐by‐play” of what is happening and why the error is raised.
+
+─────────────────────────────  
+1. Which tactic is failing and why
+
+The error message says that we have an unsolved goal:
+ 
+  ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧ ((b < a → b = a) ∨ (a ≤ b → a = b)) 
+
+The error is produced because after we call
+
+  unfold myMin myMin_spec  
+  simp  
+
+the goal is not completely solved but we immediately issue a command “split”. The “split” tactic is expected to break up the conjunction in the goal into two subgoals. However, due to the way bullets and case splits (“by_cases”) are organized (or mis‐organized) the resulting “subproofs” are not using the correct structure. In short, some of the split sub-goals remain “unsolved.” 
+
+─────────────────────────────  
+2. Consider the proof state at that point
+
+After the “unfold” and “simp”, Lean is left with a goal that is a conjunction of two parts. Its second conjunct (the disjunction of equalities) has been “simplified” into something that looks like
+  ((b < a → b = a) ∨ (a ≤ b → a = b)),
+which is not the same as saying “(result = a) ∨ (result = b)” (with result being the if–then–else). In the chosen proof approach one must prove both conjuncts:
+ • that the minimum is ≤ a and b,
+ • and that the minimum equals one or the other.
+The proof then “splits” the goal and then uses bullet notation with “by_cases” to try to cover both cases. But because of indentation and bullet-structure issues the subgoals are not being closed.
+
+─────────────────────────────  
+3. Check if the proof approach matches the specification
+
+The specification in myMin_spec is that
+  (result ≤ a ∧ result ≤ b) ∧ (result = a ∨ result = b).
+After unfolding the definitions, the goal becomes an expression that is logically equivalent (after “simp”) to something like
+  ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧ ((b < a → b = a) ∨ (a ≤ b → a = b)).
+Notice the second conjunct does not “directly” talk about the equality but rather gives an implication form. In our case‐analysis the “by_cases” splits focus only on the “if a ≤ b” branch and then on the “else” branch (using not_le) -- but the structure of the goal means that in one branch we must show “left (…)” and in the other “right (…)”. Our proof tactic “simp” underneath our by_cases does not automatically solve the goals for these implications.
+ 
+─────────────────────────────  
+4. Identify any type mismatches or incorrect assumptions
+
+One potential pitfall is the use of “not_le.mp h”. In the else‐branch you are assuming not (a ≤ b) which Lean turns into b < a. Then your “simp” calls with “not_le.mp h” become a bit hairy: you are trying to prove something like “(if condition then a else b) ≤ a” knowing that b < a (or similar). In the equality part, you pattern-match using “left” or “right” with the wrong hypothesis. Hence, the proof makes “incorrect assumptions” about the outcome of the if–then–else and the simplifications do not give Lean enough information to discharge all the necessary subgoals.
+
+Furthermore, the “bullet” style using “·” in Lean 4 is sensitive to indentation. In our proof the “split” and the bullet blocks are not indented to signal that they form one complete proof. Then Lean finds an “unexpected identifier – expected command” after line 23.
+
+─────────────────────────────  
+5. Consider alternative proof strategies
+
+One possible alternative strategy is to proceed by cases on the condition a ≤ b for the whole goal. For example, instead of doing an initial “unfold, simp, split” and then case-splitting for each conjunct, one might write
+
+  by_cases h : a ≤ b  
+  · simp [h]  
+  · simp [h, not_le.mp h]
+
+or even use the tactic “split_ifs” which handles the if–then–else automatically. This strategy avoids manually “splitting” the goal and hence also avoids some of the pitfalls with bullet indentation and the matching of hypotheses.
+
+─────────────────────────────  
+Conclusion: Detailed analysis of the root cause and fix direction
+
+The root cause of the error is twofold:
+
+ • The tactic “split” along with the bullet (·) style is not structured correctly after the “simp” command. This leads Lean to believe that the subgoals, especially the conjunct that asserts one of the equalities, are never completely solved.
+
+ • The case analysis (using “by_cases” and then “simp [h]” or “simp [h, not_le.mp h]”) does not match exactly the goal that results from unfolding the definitions. In particular, you end up with an implication (b < a → b = a) or (a ≤ b → a = b) that is not directly discharged by the given simplification.
+
+A good direction for fixing this would be to reorganize the proof structure. For example, one might first do a “by_cases” on “a ≤ b” (thus handling each branch of the if–then–else completely) and then in each branch simply show the two parts of the specification. Alternatively, consider using the “split_ifs” tactic to let Lean handle the if–then–else automatically. Finally, be sure that the bullet notation (or indentation of subproofs) is correct so that every subgoal is properly nested and ultimately solved.
+
+By reordering the case splits and double-checking the indentation you should be able to make Lean see that all subgoals have been discharged.

@@ -1,0 +1,10 @@
+Lean Error: lean_playground/TempTest.lean:7:2: error: function expected at
+  a.toList.all fun x => decide (n > x)
+term has type
+  Bool
+lean_playground/TempTest.lean:9:34: error: unexpected token 'to'; expected command
+lean_playground/TempTest.lean:20:40: error: unsolved goals
+n : ℤ
+a : Array ℤ
+⊢ (∀ i < a.size, a[i]! < n) ↔ sorry () = true
+lean_playground/TempTest.lean:24:0: error: unexpected identifier; expected command

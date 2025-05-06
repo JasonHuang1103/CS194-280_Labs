@@ -1,0 +1,73 @@
+Below is a step-by-step analysis of the error and the underlying problem:
+
+─────────────────────────────  
+1. Tactic and Error Identification
+
+The error message states:
+
+  error: unknown constant 'Array.inductionOn'
+
+This error occurs at the line:
+
+  induction a using Array.inductionOn
+
+Here, Lean cannot find any definition for Array.inductionOn. Essentially, the tactic is trying to use a non-existent induction principle for Array, and so Lean complains by indicating that “Array.inductionOn” is an unknown constant.
+
+─────────────────────────────  
+2. Proof State at the Point of Error
+
+At the point where the error is thrown, the proof has the following parameters:
+  • n : Int  
+  • a : Array Int
+
+The proof is attempting to perform an induction on a which is an Array Int. However, Lean either does not provide a built-in induction principle for Arrays or it is not named Array.inductionOn. Without a proper induction principle for arrays, Lean does not know how to break down the structure of the array recursively.
+
+─────────────────────────────  
+3. Matching the Proof Approach with the Specification
+
+The specification for isGreater_spec is stated over Arrays, but the intended idea is to show an equivalence between the behavior of foldl (as defined in isGreater) and the property “∀ i, i < a.size → n > a[i]”. The proof approach is by induction on the structure of the array. However, since an induction principle for Array is not available under the name Array.inductionOn, the chosen approach does not match the actual data structure provided by Lean.
+
+In Lean’s mathlib and Lean 4 standard library, there are standard induction principles available for lists, but not necessarily for arrays. It is common when working with arrays to convert them to lists (using a.toList) in order to perform induction or recursion.
+
+─────────────────────────────  
+4. Type Mismatches and Incorrect Assumptions
+
+The proof assumes:
+  induction a using Array.inductionOn
+But there is no such constant. This is the core issue—the tactic is trying to apply an induction principle on an Array that Lean doesn’t know about. Aside from this, the rest of the proof makes assumptions typical for lists (using cons and nil) which align with a list structure rather than an array.
+
+This mismatch between data types means the induction hypothesis (and even the pattern matching with nil/cons) is built for a list rather than an Array. Without conversion, this causes both a type mismatch and an invalid assumption.
+
+─────────────────────────────  
+5. Alternative Proof Strategies
+
+To fix the problem, consider one of the following strategies:
+
+ a. Convert the array to a list:
+  You can use a.toList and perform the induction on that list. For example:
+   induction a.toList with
+   | nil => …  
+   | cons head tail ih => …
+
+ b. Use the definitions of Array operations directly:
+  Alternatively, you could work directly with the foldl definition of isGreater and use properties of fold operations rather than performing structural induction on the array.
+
+Both approaches would align the proof with established data structures—lists have an induction principle in Lean, so converting the array with a.toList is a sound method.
+
+─────────────────────────────  
+Conclusion and Direction for Fix
+
+The root cause of the error is that the proof attempts to use an induction principle for Arrays by writing “induction a using Array.inductionOn” when no such constant exists in Lean. The intended structure used in the proof (nil and cons) is not applicable to Array, which does not have the directly destructible structure as lists do.
+
+To fix the proof, you should convert the array to a list (e.g., via a.toList) and then perform induction on the resulting list. This aligns your inductive proof with a valid induction principle and respects the underlying data structure’s properties.
+
+For example, one might begin the proof with something similar to:
+
+  let l := a.toList  
+  induction l with  
+  | nil => …  
+  | cons head tail ih => …
+
+This change should resolve the error and allow you to proceed with proving the result based on the list’s structure.
+
+By reviewing the error, understanding the current type of a, and acknowledging that Array.inductionOn does not exist, we can re-strategize the approach by converting arrays to lists and thereby properly use induction.

@@ -1,0 +1,14 @@
+simp
+split
+· split
+  · by_cases h : a ≤ b
+    · simp [h]
+    · simp [h, not_le.mp h]
+  · by_cases h : a ≤ b
+    · simp [h]
+    · simp [h, not_le.mp h]
+· by_cases h : a ≤ b
+  · left
+    simp [h]
+  · right
+    simp [h, not_le.mp h]

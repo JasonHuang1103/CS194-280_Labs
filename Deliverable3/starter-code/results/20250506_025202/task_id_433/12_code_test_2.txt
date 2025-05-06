@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:7:2: error: invalid field 'all?', the environment does not contain 'List.all?'
+  a.toList
+has type
+  List ℤ
+lean_playground/TempTest.lean:17:8: warning: declaration uses 'sorry'

@@ -1,0 +1,9 @@
+simp [List.all]
+constructor
+· intro h i hi
+  have : n > a[i]! := h _ (List.get_ofFn i hi)
+  assumption
+· intro h x hx
+  rcases List.exists_of_get_ofFn hx with ⟨i, hi, rfl⟩
+  apply h i
+  exact hi

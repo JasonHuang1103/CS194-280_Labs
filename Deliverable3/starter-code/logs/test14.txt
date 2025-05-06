@@ -1,0 +1,318 @@
+RAG components successfully imported.
+Starting test of 6 tasks: task_id_227, task_id_404, task_id_431, task_id_433, task_id_435, task_id_447
+
+==================================================
+Processing task task_id_227...
+Reading problem description and code template from tasks/task_id_227...
+Problem description length: 608 characters
+Reading unit tests...
+Unit tests length: 339 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_015225
+Processing task: task_id_227 (Task index: 0)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'minOfThree'...
+Response saved to results/20250506_015225/task_id_227/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_015225/task_id_227/02_proof_rag_examples.txt
+Response saved to results/20250506_015225/task_id_227/03_planning.txt
+Response saved to results/20250506_015225/task_id_227/04_raw_code.txt
+Response saved to results/20250506_015225/task_id_227/05_cleaned_code.txt
+Response saved to results/20250506_015225/task_id_227/06_code_test.txt
+Response saved to results/20250506_015225/task_id_227/07_raw_proof.txt
+Response saved to results/20250506_015225/task_id_227/08_cleaned_proof.txt
+Response saved to results/20250506_015225/task_id_227/09_full_test.txt
+Response saved to results/20250506_015225/task_id_227/10_proof_error_analysis_1.txt
+Response saved to results/20250506_015225/task_id_227/11_proof_fix_attempt_1.txt
+Response saved to results/20250506_015225/task_id_227/12_cleaned_proof_fix_1.txt
+Response saved to results/20250506_015225/task_id_227/13_full_test_attempt_1.txt
+Response saved to results/20250506_015225/task_id_227/14_proof_error_analysis_2.txt
+Response saved to results/20250506_015225/task_id_227/15_proof_fix_attempt_2.txt
+Response saved to results/20250506_015225/task_id_227/16_cleaned_proof_fix_2.txt
+Response saved to results/20250506_015225/task_id_227/17_full_test_attempt_2.txt
+Response saved to results/20250506_015225/task_id_227/18_proof_error_analysis_3.txt
+Response saved to results/20250506_015225/task_id_227/19_proof_fix_attempt_3.txt
+Response saved to results/20250506_015225/task_id_227/20_cleaned_proof_fix_3.txt
+Response saved to results/20250506_015225/task_id_227/21_full_test_attempt_3.txt
+Response saved to results/20250506_015225/task_id_227/22_final_solution.txt
+Solution generated in 317.35 seconds
+Generated code length: 68 characters
+Generated proof length: 611 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:25:2: error: tactic 'introN' failed, insufficient number of binders
+a b c : ℤ
+⊢ ((if a ≤ b then if a ≤ c then a else c e...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_404...
+Reading problem description and code template from tasks/task_id_404...
+Problem description length: 483 characters
+Reading unit tests...
+Unit tests length: 228 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_015225
+Processing task: task_id_404 (Task index: 1)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'myMin'...
+Response saved to results/20250506_015225/task_id_404/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_015225/task_id_404/02_proof_rag_examples.txt
+Response saved to results/20250506_015225/task_id_404/03_planning.txt
+Response saved to results/20250506_015225/task_id_404/04_raw_code.txt
+Response saved to results/20250506_015225/task_id_404/05_cleaned_code.txt
+Response saved to results/20250506_015225/task_id_404/06_code_test.txt
+Response saved to results/20250506_015225/task_id_404/07_raw_proof.txt
+Response saved to results/20250506_015225/task_id_404/08_cleaned_proof.txt
+Response saved to results/20250506_015225/task_id_404/09_full_test.txt
+Response saved to results/20250506_015225/task_id_404/10_proof_error_analysis_1.txt
+Response saved to results/20250506_015225/task_id_404/11_proof_fix_attempt_1.txt
+Response saved to results/20250506_015225/task_id_404/12_cleaned_proof_fix_1.txt
+Response saved to results/20250506_015225/task_id_404/13_full_test_attempt_1.txt
+Response saved to results/20250506_015225/task_id_404/14_proof_error_analysis_2.txt
+Response saved to results/20250506_015225/task_id_404/15_proof_fix_attempt_2.txt
+Response saved to results/20250506_015225/task_id_404/16_cleaned_proof_fix_2.txt
+Response saved to results/20250506_015225/task_id_404/17_full_test_attempt_2.txt
+Response saved to results/20250506_015225/task_id_404/18_proof_error_analysis_3.txt
+Response saved to results/20250506_015225/task_id_404/19_proof_fix_attempt_3.txt
+Response saved to results/20250506_015225/task_id_404/20_cleaned_proof_fix_3.txt
+Response saved to results/20250506_015225/task_id_404/21_full_test_attempt_3.txt
+Response saved to results/20250506_015225/task_id_404/22_final_solution.txt
+Solution generated in 228.34 seconds
+Generated code length: 22 characters
+Generated proof length: 136 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:19:32: error: unsolved goals
+case pos
+a b : ℤ
+h : a ≤ b
+⊢ (a ≤ a ∧ a ≤ b) ∧ (a = a ∨ a = b)
+
+case neg
+a b : ℤ
+h : ¬a ≤ b...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_431...
+Reading problem description and code template from tasks/task_id_431...
+Problem description length: 597 characters
+Reading unit tests...
+Unit tests length: 465 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_015225
+Processing task: task_id_431 (Task index: 2)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'hasCommonElement'...
+Response saved to results/20250506_015225/task_id_431/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_015225/task_id_431/02_proof_rag_examples.txt
+Response saved to results/20250506_015225/task_id_431/03_planning.txt
+Response saved to results/20250506_015225/task_id_431/04_raw_code.txt
+Response saved to results/20250506_015225/task_id_431/05_cleaned_code.txt
+Response saved to results/20250506_015225/task_id_431/06_code_test.txt
+Response saved to results/20250506_015225/task_id_431/07_raw_proof.txt
+Response saved to results/20250506_015225/task_id_431/08_cleaned_proof.txt
+Response saved to results/20250506_015225/task_id_431/09_full_test.txt
+Response saved to results/20250506_015225/task_id_431/10_proof_error_analysis_1.txt
+Response saved to results/20250506_015225/task_id_431/11_proof_fix_attempt_1.txt
+Response saved to results/20250506_015225/task_id_431/12_cleaned_proof_fix_1.txt
+Response saved to results/20250506_015225/task_id_431/13_full_test_attempt_1.txt
+Response saved to results/20250506_015225/task_id_431/14_proof_error_analysis_2.txt
+Response saved to results/20250506_015225/task_id_431/15_proof_fix_attempt_2.txt
+Response saved to results/20250506_015225/task_id_431/16_cleaned_proof_fix_2.txt
+Response saved to results/20250506_015225/task_id_431/17_full_test_attempt_2.txt
+Response saved to results/20250506_015225/task_id_431/18_proof_error_analysis_3.txt
+Response saved to results/20250506_015225/task_id_431/19_proof_fix_attempt_3.txt
+Response saved to results/20250506_015225/task_id_431/20_cleaned_proof_fix_3.txt
+Response saved to results/20250506_015225/task_id_431/21_full_test_attempt_3.txt
+Response saved to results/20250506_015225/task_id_431/22_final_solution.txt
+Solution generated in 250.00 seconds
+Generated code length: 35 characters
+Generated proof length: 297 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:18:54: error: unsolved goals
+case mp
+a b : Array ℤ
+⊢ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) → (a.any fun x => ...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_433...
+Reading problem description and code template from tasks/task_id_433...
+Problem description length: 646 characters
+Reading unit tests...
+Unit tests length: 367 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_015225
+Processing task: task_id_433 (Task index: 3)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'isGreater'...
+Response saved to results/20250506_015225/task_id_433/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_015225/task_id_433/02_proof_rag_examples.txt
+Response saved to results/20250506_015225/task_id_433/03_planning.txt
+Response saved to results/20250506_015225/task_id_433/04_raw_code.txt
+Response saved to results/20250506_015225/task_id_433/05_cleaned_code.txt
+Response saved to results/20250506_015225/task_id_433/06_code_test.txt
+Response saved to results/20250506_015225/task_id_433/07_raw_proof.txt
+Response saved to results/20250506_015225/task_id_433/08_cleaned_proof.txt
+Response saved to results/20250506_015225/task_id_433/09_full_test.txt
+Response saved to results/20250506_015225/task_id_433/10_proof_error_analysis_1.txt
+Response saved to results/20250506_015225/task_id_433/11_proof_fix_attempt_1.txt
+Response saved to results/20250506_015225/task_id_433/12_cleaned_proof_fix_1.txt
+Response saved to results/20250506_015225/task_id_433/13_full_test_attempt_1.txt
+Response saved to results/20250506_015225/task_id_433/14_proof_error_analysis_2.txt
+Response saved to results/20250506_015225/task_id_433/15_proof_fix_attempt_2.txt
+Response saved to results/20250506_015225/task_id_433/16_cleaned_proof_fix_2.txt
+Response saved to results/20250506_015225/task_id_433/17_full_test_attempt_2.txt
+Response saved to results/20250506_015225/task_id_433/18_proof_error_analysis_3.txt
+Response saved to results/20250506_015225/task_id_433/19_proof_fix_attempt_3.txt
+Response saved to results/20250506_015225/task_id_433/20_cleaned_proof_fix_3.txt
+Response saved to results/20250506_015225/task_id_433/21_full_test_attempt_3.txt
+Response saved to results/20250506_015225/task_id_433/22_final_solution.txt
+Solution generated in 252.97 seconds
+Generated code length: 42 characters
+Generated proof length: 410 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:18:40: error: unsolved goals
+n : ℤ
+a : Array ℤ
+⊢ (∀ i < a.size, n > a[i]!) ↔ Array.foldl (fun acc x => acc && decide (n ...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_435...
+Reading problem description and code template from tasks/task_id_435...
+Problem description length: 596 characters
+Reading unit tests...
+Unit tests length: 231 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_015225
+Processing task: task_id_435 (Task index: 4)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'lastDigit'...
+Response saved to results/20250506_015225/task_id_435/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_015225/task_id_435/02_proof_rag_examples.txt
+Response saved to results/20250506_015225/task_id_435/03_planning.txt
+Response saved to results/20250506_015225/task_id_435/04_raw_code.txt
+Response saved to results/20250506_015225/task_id_435/05_cleaned_code.txt
+Response saved to results/20250506_015225/task_id_435/06_code_test.txt
+Response saved to results/20250506_015225/task_id_435/07_raw_proof.txt
+Response saved to results/20250506_015225/task_id_435/08_cleaned_proof.txt
+Response saved to results/20250506_015225/task_id_435/09_full_test.txt
+Response saved to results/20250506_015225/task_id_435/10_final_solution.txt
+Solution generated in 59.37 seconds
+Generated code length: 6 characters
+Generated proof length: 30 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_447...
+Reading problem description and code template from tasks/task_id_447...
+Problem description length: 691 characters
+Reading unit tests...
+Unit tests length: 234 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_015225
+Processing task: task_id_447 (Task index: 5)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'cubeElements'...
+Response saved to results/20250506_015225/task_id_447/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_015225/task_id_447/02_proof_rag_examples.txt
+Response saved to results/20250506_015225/task_id_447/03_planning.txt
+Response saved to results/20250506_015225/task_id_447/04_raw_code.txt
+Response saved to results/20250506_015225/task_id_447/05_cleaned_code.txt
+Response saved to results/20250506_015225/task_id_447/06_code_test.txt
+Response saved to results/20250506_015225/task_id_447/07_raw_proof.txt
+Response saved to results/20250506_015225/task_id_447/08_cleaned_proof.txt
+Response saved to results/20250506_015225/task_id_447/09_full_test.txt
+Response saved to results/20250506_015225/task_id_447/10_proof_error_analysis_1.txt
+Response saved to results/20250506_015225/task_id_447/11_proof_fix_attempt_1.txt
+Response saved to results/20250506_015225/task_id_447/12_cleaned_proof_fix_1.txt
+Response saved to results/20250506_015225/task_id_447/13_full_test_attempt_1.txt
+Response saved to results/20250506_015225/task_id_447/14_proof_error_analysis_2.txt
+Response saved to results/20250506_015225/task_id_447/15_proof_fix_attempt_2.txt
+Response saved to results/20250506_015225/task_id_447/16_cleaned_proof_fix_2.txt
+Response saved to results/20250506_015225/task_id_447/17_full_test_attempt_2.txt
+Response saved to results/20250506_015225/task_id_447/18_proof_error_analysis_3.txt
+Response saved to results/20250506_015225/task_id_447/19_proof_fix_attempt_3.txt
+Response saved to results/20250506_015225/task_id_447/20_cleaned_proof_fix_3.txt
+Response saved to results/20250506_015225/task_id_447/21_full_test_attempt_3.txt
+Response saved to results/20250506_015225/task_id_447/22_final_solution.txt
+Solution generated in 198.70 seconds
+Generated code length: 26 characters
+Generated proof length: 75 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:19:42: error: unsolved goals
+case left
+a : Array ℤ
+⊢ (Array.map (fun x => x * x * x) a).size = a.size
+
+case right
+a : Ar...
+✅ Implementation passes unit tests
+❌ Proof has errors
+Testing Summary:
+Task task_id_227:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 317.3487310409546 seconds
+---
+Task task_id_404:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 228.33962321281433 seconds
+---
+Task task_id_431:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 249.99801516532898 seconds
+---
+Task task_id_433:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 252.97136902809143 seconds
+---
+Task task_id_435:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 59.37098407745361 seconds
+---
+Task task_id_447:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 198.70284295082092 seconds
+---

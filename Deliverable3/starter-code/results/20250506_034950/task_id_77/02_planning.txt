@@ -1,0 +1,88 @@
+Below is the step‐by‐step reasoning behind our implementation and proof plan:
+
+──────────────────────────────
+Step 1. Understand the Function’s Goal
+
+• The function must take an integer n and return a Boolean value.
+• It returns true if and only if n is divisible by 11. In Lean terms, n is divisible by 11 if n % 11 = 0.
+• The specification given says: “n % 11 = 0 ↔ result”. In other words, the Boolean result must reflect the fact that n % 11 equals 0.
+
+──────────────────────────────
+Step 2. Break Down the Problem
+
+• Implementation: We need to check the remainder when n is divided by 11.
+  – In Lean, the modulo operator “%” can be used with Int.
+  – We can obtain a Boolean by comparing n % 11 to 0.
+  – Lean’s boolean equality is written as “==”. (Using “==” instead of “=” is needed since “=” in Lean denotes a Proposition while “==” is for decidable Boolean equality.)
+  
+• Specification: We have a predicate isDivisibleBy11_spec that relates the arithmetic condition (n % 11 = 0) with the result value.
+  – The theorem we need to prove shows that our implementation indeed satisfies the logical specification.
+  
+──────────────────────────────
+Step 3. Consider Input Types, Edge Cases, and Expected Behavior
+
+• Input type: n is of type Int. Since integers in Lean include negatives, we note that:
+  – For example, (-11) % 11 is 0, so our check should correctly return true.
+  – No additional data bounds or exceptional cases are needed.
+
+• Expected behavior: For any integer n, the Boolean value “(n % 11 == 0)” works correctly across all cases.
+
+──────────────────────────────
+Step 4. Choosing the Proof Technique
+
+• The theorem “isDivisibleBy11_spec_satisfied” unfolds the definitions:
+  – After unfolding, we are left with proving n % 11 = 0 ↔ (n % 11 == 0).
+  – Because our implementation directly uses “n % 11 == 0” as the computed Boolean, the two sides are definitionally equivalent.
+  
+• Thus the proof can be concluded by a simple “rfl” (reflexivity), once we have unfolded our definitions.
+  
+──────────────────────────────
+Step 5. Recognizing Similar Patterns
+
+• The pattern of “defining a specification predicate and then proving the implementation satisfies it” is common.
+• In many cases the proof is just unfolding the definition and applying reflexivity. Our situation is analogous.
+
+──────────────────────────────
+Detailed Plan for Implementation and Proof
+
+1. Implementation:
+   • Define the function isDivisibleBy11 such that for any integer n it returns the Boolean value of “n % 11 == 0”. Using “==” is important because it produces a Bool (as needed by the output).
+
+2. Specification and Proof:
+   • Write the specification predicate: isDivisibleBy11_spec n result as “n % 11 = 0 ↔ result”.
+   • For the theorem isDivisibleBy11_spec_satisfied, the proof will:
+     - Unfold both isDivisibleBy11 and isDivisibleBy11_spec.
+     - Show that after unfolding, both sides of the equivalence coincide.
+     - Conclude with “rfl” (reflexivity).
+
+──────────────────────────────
+Below is the complete Lean 4 code following our plan:
+
+-------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation:
+def isDivisibleBy11 (n : Int) : Bool :=
+  -- We check if the remainder on division by 11 equals zero.
+  n % 11 == 0
+
+-- Theorem specification: result is true exactly when n is divisible by 11
+def isDivisibleBy11_spec (n : Int) (result : Bool) : Prop :=
+  n % 11 = 0 ↔ result
+
+-- Theorem: Our implementation satisfies the specification.
+theorem isDivisibleBy11_spec_satisfied (n : Int) :
+  isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+  -- Unfold the definitions of the function and the spec predicate.
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  -- The two sides are definitionally equal, so we finish by reflexivity.
+  rfl
+-------------------------------------------------
+
+This plan meets the problem description:
+• We implemented the function that returns a Boolean checking divisibility by 11.
+• We specified the expected relation between the result and the arithmetic condition.
+• We proved the equivalence by unfolding definitions and applying reflexivity.
+
+This completes our detailed plan for both the implementation and its specification proof in Lean 4.

@@ -1,0 +1,22 @@
+```lean
+induction' a using Array.rec with xs ih
+· simp
+simp
+split
+· intro h i hlt
+  simp at h
+  cases Decidable.em (i < xs.size) with
+  | inl hlt' =>
+    rw [Array.size_cons] at hlt
+    cases i with
+    | zero => exact h 0 (by simp [hlt'])
+    | succ i' =>
+      exact h (i' + 1) (by simp [hlt, hlt'])
+  | inr hnlt =>
+    rw [iot, Nat.not_lt] at hnlt
+    contradict hlt
+    exact hnlt
+
+· intro h
+  simp [ih, h]
+```

@@ -1,0 +1,50 @@
+Lean Error: lean_playground/TempTest.lean:8:23: error: function expected at
+  c
+term has type
+  ℤ
+lean_playground/TempTest.lean:10:20: error: unexpected token 'using'; expected command
+lean_playground/TempTest.lean:22:46: error: unsolved goals
+case isTrue
+a b c : ℤ
+h✝ : a ≤ b
+⊢ ((let m := a;
+        if m ≤ c then m else sorry) ≤
+        a ∧
+      (let m := a;
+          if m ≤ c then m else sorry) ≤
+          b ∧
+        (let m := a;
+          if m ≤ c then m else sorry) ≤
+          c) ∧
+    ((let m := a;
+        if m ≤ c then m else sorry) =
+        a ∨
+      (let m := a;
+          if m ≤ c then m else sorry) =
+          b ∨
+        (let m := a;
+          if m ≤ c then m else sorry) =
+          c)
+
+case isFalse
+a b c : ℤ
+h✝ : ¬a ≤ b
+⊢ ((let m := b;
+        if m ≤ c then m else sorry) ≤
+        a ∧
+      (let m := b;
+          if m ≤ c then m else sorry) ≤
+          b ∧
+        (let m := b;
+          if m ≤ c then m else sorry) ≤
+          c) ∧
+    ((let m := b;
+        if m ≤ c then m else sorry) =
+        a ∨
+      (let m := b;
+          if m ≤ c then m else sorry) =
+          b ∨
+        (let m := b;
+          if m ≤ c then m else sorry) =
+          c)
+lean_playground/TempTest.lean:26:0: error: unexpected token '·'; expected command

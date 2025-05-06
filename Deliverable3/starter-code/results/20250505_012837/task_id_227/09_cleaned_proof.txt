@@ -1,0 +1,29 @@
+cases lt_or_le a b with
+| inl h₁ =>
+  cases lt_or_le a c with
+  | inl h₂ =>
+    apply And.intro
+    · apply And.intro
+      · apply le_of_lt h₁
+      · apply le_of_lt h₂
+    · left; rfl
+  | inr h₂ =>
+    apply And.intro
+    · apply And.intro
+      · apply le_of_lt h₁
+      · exact h₂
+    · right; right; rfl
+| inr h₁ =>
+  cases lt_or_le b c with
+  | inl h₂ =>
+    apply And.intro
+    · apply And.intro
+      · exact h₁
+      · apply le_of_lt h₂
+    · right; left; rfl
+  | inr h₂ =>
+    apply And.intro
+    · apply And.intro
+      · exact h₁
+      · exact h₂
+    · right; right; rfl

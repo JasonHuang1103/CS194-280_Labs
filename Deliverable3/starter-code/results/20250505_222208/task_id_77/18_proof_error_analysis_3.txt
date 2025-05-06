@@ -1,0 +1,64 @@
+Below is one example of what went wrong. In our proof we write
+
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  simp only
+  split_ifs
+  { exact Iff.rfl }
+  { simp }
+
+but Lean reports that “simp made no progress” (and then “unexpected identifier; expected command”).
+
+I’ll now explain step‐by‐step what happens and where the error lies:
+
+1. Identifying the failing tactic
+
+  The first “simp only” call is the culprit. In Lean 4 (and in some modes of Lean 3) the tactic “simp only” expects a list of rewriting rules that it should use—but here none are given. In our case the “unfold” has already expanded the definitions so that the goal becomes
+
+   n % 11 = 0 ↔ (if n % 11 = 0 then true else false).
+
+  One would expect that after unfolding the “if … then … else …”, the work could be finished by a “split_ifs” to consider the two cases. However, “simp only” (with no lemmas) does not “make progress” on that goal; Lean sees that no rewriting happened and signals an error.
+
+2. Considering the proof state
+
+  After the “unfold” the goal is exactly
+   n % 11 = 0 ↔ (if n % 11 = 0 then true else false).
+  This is the specification we want to prove. The idea is to do a case analysis on the Boolean test inside the “if”. In essence we want to show that when n % 11 equals 0 the “if” yields true (and the equivalence is definitional), and in the other branch, a similar argument holds. Thus the plan is good but our “simp only” call does nothing before “split_ifs” is reached.
+
+3. Checking proof approach vs. specification
+
+  The intended approach is to unfold the definitions, and then to split the “if” construct using “split_ifs” to treat the two cases. That idea is “on track” with the specification (since isDivisibleBy11_spec is defined as an equivalence between n % 11 = 0 and the result of the if–then–else). However, calling “simp only” with no arguments doesn’t change the goal; in fact it does nothing in this case.
+
+4. Type mismatches or incorrect assumptions
+
+  There is no real type error in the mathematics or in the unfolding. Instead, the “simp” call is “misused” in that it does not simplify anything. In Lean 4 the tactic “simp only” expects a list of lemmas (or a bracketted list) – writing “simp only” by itself may be flagged as an error if no progress is made. The subsequent command “split_ifs” is then parsed incorrectly (or the tactic state is not what the parser expected), yielding the further complaint “unexpected identifier; expected command.”
+
+5. Alternative proof strategies
+
+  One could fix the error by:
+  • Either removing the “simp only” call altogether (if it does not affect the goal) or
+  • Replacing it with a “simp” (or “simp only []”) that will “do nothing” but not cause an error.
+  Also, one might call “split_ifs” immediately after “unfold …” so that the if–then–else expression is directly case analyzed. In fact, one acceptable proof would be
+
+   unfold isDivisibleBy11 isDivisibleBy11_spec
+   split_ifs
+   · exact Iff.rfl
+   · simp
+
+  That shows that if n % 11 is 0 the equivalence holds by reflexivity, otherwise (when n % 11 ≠ 0) a “simp” finishes the discharge of the goal.
+
+Detailed Analysis and Conclusion
+
+The root cause is that “simp only” was called with no rewriting rules and it did not simplify the goal at all. Lean’s tactic framework in Lean 4 (with its stricter checking of “progress”) then complains that the simp tactic made no progress. As a consequence, when the next tactic “split_ifs” is encountered, the parser or tactic state is not what is expected (leading to “unexpected identifier; expected command”). 
+
+To fix the error, one should either remove the “simp only” call altogether or provide the desired rewrite rules (or simply replace it with “simp” if its work is needed). In our proof the “simp only” turned out to be unnecessary at all. So the corrected proof would be:
+
+  theorem isDivisibleBy11_spec_satisfied (n : Int) :
+    isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+    unfold isDivisibleBy11 isDivisibleBy11_spec
+    split_ifs
+    · exact Iff.rfl
+    · simp
+
+This revision makes the case analysis work correctly and avoids the error about “simp made no progress.”
+
+By following the steps above—verifying which tactic (simp only) was not contributing to simplifying the goal, examining the goal after unfolding, and understanding the requirements for a proper tactical command in Lean—we identify that the extra “simp only” was the root cause of the error.

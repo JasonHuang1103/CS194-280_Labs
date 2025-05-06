@@ -1,0 +1,69 @@
+Below is one way to plan the solution. In our approach we must do two things: (1) implement the function hasOppositeSign and (2) prove that the function satisfies the specification given by hasOppositeSign_spec. Here is a step‐by‐step plan outlining the key steps for both parts.
+
+──────────────────────────────
+Step 1. Designing the Function Implementation
+
+The requirement is to return true if one integer is positive and the other is negative (with zero not qualifying as either). A clear way to reflect this is to check:
+ • If a is less than 0, then in order to have opposite signs b must be greater than 0.
+ • Else if a is greater than 0, then b must be less than 0.
+ • Else (if a equals 0) return false immediately.
+In Lean, a good idiom is to structure the function with nested if–then–else expressions. One plausible implementation is:
+ if a < 0 then
+  b > 0
+ else if a > 0 then
+  b < 0
+ else
+  false
+
+Note that the Booleans b > 0 and b < 0 use comparisons that return Bool, and all cases cover a producing a Bool.
+
+──────────────────────────────
+Step 2. Defining the Specification
+
+The specification is given as:
+ (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+
+This logical equivalence states that the Boolean result of our function is true exactly when a and b have opposite (nonzero) signs. Our function must exactly match this predicate. Once our function is implemented in the way described, it is expected to align directly with the two cases outlined in the specification.
+
+──────────────────────────────
+Step 3. Proving the Specification
+
+The theorem hasOppositeSign_spec_satisfied should prove that for any integers a and b, the implementation hasOppositeSign a b satisfies the condition established in hasOppositeSign_spec.
+
+To write this proof:
+1. Unfold the definitions of both hasOppositeSign and hasOppositeSign_spec. This expands the if–then–else structure and the logical equivalence.
+
+2. Perform a case analysis on a:
+ • Case 1: a < 0. In this case, hasOppositeSign reduces to (b > 0) and the left-hand side of the specification reduces to (b > 0) (because then (a < 0 ∧ b > 0) is in force and (a > 0 ∧ b < 0) is automatically false).
+ • Case 2: a > 0. Here, hasOppositeSign reduces to (b < 0) and similarly the specification becomes equivalent to (b < 0).
+ • Case 3: a = 0. Here, our function returns false; meanwhile, the specification is false because neither (0 < 0 ∧ b > 0) nor (0 > 0 ∧ b < 0) holds (due to the inequality with zero).
+
+3. In each case, show the equivalence between the condition from the if–then–else and the corresponding logical condition from the specification (you may use simp, split, or simple reasoning tactics).
+
+4. Conclude by either explicitly doing case analysis (using “by cases” in Lean) or by directly using the equivalence properties of if–then–else constructs.
+
+──────────────────────────────
+Step 4. Putting it Together in a Lean Module
+
+Your file will have sections:
+ • The import statements
+ • The implementation of hasOppositeSign
+ • The definition of the specification hasOppositeSign_spec
+ • The theorem hasOppositeSign_spec_satisfied along with its proof
+
+Both the function and the theorem should clearly reflect the intended two “cases” (depending on whether a is negative, positive, or zero).
+
+──────────────────────────────
+Summary
+
+1. Implementation:
+ - Use nested if expressions to check the sign of a.
+ - For a < 0, return (b > 0); for a > 0, return (b < 0); otherwise, return false.
+
+2. Proof:
+ - Unfold the definitions.
+ - Break into cases depending on the sign of a.
+ - Verify that the Boolean returned by the function matches the logical statement
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0).
+
+This plan should give you a clear guide to implement and then prove the required function meets the given specification in Lean 4.

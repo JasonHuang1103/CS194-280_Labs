@@ -1,0 +1,1 @@
+simp [Nat.mod_lt, Nat.zero_le]

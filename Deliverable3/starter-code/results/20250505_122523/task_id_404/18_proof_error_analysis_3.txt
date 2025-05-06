@@ -1,0 +1,60 @@
+Below is an explanation of what is “wrong” with this proof and one way to think about fixing it.
+
+1. The proof script unfolds your definitions and then “splits” the if–then–else by using
+  split_ifs with h
+so that you get two cases:
+ • the “then‐branch” where Lean adds h : a ≤ b to the context, and
+ • the “else‐branch” where Lean adds h : ¬ a ≤ b.
+
+2. In each branch you write a proof “by exact …”. For example, in the then–branch you try
+  exact ⟨⟨le_refl a, h⟩, Or.inl rfl⟩
+That proof term is meant to show
+ (a ≤ a ∧ a ≤ b) ∧ (a = a ∨ a = b)
+by using le_refl for a ≤ a and the hypothesis h for a ≤ b. (Similarly, the else–branch uses not_le.mp h to show b ≤ a, etc.)
+
+3. However, Lean complains in the “case pos” (the then–branch) that there is an unsolved goal,
+even though your “exact …” looks like it should have finished the branch. In fact the underlying
+problem is that the “if splitting” has not been “closed” properly before you move on to the next
+branch. In Lean 4 the syntax for using bullet markers (the Unicode “·”) inside tactic blocks is
+sensitive to indentation and “structure.” A symptom of an “unsolved goal” combined with a message
+like “unexpected token ‘·’; expected command” is that Lean did not associate the two bullet–marked
+cases as two branches of the split_ifs. (In other words, the reaction you see is because Lean still
+expects you to solve the very first branch before encountering a new bullet.)
+
+4. In our case the “root cause” is not the “logic” of your proof but rather its structure: because
+you use split_ifs (which creates multiple subgoals) you must close each subgoal fully before
+starting the next. When the first branch is not “closed” (or if the tactic chain is mis‐indented)
+Lean later sees a bullet “·” at the beginning of a line that does not start a new tactic command.
+
+Suggested direction for a fix:
+ • Make sure that each branch of the split_ifs gets its own complete proof and that the bullet
+  markers are correctly indented.
+ • For example, you might “chain” the tactics by writing a begin…end block or by aligning the bullets
+  properly. One approach is to “open” two goals with split_ifs and then immediately solve each one
+  with its own block. For instance, you could try something like:
+
+-----------------------------------------------------------
+theorem myMin_spec_satisfied (a b : Int) :
+  myMin_spec a b (myMin a b) :=
+by
+  unfold myMin myMin_spec
+  split_ifs
+  case pos =>
+    exact ⟨⟨le_refl a, ‹a ≤ b›⟩, Or.inl rfl⟩
+  case neg =>
+    -- Here you may need to explicitly derive b ≤ a from ¬ a ≤ b.
+    exact ⟨⟨(Int.not_le.mp ‹¬ a ≤ b›), le_refl b⟩, Or.inr rfl⟩
+-----------------------------------------------------------
+
+Notice two things in this revision:
+ – Using the “case pos =>” and “case neg =>” syntax (instead of bullet “·”) helps Lean see that
+  you are providing proofs for each branch.
+ – Ensure that the proofs in each case are “complete” (with no unsolved parts).
+
+Once the cases are clearly separated and each branch is finished, Lean will no longer warn about
+unsolved goals or unexpected tokens.
+
+In summary, the error is not in the definitions or the “mathematical” parts of your proof but in the
+proof‐script’s structure. The bullet markers (the Unicode “·”) and their indentation lead Lean to think
+that there are unsolved goals. Separating the cases with explicit “case … =>” clauses (or else carefully
+adjusting the bullets) will tell Lean how to dispatch each branch of the split‐if structure.

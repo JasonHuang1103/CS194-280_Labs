@@ -1,0 +1,104 @@
+Below is our step‐by‐step reasoning process and the accompanying detailed plan for both the Lean function implementation and its correctness proof.
+
+──────────────────────────────
+Step 1. Understand the Problem
+
+• The function must check whether a given integer n is divisible by 11.
+• “Divisible by 11” means that n % 11 = 0.
+• Accordingly, our function should return true when n % 11 = 0 and false otherwise.
+
+──────────────────────────────
+Step 2. Break Down into Subproblems
+
+a. Implementation:
+   – We need to implement isDivisibleBy11 so that it checks if n % 11 = 0.
+   – In Lean, a natural way is to use an if-then-else construct:
+       if n % 11 = 0 then true else false.
+   – Note: In Lean the modulo operator (%) is defined for Int and returns the remainder.
+   
+b. Specification:
+   – The specification predicate is given by:
+       n % 11 = 0 ↔ result.
+   – That is, if result is the output of our function, then the equivalence n % 11 = 0 is true exactly when result = true.
+
+c. Proof:
+   – We need to prove that for every integer n, the function’s output (computed with our implementation) satisfies the specification.
+   – When we unfold the definitions, we obtain:
+         n % 11 = 0 ↔ (if n % 11 = 0 then true else false).
+   – This equivalence is immediate. The proof can be done by a case split on the condition (n % 11 = 0).
+
+──────────────────────────────
+Step 3. Consider Input Types, Edge Cases, and Expected Behavior
+
+• Input type is Int. Lean’s Int type handles both positive and negative numbers.
+• The modulo operation works similarly for negative numbers as well (keeping in mind Lean’s definition of %).
+• No additional edge cases are needed because the function is simply checking the equality n % 11 = 0.
+
+──────────────────────────────
+Step 4. Choose Appropriate Proof Techniques
+
+• The proof uses a simple unfolding (or simplification) strategy:
+   – Unfold the definitions of isDivisibleBy11 and isDivisibleBy11_spec.
+   – Then, perform a case analysis on the condition (n % 11 = 0) using the if-then-else structure.
+• The proof is essentially a direct equivalence by definition.
+
+──────────────────────────────
+Step 5. Identify Similar Patterns
+
+• A common pattern in Lean proofs is proving that:
+      P ↔ (if P then true else false)
+  which is true by a simple case split.
+• The manual cases:
+    o When n % 11 = 0, then the if branch returns true, so the equivalence becomes (true ↔ true).
+    o When n % 11 ≠ 0, then the if branch returns false, so the equivalence becomes (false ↔ false).
+
+──────────────────────────────
+Detailed Implementation and Proof Plan
+
+1. Implementation:
+   – Write the isDivisibleBy11 function using:
+         def isDivisibleBy11 (n : Int) : Bool := if n % 11 = 0 then true else false
+
+2. Proof:
+   – State the theorem isDivisibleBy11_spec_satisfied.
+   – Unfold the definitions using the "unfold" tactic.
+   – Do a case analysis using "split" or "by_cases" on the condition n % 11 = 0.
+   – Handle each branch (the if and else) to show that the equivalence holds.
+   – Lean’s simplifier is likely smart enough that after unfolding the definitions, the result is evident.
+
+──────────────────────────────
+The Completed Lean Code
+
+Below is the final code based on our plan:
+
+-------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def isDivisibleBy11 (n : Int) : Bool :=
+  -- << CODE START >>
+  if n % 11 = 0 then true else false
+  -- << CODE END >>
+
+-- Specification: The result is true if n is divisible by 11, false otherwise.
+def isDivisibleBy11_spec (n : Int) (result : Bool) : Prop :=
+  -- << SPEC START >>
+  n % 11 = 0 ↔ result
+  -- << SPEC END >>
+
+theorem isDivisibleBy11_spec_satisfied (n : Int) :
+  isDivisibleBy11_spec n (isDivisibleBy11 n) :=
+by
+  -- << PROOF START >>
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  by_cases h: n % 11 = 0
+  · -- Case: n % 11 = 0
+    simp [h]  -- Here the if expression becomes "if true then true else false" which reduces to true.
+  · -- Case: n % 11 ≠ 0
+    simp [h]  -- Here the if becomes "if false then true else false" which reduces to false.
+  -- << PROOF END >>
+
+-------------------------------------------------
+
+This plan and implementation fully address the problem description.

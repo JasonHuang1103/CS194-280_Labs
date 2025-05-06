@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then\n  if a \u2264 c then a else c\nelse\n  if b \u2264 c then b else c",
+  "proof": "intro\nsplit_ifs with h1 h2 h3 h4\nall_goals {\n  rw minOfThree_spec,\n  apply And.intro,\n}\n\u00b7 -- Case 1: a \u2264 b and a \u2264 c\n  exact \u27e8h1, h2, le_refl _\u27e9,\n  left,\n  rfl\n\u00b7 -- Case 2: a \u2264 b and \u00ac a \u2264 c\n  have hc : c < a := lt_of_not_le h2,\n  exact \u27e8le_of_lt hc, h1, le_refl _\u27e9,\n  right, right,\n  rfl\n\u00b7 -- Case 3: \u00ac a \u2264 b and b \u2264 c\n  have ha : a < b := lt_of_not_le h1,\n  exact \u27e8le_of_lt ha, le_refl _, h3\u27e9,\n  right, left,\n  rfl   \n\u00b7 -- Case 4: \u00ac a \u2264 b and \u00ac b \u2264 c\n  have hb : c < b := lt_of_not_le h3,\n  have ha : a < b := lt_of_not_le h1,\n  exact \u27e8le_of_lt (lt_trans hb ha), le_of_lt hb, le_refl _\u27e9,\n  right, right,\n  rfl"
+}

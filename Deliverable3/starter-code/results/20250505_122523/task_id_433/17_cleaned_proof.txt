@@ -1,0 +1,7 @@
+simp [List.all, decide_eq_true_eq]
+apply Iff.intro
+· intros h i hi
+  exact h (a.getElem i) ⟨i, hi⟩
+· intro h
+  intros x ⟨i, hi⟩
+  exact h i hi

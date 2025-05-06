@@ -1,0 +1,12 @@
+split
+· intro h
+  apply List.all_iff_forall.mp
+  simp at h
+  intro ix hix
+  exact h ix hix
+· intro h
+  apply List.all_iff_forall.mpr
+  intro b hb
+  cases List.index_of_mem hb with ix hix
+  simp at hix
+  exact h ix (by simp [hix])

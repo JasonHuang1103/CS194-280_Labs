@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:21:9: error: tactic 'unfold' failed to unfold 'isDivisibleBy11' at
+  n % 11 = 0 ↔ (if n % 11 = 0 then true else false) = true

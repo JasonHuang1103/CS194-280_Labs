@@ -1,0 +1,7 @@
+```
+split_ifs
+case pos =>
+  exact ⟨⟨le_refl a, h⟩, Or.inl rfl⟩
+case neg =>
+  exact ⟨⟨not_le.mp h, le_refl b⟩, Or.inr rfl⟩
+```

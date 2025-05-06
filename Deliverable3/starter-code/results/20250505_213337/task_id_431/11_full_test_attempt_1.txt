@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:21:6: error: unknown constant 'Array.any_iff_mem'
+lean_playground/TempTest.lean:18:54: error: unsolved goals
+a b : Array ℤ
+⊢ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ (a.any fun x => b.contains x) = true

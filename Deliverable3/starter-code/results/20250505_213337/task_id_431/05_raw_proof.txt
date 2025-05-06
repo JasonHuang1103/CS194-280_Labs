@@ -1,0 +1,12 @@
+```lean
+simp
+constructor
+· intro h
+  obtain ⟨i, hi, hx⟩ := Array.exists_index_of_mem h
+  use i, Array.indexOf o hx, hi
+  simp [hx, Array.contains_eq]
+· intro ⟨i, j, hi, hj, he⟩
+  apply Array.any_iff_mem.2
+  use a[i]!, hi
+  simp [←he, hj, Array.contains_eq]
+```

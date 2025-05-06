@@ -1,0 +1,15 @@
+The error comes from the stray non‐comment text in your file. In Lean every line of text must be either valid Lean code or commented out. In your snippet the line
+
+  This change replaces "x = y" with "x == y", so that the lambdas return Boolean values as expected by Array.any.
+
+is not commented and thus causes the errors. To fix the issue in the function implementation, remove (or comment out) the extra text. The fixed function implementation is:
+
+------------------------------------------------
+import Mathlib
+import Aesop
+
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  Array.any a (fun x => Array.any b (fun y => x == y))
+------------------------------------------------
+
+This version contains only valid Lean code for the definition of hasCommonElement.

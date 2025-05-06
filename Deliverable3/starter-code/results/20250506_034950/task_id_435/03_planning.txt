@@ -1,0 +1,108 @@
+Below is a detailed walkthrough of the reasoning process followed by a concrete plan for the implementation and the proof.
+
+──────────────────────────────
+Step 1. Understanding the Function Specification
+
+• The function is named lastDigit and takes a non-negative natural number n as input.
+• It must return the last (rightmost) digit of n, which is the remainder of n when divided by 10.
+• In Lean’s natural numbers, the operator n % 10 calculates this remainder.
+• The result must lie between 0 and 9. That property must be captured by the predicate lastDigit_spec:
+    - (0 ≤ result ∧ result < 10) 
+    - and by the fact that result is equal to n % 10.
+
+──────────────────────────────
+Step 2. Breaking Down the Problem
+
+• Implementation:  
+  – Simply implement the function lastDigit as n % 10.
+  – There is no need for recursion or any special cases because the % operator already handles the computation.
+  
+• Specification:  
+  – The predicate lastDigit_spec takes an integer n and an integer result and requires two things:
+      • result is in the interval [0, 10), and 
+      • result equals n % 10.
+  
+• Theorem lastDigit_spec_satisfied:  
+  – We need to show that lastDigit n satisfies the specification; that is:
+       lastDigit_spec n (lastDigit n)
+
+──────────────────────────────
+Step 3. Considering Input Types, Edge Cases, and Expected Behavior
+
+• Input Types:  
+  – n is a Nat (natural number), which in Lean is by definition non-negative.
+  
+• Edge Cases:  
+  – The smallest possible input is 0.
+  – For n = 0, 0 % 10 returns 0, which is in the desired range.
+  
+• Expected Behavior:  
+  – No extra conditions or error handling is needed because the input guarantees non-negativity.
+  – The remainder operation (%) on natural numbers n and 10 always gives a number between 0 and 9 when 10 ≠ 0.
+
+──────────────────────────────
+Step 4. Proof Techniques Consideration
+
+• To prove the theorem, we will “unfold” (or simplify) the definitions of lastDigit and lastDigit_spec.
+• After unfolding, the goal becomes:
+    (0 ≤ n % 10 ∧ n % 10 < 10) ∧ (n % 10 = n % 10)
+
+• The equality n % 10 = n % 10 is trivial by reflexivity.
+• The two inequalities need to be proved separately:
+  – First inequality: Since by definition and properties of % (and because n and 10 are natural numbers), n % 10 is always at least 0. Lean’s library often contains a lemma (such as Nat.zero_le) showing that for any natural number, 0 ≤ n % 10.
+  – Second inequality: There is a standard lemma Nat.mod_lt which states that for any natural number n and any positive m, n % m < m. Here we will apply it with m = 10 and use the fact that 10 is positive.
+  
+• The proof is short and it uses these standard properties from Lean’s math library.
+
+──────────────────────────────
+Step 5. Similar Patterns and Helpful Examples
+
+• Examples in Lean documentation show pattern matching or using if…else, but our use-case is much simpler.
+• In other proofs, unfolding the definitions and applying known facts (like reflexivity, zero_le, and mod_lt) is common.
+• The structure of splitting the conjunction and proving each part separately is also a standard technique in Lean proofs.
+
+──────────────────────────────
+Detailed Plan for Implementation and Proof
+
+1. Implementation of lastDigit:
+   • Write the function lastDigit such that it returns n % 10.
+   • Code in Lean will be as follows:
+   
+     def lastDigit (n : Nat) : Nat :=
+       n % 10
+
+2. Specification Construction:
+   • The predicate lastDigit_spec is already given; it ensures two conditions:
+     - The result is between 0 and 9.
+     - The result equals n % 10.
+   • No changes are needed here.
+
+3. Proof of Theorem lastDigit_spec_satisfied:
+   • Begin by unfolding both lastDigit and lastDigit_spec.
+   • The goal will reduce to proving:
+        (0 ≤ n % 10 ∧ n % 10 < 10) ∧ (n % 10 = n % 10)
+   • The reflexivity part (n % 10 = n % 10) is trivial (by rfl).
+   • For the inequalities:
+       - For 0 ≤ n % 10, use Nat.zero_le (or a similar fact).
+       - For n % 10 < 10, use Nat.mod_lt n 10 along with the fact that 10 > 0.
+   • Combine these proofs using tactics like split.
+   
+   • A sample proof script in Lean:
+   
+         theorem lastDigit_spec_satisfied (n : Nat) :
+           lastDigit_spec n (lastDigit n) := by
+           unfold lastDigit lastDigit_spec
+           split
+           · split
+             · exact Nat.zero_le (n % 10)
+             · exact Nat.mod_lt n (by decide)
+           · rfl
+
+   • Note: The "by decide" tactic confirms that 10 > 0.
+
+──────────────────────────────
+Conclusion
+
+The plan is to implement lastDigit simply as n % 10. The proof that the function meets the specification involves unfolding the definitions and using standard lemmas about modulo arithmetic on natural numbers. By applying reflexivity for equality and appropriate lemmas for the inequality properties, we complete the theorem proof.
+
+This detailed plan covers both the implementation and the correctness proof of your Lean 4 function.

@@ -1,0 +1,79 @@
+Below is a detailed plan for how to approach the implementation and proof.
+
+──────────────────────────────
+Step 1. Implementation of the Function
+
+• We need to write a function called myMin that takes two integers, a and b, and returns the smaller integer.
+
+• A straightforward way is to use an if–then–else statement:
+  if a ≤ b then a else b
+
+• This ensures that when a is less than or equal to b, we return a; otherwise, we return b.
+
+──────────────────────────────
+Step 2. Specification of the Function
+
+• The specification, called myMin_spec, has two parts:
+  (1) The result is less than or equal to both a and b.
+  (2) The result is equal to either a or b.
+
+• In Lean, we express this as:
+  (result ≤ a ∧ result ≤ b) ∧ (result = a ∨ result = b)
+
+• This means that the minimum value really comes from the two inputs.
+
+──────────────────────────────
+Step 3. Proving that the Function Meets the Specification
+
+The goal is to prove the theorem myMin_spec_satisfied, that for any a and b, myMin a b satisfies myMin_spec a b.
+
+Here’s the plan to prove the theorem:
+
+1. Unfold the definitions of myMin and myMin_spec. This will replace the definitions with their underlying code.
+
+2. Use case analysis on the if–then–else structure in myMin.
+  – In the first branch, assume a ≤ b:
+   • Then myMin a b returns a.
+   • You need to show: a ≤ a (which is trivial) and a ≤ b (which follows by assumption).
+   • Moreover, show that the result is either a or b. In this case, it is obviously equal to a.
+
+  – In the second branch, assume ¬(a ≤ b) which means b < a:
+   • Then myMin a b returns b.
+   • Show that b ≤ a (which follows from b < a) and b ≤ b (trivial).
+   • Also, show that the result is either a or b. Here, it is equal to b.
+
+3. For both cases, use tactics such as split, cases, or by simp, using the appropriate arithmetic or logical reasoning (for example, the simp tactic might automatically handle simple inequalities).
+
+──────────────────────────────
+Step 4. Writing Out the Lean Code
+
+For the implementation section in the template, you would replace {{code}} with:
+
+  if a ≤ b then a else b
+
+For the proof section, you would replace {{proof}} with a case analysis outline similar to:
+
+  cases' h : (a ≤ b) with h₁ h₂  -- split into case a ≤ b and ¬(a ≤ b)
+  • In the first case (h : a ≤ b), simplify and use the assumption.
+  • In the second case (h : ¬(a ≤ b), hence b < a), simplify accordingly.
+  • Use split to handle the conjunction in the spec.
+  • Use logical tactics (exact, left, right, assumption) to complete the proof.
+
+In Lean 4, tactics like by cases, split, and simp (or even lia for linear arithmetic) help to finish off these goals.
+
+──────────────────────────────
+Step 5. Summary of Key Steps
+
+1. Define myMin using if–then–else.
+2. Write down the predicate myMin_spec that expresses the desired properties of the result.
+3. In the proof of myMin_spec_satisfied:
+  – Unfold both definitions.
+  – Do a case split based on the condition “if a ≤ b”:
+   ◦ In the first branch, verify both the inequality and that the result equals a.
+   ◦ In the second branch, verify that the inequality holds and the result equals b.
+4. Make use of Lean tactics to simplify and automatically handle the basic arithmetic.
+
+──────────────────────────────
+By following this plan, you'll produce a Lean 4 function that correctly returns the minimum of two integers and a formal proof that the function meets the specified properties.
+
+This detailed blueprint should guide you through the implementation and the formal verification in Lean 4.

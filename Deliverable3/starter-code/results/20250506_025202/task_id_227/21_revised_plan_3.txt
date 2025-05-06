@@ -1,0 +1,186 @@
+Below is an analysis of the issues you encountered along with a revised strategy that you can follow. In summary, you need to fix problems in two places: the definition of the function (how you write nested if–then–else expressions) and the proof (how you handle cases, bullet notation, and tactic application).
+
+──────────────────────────────
+1. Patterns in the Errors
+
+a. Unsolved Goals after Unfolding the Function  
+ • When you unfold the if–then–else definitions in the proof, Lean still shows remaining “if” expressions that have not been fully simplified. This tells you that the tactic(s) used (or the order of applying them) are not “consuming” the if–then–else constructs, leaving unsolved goals for the corresponding cases.
+
+b. Unexpected Token Errors Related to Bullet Notation  
+ • Errors such as “unexpected token '·'; expected command” come from using bullet symbols incorrectly or mis-indented bullets. In Lean 4, bullets (or the annotated branches in by_cases) must line up exactly. If you use “·” or an incorrect indentation, Lean will throw a parsing error.
+
+c. Complexity in Handling Nested if–then–else  
+ • Using nested if–then–else expressions implicitly builds a nested structure that is hard to simplify in the proof. The inner if constructs might remain “opaque” until you explicitly invoke rewriting/simplification lemmas (like if_pos/if_neg), meaning that case analysis may be split into too many branches to handle elegantly.
+
+──────────────────────────────
+2. What Isn’t Working
+
+a. Direct Unfolding of Nested if–then–else  
+ • Unfolding the function definition leaves many nested “if” expressions. The proof then must manually deal with all these levels. Without a clear strategy for handling each branch, some cases remain unsolved.
+
+b. Mixed or Poor Bullet and Indentation Usage  
+ • The errors point to misaligned bullet symbols and unexpected tokens. This usually happens when mixing bullet styles or when the indentation is off. Lean 4 is particularly sensitive to blocks and bullet notation in tactic mode.
+
+c. Inadequate Use of Simplification Tactics  
+ • Relying solely on “unfold” does not trigger the simplification of if–then–else expressions. Without proper use of “simp/dsimp” or manual rewriting with if_pos/if_neg, some inequalities are left in an unsimplified state.
+
+──────────────────────────────
+3. Alternative Implementation Approaches
+
+a. Use a Helper Function to Reduce Nesting  
+ • Instead of writing a directly nested if–then–else in minOfThree, you can define a helper function such as:  
+  def min2 (x y : Int) : Int := if x ≤ y then x else y  
+ Then define:  
+  def minOfThree (a b c : Int) : Int := min2 (min2 a b) c  
+This modularizes the code and makes the resulting proof simpler.
+
+b. Use Pattern Matching Instead of Nested if–then–else  
+ • You could write minOfThree by “matching” on comparisons rather than nesting if statements. Pattern matching sometimes produces a more “transparent” definition that is easier to analyse in proofs.
+
+c. Adjust the Proof Tactics to Simplify if–then–else Cases  
+ • Ensure that you explicitly use tactics like “simp only [if_pos _]” or “simp only [if_neg _]” with the appropriate hypothesis so that Lean removes the if–then–else expressions.  
+ • Break the proof into separate lines with the proper bullet (or “with” annotated cases when using by_cases) ensuring the indentation is consistent.
+
+──────────────────────────────
+4. Revised Plan
+
+A. Implementation Revision  
+ Option 1 (Using nested if—be careful with formatting):
+
+  def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+    if a ≤ b then 
+      if a ≤ c then a else c
+    else 
+      if b ≤ c then b else c
+
+ Option 2 (Using helper function min2):
+
+  def min2 (x y : Int) : Int :=
+    if x ≤ y then x else y
+
+  def minOfThree (a b c : Int) : Int :=
+    min2 (min2 a b) c
+
+ Both options are acceptable; option 2 modularizes the minimum-of-two operation.
+
+B. Proof Strategy Revision
+
+1. Unfold and Simplify Step-By-Step  
+ • Instead of just “unfold,” immediately use “simp” or “dsimp” with the proper if rewriting lemmas.  
+ • For instance, after doing a by_cases on (a ≤ b), use “simp only [if_pos h₁]” in the branch where the condition holds.
+
+2. Structure Proof Using Clear Case Analysis  
+ • Start with “by_cases h₁ : a ≤ b” and then within each branch (h₁ true and false) do further case analyses (e.g. by_cases on a ≤ c or b ≤ c).  
+ • In each branch, ensure that you use either “| pos =>” and “| neg =>” notation or properly aligned bullets. Do not mix bullet symbols (like “·”) if they cause parsing errors.
+
+3. Split the Goal and Use Tactics  
+ • After simplifying the if–then–else expressions, you will have to prove two things:  
+  – The inequality: the result is ≤ a, b, and c.  
+  – The membership: the result is equal to a, b, or c.  
+ • Use “split” for the conjunction. Then, in one branch, you can use “linarith” to automatically solve the inequality part (if the linear arithmetic is clear).  
+ • For the membership part, typically use “left; rfl” or “right; left; rfl” to decide which input is the minimum.
+
+C. Revised Proof Skeleton Example
+
+Below is an outline (using Option 1 for illustration):
+
+---------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation (Option 1)
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  if a ≤ b then 
+    if a ≤ c then a else c
+  else 
+    if b ≤ c then b else c
+
+-- Specification: The result is ≤ each of a, b, c and equals one of them.
+def minOfThree_spec (a : Int) (b : Int) (c : Int) (result : Int) : Prop :=
+  (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧
+  (result = a ∨ result = b ∨ result = c)
+
+theorem minOfThree_spec_satisfied (a : Int) (b : Int) (c : Int) :
+  minOfThree_spec a b c (minOfThree a b c) := by
+  /- Unfold the definition to expose the nested ifs -/
+  unfold minOfThree minOfThree_spec
+  /- Case analysis on the outer condition a ≤ b -/
+  by_cases h₁ : a ≤ b with
+  | pos =>
+    simp only [if_pos h₁]
+    /- Now, analyze the inner if on (a ≤ c) -/
+    by_cases h₂ : a ≤ c with
+    | pos =>
+      simp only [if_pos h₂]
+      split
+      · -- Prove: a ≤ a, a ≤ b, and a ≤ c
+        split
+        · exact Int.le_refl a
+        · exact h₁
+        · exact h₂
+      · -- Membership: result equals a
+        left; rfl
+    | neg =>
+      simp only [if_neg h₂]
+      split
+      · -- Prove: c ≤ a, c ≤ b, and c ≤ c
+        split
+        · -- Here, the fact h₂ means ¬(a ≤ c), so a > c.
+          exact Int.le_of_lt (Int.lt_of_not_ge h₂)
+        · -- From a ≤ b and c < a we conclude c < b
+          have lt_ca : c < a := Int.lt_of_not_ge h₂
+          have lt_cb : c < b := Int.lt_of_lt_of_le lt_ca h₁
+          exact Int.le_of_lt lt_cb
+        · exact Int.le_refl c
+      · -- Membership: result equals c
+        right; right; rfl
+  | neg =>
+    simp only [if_neg h₁]
+    by_cases h₃ : b ≤ c with
+    | pos =>
+      simp only [if_pos h₃]
+      split
+      · -- Prove: result (which is b) is ≤ a, b, and c
+        split
+        · -- From ¬(a ≤ b), we know a > b.
+          exact Int.le_of_lt (Int.lt_of_not_ge h₁)
+        · exact Int.le_refl b
+        · exact h₃
+      · -- Membership: result equals b
+        right; left; rfl
+    | neg =>
+      simp only [if_neg h₃]
+      split
+      · -- Prove: result (which is c) is ≤ a, b, and c
+        split
+        ·
+          -- You can arrange the inequality proofs in several ways.
+          have lt_cb : c < b := Int.lt_of_not_ge h₃
+          have lt_ca : c < a := by {
+            -- From ¬(a ≤ b) we get a > b and then c < b yields c < a.
+            exact Int.lt_of_lt_of_le lt_cb (Int.le_of_lt (Int.lt_of_not_ge h₁))
+          }
+          exact Int.le_of_lt lt_ca
+        ·
+          have lt_cb : c < b := Int.lt_of_not_ge h₃
+          exact Int.le_of_lt lt_cb
+        · exact Int.le_refl c
+      · -- Membership: result equals c
+        right; right; rfl
+---------------------------------------------------------
+
+Key points in this revised proof:
+ • We use proper by_cases with “with | pos =>” and “| neg =>” to clearly delineate the branches.  
+ • After each by_cases, we immediately simplify the if–then–else expression using “simp only [if_pos …]” or “simp only [if_neg …].”  
+ • We split the overall conjunction to separately prove the inequality part and the membership part.  
+ • Tactics such as “linarith” could replace several steps once the context is simplified, but even manually proving each branch is clearer than an unsolved goal.
+
+──────────────────────────────
+5. Final Recommendations
+
+• In the implementation, consider using helper functions (like min2) or pattern matching to reduce the nesting, which in turn simplifies the proof.  
+• In the proof, always check the bullet notation and indentation if you encounter “unexpected token” errors.  
+• Use tactics (simp, dsimp, by_cases) in a structured manner—first simplify the definition and then split the goal—so that if–then–else expressions are eliminated systematically.  
+• Finally, if the arithmetic parts of the proof are clear, let “linarith” handle the inequality reasoning to reduce manual steps.
+
+Following this revised plan should help you avoid unsolved goals and unexpected token errors, making both your implementation and your proof work neatly in Lean 4.

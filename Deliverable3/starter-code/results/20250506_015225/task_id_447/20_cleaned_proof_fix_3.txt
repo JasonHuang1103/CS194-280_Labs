@@ -1,0 +1,4 @@
+constructor
+· simp [Array.size_map]
+· intro i hi
+  simp [Array.getElem_map]

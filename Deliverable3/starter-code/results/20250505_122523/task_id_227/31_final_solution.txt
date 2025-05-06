@@ -1,0 +1,4 @@
+{
+  "code": "let minAB := if decide (a <= b) then a else b\n  if decide (minAB <= c) then minAB else c\n\nThis modification converts the proposition (minAB \u2264 c) into a Bool using decide, which resolves the error.",
+  "proof": "by_cases h1 : a \u2264 b\n  \u00b7 by_cases h2 : a \u2264 c\n    \u00b7 simp [h1, h2]\n      constructor\n      \u00b7 exact \u27e8le_rfl, h1, h2\u27e9\n      \u00b7 exact Or.inl rfl\n    \u00b7 simp [h1, h2]\n      constructor\n      \u00b7 exact \u27e8le_rfl, h1, le_of_not_le h2\u27e9\n      \u00b7 exact Or.inr (Or.inr rfl)\n  \u00b7 by_cases h2 : b \u2264 c\n    \u00b7 simp [h1, h2]\n      constructor\n      \u00b7 exact \u27e8le_of_not_le h1, le_rfl, h2\u27e9\n      \u00b7 exact Or.inr (Or.inl rfl)\n    \u00b7 simp [h1, h2]\n      constructor\n      \u00b7 exact \u27e8le_of_not_le h1, le_rfl, le_of_not_le h2\u27e9\n      \u00b7 exact Or.inr (Or.inr rfl)"
+}

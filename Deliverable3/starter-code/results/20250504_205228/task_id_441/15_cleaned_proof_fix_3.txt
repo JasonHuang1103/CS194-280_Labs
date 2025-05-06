@@ -1,0 +1,4 @@
+theorem cubeSurfaceArea_spec_satisfied (size : Int):
+  cubeSurfaceArea_spec size (cubeSurfaceArea size) := by
+  unfold cubeSurfaceArea cubeSurfaceArea_spec
+  rfl

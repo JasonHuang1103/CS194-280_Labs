@@ -1,0 +1,13 @@
+simp only [hasCommonElement, hasCommonElement_spec, List.any, List.contains]
+apply Iff.intro
+· intro h
+  rcases h with ⟨x, ⟨ha, hx⟩, hb⟩
+  obtain ⟨i, hi⟩ := List.mem_iff_nthLe.mpr hx
+  obtain ⟨j, hj⟩ := List.mem_iff_nthLe.mpr hb
+  use [i, j]
+  simp [hi, hj]
+· intro h
+  rcases h with ⟨i, j, ha, hb, hab⟩
+  have hai : a[i]! ∈ a.toList := List.nthLe_mem _ _ ha
+  have hbj : a[i]! ∈ b.toList := List.nthLe_mem _ _ hb
+  exact ⟨a[i]!, ⟨hai, rfl⟩, hbj⟩

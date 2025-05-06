@@ -1,0 +1,4 @@
+{
+  "code": "a.any (fun x => b.any (fun y => x = y))",
+  "proof": "apply Iff.intro\n\u00b7 intro \u27e8i, j, hi, hj, h\u27e9\n  apply Array.any_eq_true.mpr\n  use a[i]!\n  constructor\n  \u00b7 apply Array.get_mem\n  \u00b7 apply Array.any_eq_true.mpr\n    use b[j]!\n    constructor\n    \u00b7 apply Array.get_mem\n    \u00b7 exact h\n\u00b7 intro h\n  apply Array.any_eq_true.mp h\n  intro x\n  intro \u27e8hx, hy\u27e9\n  apply Array.any_eq_true.mp hy\n  intro y\n  intro \u27e8hy, heq\u27e9\n  have \u27e8i, hi\u27e9 := Array.mem_iff_get.mp hx\n  have \u27e8j, hj\u27e9 := Array.mem_iff_get.mp hy\n  exists i, j\n  constructor\n  \u00b7 apply i.2\n  \u00b7 constructor\n    \u00b7 apply j.2\n    \u00b7 rw [\u2190 heq]\n      exact hi"
+}

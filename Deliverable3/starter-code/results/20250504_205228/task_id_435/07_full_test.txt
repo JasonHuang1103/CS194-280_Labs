@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:22:9: error: tactic 'unfold' failed to unfold 'lastDigit' at
+  (0 ≤ n % 10 ∧ n % 10 < 10) ∧ n % 10 = n % 10

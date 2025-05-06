@@ -1,0 +1,19 @@
+```lean
+let xs := a.toList
+induction xs with
+| nil =>
+    simp
+| cons x xs ih =>
+    simp only [List.foldl, List.length_cons, Nat.succ_eq_add_one, List.get_cons_zero, List.get_cons_succ] at *
+    constructor
+    · intro h i hi
+      cases i with
+      | zero => exact h.1
+      | succ i =>
+        exact h.2 i (Nat.lt_of_succ_lt_succ hi)
+    · intro h
+      constructor
+      · exact h 0 (Nat.zero_lt_succ _)
+      · intro i hi
+        exact h (i + 1) (Nat.succ_lt_succ hi)
+```

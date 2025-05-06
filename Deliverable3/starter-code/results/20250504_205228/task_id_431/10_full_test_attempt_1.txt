@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:18:54: error: unsolved goals
+a b : Array ℤ
+⊢ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ (a.any fun x => b.any fun y => decide (x = y)) = true
+lean_playground/TempTest.lean:21:10: error: 'hasCommonElement_spec_satisfied' has already been declared

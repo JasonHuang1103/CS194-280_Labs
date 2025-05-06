@@ -1,0 +1,11 @@
+```lean
+simp [List.all, decide_eq_true_iff]
+constructor
+· intros h i hi
+  specialize h (a[i]!) (by rwa [Array.getElem_toList])
+  exact h
+· intros h x hx
+  obtain ⟨j, hj⟩ := List.mem_toList.mp hx
+  rw [← Array.toList_getElem j a] at hj
+  exact h j (lt_of_lt_of_le (by rw [hj] at *; exact hx) (Array.toList_length a))
+```

@@ -1,0 +1,3 @@
+a.toList.all? (λ m => n > m)
+
+This corrected implementation converts the Array to a List and then applies the all? function, which resolves the original error.

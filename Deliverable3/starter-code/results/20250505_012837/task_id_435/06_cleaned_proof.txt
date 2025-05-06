@@ -1,0 +1,2 @@
+simp
+exact ⟨Nat.zero_le _, Nat.mod_lt _ (Nat.zero_lt_succ _), rfl⟩

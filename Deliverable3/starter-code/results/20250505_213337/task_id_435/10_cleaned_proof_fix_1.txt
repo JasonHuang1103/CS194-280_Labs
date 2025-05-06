@@ -1,0 +1,6 @@
+simp
+constructor
+· constructor
+  · apply Nat.zero_le
+  · exact Nat.mod_lt n 10 (Nat.zero_lt_succ 9)
+· rfl

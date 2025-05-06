@@ -1,0 +1,39 @@
+The heart of the problem is that you are mixing Booleans (produced by decide) with the logical infrastructure that Lean’s case‐analysis (by_cases) expects. In your definition you use
+
+  let minAB := if decide (a ≤ b) then a else b
+  if decide (minAB ≤ c) then minAB else c
+
+so that decide is “converting” the propositions (a ≤ b) and (minAB ≤ c) into Booleans. That is perfectly acceptable for a computation (and it made your earlier error go away), but then in your proof you try to do
+
+  by_cases h1 : decide (a ≤ b)
+  by_cases h2 : decide (if h1 then a ≤ c else b ≤ c)
+  { … }
+  { … }
+  …
+
+There are two problems with this approach:
+
+1. You are “case splitting” on decide (a ≤ b) even though decide returns a Boolean. In Lean 4 a Boolean is not a Proposition (there isn’t an automatic coercion from Bool to Prop), so a by_cases on a Boolean value does not work as you expect. (The error “function expected at c” comes from Lean trying to interpret what you mean when you mix these levels.) In other words, your by_cases is being given a term of type Bool rather than a Prop. If you wanted to case–split on a decidable proposition you would instead use something like
+  by_cases h1 : a ≤ b
+since a ≤ b is a Proposition and Lean has decidability for it. Alternatively, if you really want to use decide then you must compare it explicitly to true (or false) so that you work with a Prop, for example:
+  by_cases h1 : decide (a ≤ b) = true
+
+2. In the second by_cases you write
+  by_cases h2 : decide (if h1 then a ≤ c else b ≤ c)
+but note that h1 is not a Boolean toggle in the sense you intend—it is already a proof that decide (a ≤ b) = true (or its negation), so writing “if h1 then … else …” is not doing what you think. In the unfolded goal (after unfolding minOfThree and minOfThree_spec) you see many “if decide (…)=true then … else sorry” occurrences. (The “sorry”s come from the fact that once you unfold the definition the “if” is not being simplified as you expect, leaving parts of the goal incomplete.) 
+
+In summary, the error arises because:
+ • Your proof script is splitting on decision procedures (which yield Bool) without properly converting them into Propositions,
+ • You are then “plugging” these Boolean case hypotheses into further if–expressions that were written to work on the raw output of decide (or on a conditional computed inside a let–binding). This mismatch of types (Proposition vs. Bool) leads Lean to try to “apply” an expression where it expects a function and hence to the error “function expected at c” (with c being a number).
+
+A possible direction to fix the issue is to change your approach so that you do case analysis on the inequalities directly. For example, if you rewrite your proof to use
+  by_cases h1 : a ≤ b  / * or its negation   */
+and then, in the branch where a ≤ b holds, let minAB be a and further case–split on a ≤ c, and similarly in the other branch, the structure of the proof will correspond more directly to the definition of minOfThree. Alternatively, if you really prefer to use decide in the definition, then in your proof you should “bring” the Boolean into the realm of propositions by testing equality with true. For example:
+
+  by_cases h1 : decide (a ≤ b) = true
+
+and then use rewriting lemmas (or simp) to convert if–expressions like if decide (a ≤ b) then a else b into a or b according to h1. (You will need to massage things so that the conditional inside minOfThree “matches” the one you are case–splitting on.)
+
+Getting the types to line up properly (and avoiding the “unsolved goals” that come from having “if … else sorry”) is key.
+
+To summarize, the root cause is that you are mixing Booleans and Propositions in a way that confuses Lean’s typechecker. Adjust your proof either by case–splitting on the actual propositions (a ≤ b) and (minAB ≤ c) or “lift” the Booleans (by comparing to true) so that the conditions are propositions.

@@ -1,0 +1,4 @@
+let minAB := if decide (a <= b) then a else b
+  if decide (minAB <= c) then minAB else c
+
+This modification converts the proposition (minAB ≤ c) into a Bool using decide, which resolves the error.

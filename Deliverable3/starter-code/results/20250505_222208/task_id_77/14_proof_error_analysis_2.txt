@@ -1,0 +1,78 @@
+Below is a step‐by‐step explanation of the error, the state in which it occurs, why the proof “by exact Iff.refl” fails, and what you might do instead.
+
+─────────────────────────────  
+Step 1. Identify the Failing Tactic
+
+• The proof ends with “exact Iff.refl”.  
+• The tactic Iff.refl is meant to finish a goal of the form A ↔ A (i.e. when both sides are definitionally the same).  
+• Here the goal is  
+  n % 11 = 0 ↔ (if n % 11 = 0 then true else false) = true  
+but the two sides are not literally the same due to the “if … then … else …” expression.
+
+─────────────────────────────  
+Step 2. Consider the Proof State
+
+• After unfolding the definitions of isDivisibleBy11 and isDivisibleBy11_spec, the goal becomes:
+  (n % 11 = 0) ↔ ((if n % 11 = 0 then true else false) = true)
+• Although from a semantic point of view these two formulations are intended to agree, Lean’s definitional equality is much stricter.  
+• In Lean’s “conversion checking” the two sides do not compute to the same normal form.
+
+─────────────────────────────  
+Step 3. Check if the Proof Approach Matches the Specification
+
+• The specification “isDivisibleBy11_spec n (isDivisibleBy11 n)” says that n is divisible by 11 if and only if (isDivisibleBy11 n) equals true.  
+• By writing isDivisibleBy11 as “if n % 11 = 0 then true else false”, the programmer intended a simple Boolean test.  
+• However, while the idea is correct, using Iff.refl requires that both sides of the ↔ be *definitionally identical* (not merely logically equivalent) – which is not the case here.
+
+─────────────────────────────  
+Step 4. Identify Type Mismatches or Incorrect Assumptions
+
+• The form “if n % 11 = 0 then true else false” does not reduce definitionally to “n % 11 = 0” or “true” in a way that makes  
+  (n % 11 = 0) ↔ ((if n % 11 = 0 then true else false) = true)  
+be definitionally true.
+• The tactic Iff.refl has type “∀ (a : Prop), a ↔ a”. But Lean’s expected target is a specific proposition in which the right-hand side is an “if … then … else …” expression.
+• In short, Lean refuses to close the goal because the two sides of the “↔” aren’t judgmentally the same.
+
+─────────────────────────────  
+Step 5. Consider Alternative Proof Strategies
+
+• One possibility is to prove the equivalence by cases. For example, you can consider the case when “n % 11 = 0” holds and when it does not hold.
+  – In the first case, you show that the “if … then … else …” evaluates to true.
+  – In the second case, you show that it evaluates to false, and hence (if … then … else …) = true fails.
+• Another option is to change the definition of isDivisibleBy11 so that it is defined directly as “n % 11 = 0” (a Prop) rather than as a Boolean value.
+• Alternatively, you could prove a lemma that converts your Boolean test into a proposition; for example, prove that “(if b then true else false) = true” is equivalent to b being true (for the decidable proposition “n % 11 = 0”).
+  Such a lemma might look like:
+   lemma bool_iff {b : Bool} : (if b then true else false) = true ↔ b = true
+    by cases b <;> simp
+  Then you could use this lemma after unfolding the definitions in your main theorem.
+
+─────────────────────────────  
+Conclusion and Root Cause Analysis
+
+The root cause is that after unfolding the definitions, the goal you need to prove is not one of the form A ↔ A. Instead, it is 
+  (n % 11 = 0) ↔ ((if n % 11 = 0 then true else false) = true).
+Even though these two sides are “intended” to be equivalent, they are not definitionally equal in Lean’s conversion checker. Consequently, using Iff.refl fails because Lean cannot see them as the same.
+
+─────────────────────────────  
+Suggestion for Fixing
+
+• Either revise isDivisibleBy11 to work in Prop rather than Bool.  
+  For example, define it as
+   def isDivisibleBy11 (n : ℤ) : Prop := n % 11 = 0
+• Or prove an auxiliary lemma (as suggested above) that shows:
+  ∀ n, (if n % 11 = 0 then true else false) = true ↔ n % 11 = 0,
+  and then use that lemma to finish the proof.
+• Finally, if you prefer to keep isDivisibleBy11 as a Boolean function, then perform a case analysis on “n % 11 = 0” rather than using Iff.refl.
+
+─────────────────────────────  
+Summary
+
+1. The tactic failing is “exact Iff.refl” because it requires the goal to be of the form A ↔ A, but the two sides given are not definitionally equal.
+2. At that point the goal is  
+  n % 11 = 0 ↔ (if n % 11 = 0 then true else false) = true  
+which does not match the expected form.
+3. The proof approach (using an “if … then … else …” Boolean function) matches the informal specification but not the strict type equality Lean requires.
+4. There is a type mismatch caused by the non-reduction of the Boolean “if … then … else …” expression to the same normal form as “n % 11 = 0” (or true/false as appropriate).
+5. A better strategy is either to work with props directly or to prove an auxiliary equivalence lemma rather than try to end the proof with Iff.refl.
+
+By following one of the suggested changes, you should be able to adjust the proof so that Lean sees the two sides as equal or (at least) logically equivalent in a way that can be proved step‐by‐step.

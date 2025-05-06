@@ -1,0 +1,4 @@
+{
+  "code": "a.any (\u03bb x => b.any (\u03bb y => x = y))",
+  "proof": "apply Iff.intro\n\u00b7 intro \u27e8i, j, hi, hj, heq\u27e9\n  apply a.any_spec.2\n  use i, hi\n  apply b.any_spec.2\n  use j, hj\n  rw [heq]\n  exact decide_eq_true rfl\n\u00b7 intro h\n  obtain \u27e8i, hi, hb\u27e9 := a.any_spec.1 h\n  obtain \u27e8j, hj, heq\u27e9 := b.any_spec.1 hb\n  rw [decide_eq_true_eq] at heq\n  exact \u27e8i, j, hi, hj, heq\u27e9"
+}

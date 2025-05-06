@@ -1,0 +1,3 @@
+```lean
+(a.toList).all? (fun x => n > x)
+```

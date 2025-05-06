@@ -1,0 +1,3 @@
+Lean Error: lean_playground/TempTest.lean:22:2: error: tactic 'split' failed, consider using `set_option trace.split.failure true`
+a b : Array ℤ
+⊢ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ (a.any fun x => b.any fun y => decide (x = y)) = true

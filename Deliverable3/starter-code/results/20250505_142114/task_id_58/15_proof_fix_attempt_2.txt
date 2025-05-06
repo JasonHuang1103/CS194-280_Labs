@@ -1,0 +1,3 @@
+```lean
+simp [Bool.and_eq_true, Bool.or_eq_true, or_comm]
+```

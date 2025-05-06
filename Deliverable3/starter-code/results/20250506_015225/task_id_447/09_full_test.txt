@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:19:42: error: unsolved goals
+a : Array ℤ
+⊢ ∀ i < a.size, (Array.map (fun x => x * x * x) a)[i]! = a[i]! * a[i]! * a[i]!
+lean_playground/TempTest.lean:23:0: error: unexpected identifier; expected command

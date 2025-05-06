@@ -1,0 +1,67 @@
+The problem is not with the definition of cubeElements or its specification at all—it is in the tactic “script” (the proof) itself. In your proof you write
+
+  apply And.intro
+· simp
+· intros i hi
+  simp [Array.getElem_eq_data_get, Array.get!]
+  rw [Array.get_map]
+  rfl
+
+What happens is that the command “apply And.intro” splits the goal into two subgoals:
+ • one for proving (Array.map (fun x => x * x * x) a).size = a.size
+ • and one proving ∀ i, i < a.size → (Array.map (fun x => x * x * x) a)[i]! = a[i]! * a[i]! * a[i]!.
+
+The bullets “·” that follow are intended to dispatch to those two subgoals. However, Lean 4 is complaining that after “apply And.intro” there remain unsolved goals and then it sees an unexpected token '·' (bullet) where it expected a command.
+
+There are a couple of things that could be at fault here:
+ 
+1. The bullets are not recognized because of mis‐indentation or because Lean 4 is picky about tactic bullet syntax. (In Lean 4 you can use “·” bullets, but they must be indented correctly so that Lean sees each bullet as the start of a subproof.)
+
+2. More importantly, after applying And.intro the new subgoals are “open”, but your tactic script does not “enter” them properly. That is, Lean does not “know” that the “simp” in the first bullet is meant to solve the first subgoal and that the “intros i hi” in the second bullet is meant to solve the second one.
+
+The error message
+
+  case left
+  a : Array ℤ
+  ⊢ (Array.map (fun x => x * x * x) a).size = a.size
+
+indicates that the first subgoal remains unsolved and then later, at line 23, Lean sees a bullet token it doesn’t expect in this context.
+
+A common solution is to “package” each case either by adjusting the indentation or by using a block structure (for example a begin…end block) so that Lean clearly sees the separate proofs for the two parts. For instance, you might rewrite the proof as follows:
+
+-----------------------
+theorem cubeElements_spec_satisfied (a : Array Int) :
+  cubeElements_spec a (cubeElements a) := by
+  unfold cubeElements cubeElements_spec
+  apply And.intro
+  · simp
+  · intros i hi
+    simp [Array.getElem_eq_data_get, Array.get!]
+    rw [Array.get_map]
+    rfl
+-----------------------
+
+Or, if Lean 4 still complains about the bullet “·” tokens (which can happen if the indentation is off or the parser is confused), you might switch to a more “tactic block” style:
+
+-----------------------
+theorem cubeElements_spec_satisfied (a : Array Int) :
+  cubeElements_spec a (cubeElements a) := 
+by
+  unfold cubeElements cubeElements_spec
+  apply And.intro
+  begin
+    -- First subgoal: prove the sizes are equal.
+    simp
+  end,
+  begin
+    -- Second subgoal: prove the elementwise property.
+    intros i hi
+    simp [Array.getElem_eq_data_get, Array.get!]
+    rw [Array.get_map]
+    rfl
+  end
+-----------------------
+
+This structure makes it more explicit that you are closing each subgoal with a separate block of tactics. (Note that if you use a comma after the block it tells Lean that the proof for the first component is finished and then you provide the proof for the second.)
+
+In summary, the root cause of your error is that after “apply And.intro” the proof script’s bullet-style subproofs are not being parsed correctly. Lean ends up with two unsolved subgoals and then finds a bullet token “·” where it does not expect one. The remedy is to adjust the proof structure so that the two subgoals from the And.intro are properly (and unambiguously) addressed—for example, by ensuring correct indentation or by explicitly grouping the subproofs with begin…end blocks.

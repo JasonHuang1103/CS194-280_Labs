@@ -1,0 +1,4 @@
+```lean
+  unfold multiply multiply_spec
+  rfl
+```

@@ -1,0 +1,36 @@
+split_ifs with h₁ h₂ h₃ h₄
+case inl.inl =>
+  constructor
+  · exact h₁
+  · constructor
+    · exact le_trans h₁ h₂
+    · exact le_trans h₁ h₃
+  left
+  rfl
+case inl.inr =>
+  constructor
+  · exact le_of_not_le h₂
+  · constructor
+    · exact le_trans h₁ h₃
+    · exact le_refl c
+  right
+  right
+  rfl
+case inr.inl =>
+  constructor
+  · exact h₂
+  · constructor
+    · exact le_trans (le_of_not_le h₁) h₂
+    · exact le_trans h₂ h₃
+  right
+  left
+  rfl
+case inr.inr =>
+  constructor
+  · exact le_of_not_le h₃
+  · constructor
+    · exact le_of_not_le (le_trans h₂ h₁)
+    · exact le_refl c
+  right
+  right
+  rfl

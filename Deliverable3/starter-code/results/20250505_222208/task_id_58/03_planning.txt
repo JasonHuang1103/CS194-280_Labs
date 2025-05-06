@@ -1,0 +1,115 @@
+We want to make a function that “detects” whether two integers have opposite signs. In our setting zero counts as neither positive nor negative, so for instance if one value is zero the function must return false—even though one number might “look” nonnegative. In Lean the function must return a Bool, and the specification tells us that the result is exactly true when
+
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)
+
+and false otherwise.
+
+Below is a step‐by‐step outline of our thought process and the plan for both the implementation and proof.
+
+────────────────────────────
+Step 1. Understanding the Problem
+
+• The function takes two integers (a and b) and returns a Bool.
+• It should return true if one of the integers is positive and the other negative.
+• When either a or b is 0 (or if they have the same sign), the answer is false.
+• The specification is given by a “bi‐implication” (↔) showing the equivalence of our Boolean result with the predicate
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0).
+
+────────────────────────────
+Step 2. Breaking Down the Problem
+
+(a) Implementation Subproblem:
+  – We must “compute” a Bool value.
+  – A natural way in Lean is to use an if–then–else construct with a Boolean condition.
+  – Our condition is exactly ((a > 0 ∧ b < 0) ∨ (a < 0 ∧ b > 0)).
+  – (Note that in Lean 4, the standard comparison operators on Int give us a Bool condition, and the Boolean operators ∧ and ∨ are available for Bool.)
+
+(b) Proof Subproblem:
+  – Our specification (hasOppositeSign_spec) is defined as:
+   ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result.
+  – Our theorem is to show that when we plug in (hasOppositeSign a b) for result—it is definitionally equal (after “unfolding”) to the same condition.
+  – Thus, after expanding the definitions, the proof should be trivial: both sides of the ↔ are exactly the same.
+  – We can use tactics like “unfold” (to reveal our definitions) and “simp” (or even “rfl”) to finish off the proof.
+
+────────────────────────────
+Step 3. Input Types, Edge Cases, and Expected Behavior
+
+• Input: two integers (of type Int).  
+• Edge Cases:
+  – If a = 0 or b = 0 then neither inequality (a > 0, a < 0, etc.) holds in the “correct” way so that the condition becomes false.
+  – If both numbers are positive or both are negative, neither branch of the disjunction holds.
+• Expected Behavior:
+  – For example, hasOppositeSign 5 (-3) should return true.
+  – But hasOppositeSign 0 3, hasOppositeSign (-1) (-7) and hasOppositeSign 0 0 all return false.
+
+────────────────────────────
+Step 4. Choosing Proof Techniques
+
+For the proof we will:
+ 1. Use “unfold” to replace both the function and the specification with their definitions.
+ 2. Observe that our definition of hasOppositeSign is exactly “if condition then true else false” where “condition” is ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)).
+ 3. Notice that for a Boolean c, it is true that “if c then true else false” is definitionally equivalent to c.
+ 4. Hence, the goal becomes “condition ↔ condition” which is trivial (by reflexivity of ↔ or by simp).
+
+Looking at some Lean examples above, we see similar patterns of unfolding definitions and then using simplification tactics.
+
+────────────────────────────
+Step 5. Similar Patterns from Examples
+
+• Often a function is defined with an if–then–else, and its specification is given as an equivalence between a predicate and the returned Boolean value.
+• Many proofs simply “unfold” and then “simp” to see that the definition and the predicate are the same.
+• We can mimic that approach here.
+
+────────────────────────────
+Detailed Plan for Implementation and Proof
+
+1. Implementation:
+ a. Write the function as  
+  def hasOppositeSign (a : Int) (b : Int) : Bool :=
+   if ((a > 0 && b < 0) || (a < 0 && b > 0)) then true else false  
+ b. In Lean 4 the operators “&&” and “||” are the Boolean versions and the comparisons (>, <) on Int produce a Bool because the order is decidable.
+ c. This definition meets the requirement: if the condition holds then true is returned, else false.
+
+2. Proof:
+ a. Start the proof with:  
+  unfold hasOppositeSign hasOppositeSign_spec  
+ b. After unfolding, the goal becomes  
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ (if ((a > 0 && b < 0) || (a < 0 && b > 0)) then true else false)
+ c. Since “if c then true else false” is definitionally equal to c for any Boolean c, we have that the right‐side simplifies exactly to ((a > 0 && b < 0) || (a < 0 && b > 0)).
+ d. Show that the expressions on both sides are identical.
+ e. We can finish the proof with “rfl” or “simp” (possibly after a “split”) so that both directions are immediate.
+
+────────────────────────────
+Conclusion: Detailed Plan
+
+• Implementation:
+  Step 1: Define “hasOppositeSign” by testing the disjunction of the two cases. Use if–then–else syntax.
+• Proof:
+  Step 1: Unfold the definitions of hasOppositeSign and the spec.
+  Step 2: Notice the if–then–else expression “if c then true else false” is definitionally equivalent to c.
+  Step 3: Conclude that the resulting formula is (condition ↔ condition), which is true by reflexivity.
+  Step 4: Use a tactic like “rfl” (or “simp”) to complete the proof.
+
+────────────────────────────
+Below is the final plan in Lean pseudocode for clarity:
+
+--------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasOppositeSign (a : Int) (b : Int) : Bool :=
+  if ((a > 0 && b < 0) || (a < 0 && b > 0)) then true else false
+
+-- Specification: true exactly when a and b have opposite signs.
+def hasOppositeSign_spec (a : Int) (b : Int) (result : Bool) : Prop :=
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result
+
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  unfold hasOppositeSign hasOppositeSign_spec
+  -- The if–then–else simplifies to the condition; hence the equivalence is trivial.
+  rfl
+--------------------------------------------------
+
+That is our detailed plan for both implementing the function and proving that it meets its specification.

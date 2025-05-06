@@ -1,0 +1,4 @@
+{
+  "code": "(decide (a < 0) && decide (b > 0)) || (decide (a > 0) && decide (b < 0))",
+  "proof": "simp [decide_eq_true_eq]\nrcases lt_trichotomy a 0 with ha | rfl | ha\n\u00b7 rcases lt_trichotomy b 0 with hb | rfl | hb\n  \u00b7 simp [ha, hb]\n  \u00b7 simp [ha, hb]\n  \u00b7 simp [ha, hb]\n\u00b7 rcases eq_or_lt_of_le (Int.le_of_eq rfl) with rfl | hb\n  \u00b7 simp\n  \u00b7 simp [hb]\n\u00b7 rcases lt_trichotomy b 0 with hb | rfl | hb\n  \u00b7 simp [ha, hb]\n  \u00b7 simp [ha, hb]\n  \u00b7 simp [ha, hb]"
+}

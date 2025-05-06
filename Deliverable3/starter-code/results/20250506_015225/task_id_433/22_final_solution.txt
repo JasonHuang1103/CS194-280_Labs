@@ -1,0 +1,4 @@
+{
+  "code": "a.foldl (fun acc x => acc && (n > x)) true",
+  "proof": "congr\ninduction a using Array.revRecOn with\n| nil =>\n  simp\n| cons a as ih =>\n  simp [Array.foldl, List.foldl]\n  split\n  \u00b7 intro h\n    apply And.intro\n    \u00b7 exact h as.size (by simp)\n    \u00b7 apply ih\n      intro i hi\n      exact h i (Nat.lt_trans hi (Nat.lt_succ_self _))\n  \u00b7 intro h\n    intro i hi\n    cases Nat.eq_or_lt_of_le hi with\n    | inl heq => subst heq; exact h.1\n    | inr hlt => exact ih.mp h.2 i hlt"
+}

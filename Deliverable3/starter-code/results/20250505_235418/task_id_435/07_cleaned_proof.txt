@@ -1,0 +1,4 @@
+simp
+apply And.intro
+· exact Nat.zero_le _
+· exact Nat.mod_lt _ (by decide)

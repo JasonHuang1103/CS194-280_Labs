@@ -1,0 +1,99 @@
+Below is one way to think about the problem and then a detailed plan for writing both the function and its correctness proof.
+
+──────────────────────────────
+Step 1. Understand the Function Specification
+
+• We need a function hasOppositeSign that takes two integers a and b and returns a Bool.
+• It should return true exactly when one number is negative and the other is positive.
+• Importantly, zero is neither positive nor negative. Thus, if either a or b equals 0 then the result is false.
+
+──────────────────────────────
+Step 2. Break Down the Problem
+
+• We separate the “good” case into two parts:
+  – Case 1: a is negative and b is positive (a < 0 ∧ b > 0).
+  – Case 2: a is positive and b is negative (a > 0 ∧ b < 0).
+• In any other case (including when one or both are zero), the function should return false.
+• A natural Lean implementation is to “if … then … else” on the disjunction:
+ 
+ if ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) then true else false.
+
+──────────────────────────────
+Step 3. Consider Input Types, Edge Cases, and Behavior
+
+• The inputs are of type Int, and comparisons like a < 0 are available in Lean, with decidability already provided by Mathlib.
+• The edge case when a = 0 or b = 0 works out because, for example, if a = 0 then neither a < 0 nor a > 0 holds.
+• Thus, the “if … then … else” implementation naturally returns false when zero is one of the arguments.
+
+──────────────────────────────
+Step 4. Proof Technique
+
+• The specification theorem “hasOppositeSign_spec” states that the boolean result is true precisely when
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) holds.
+• When we define hasOppositeSign as
+
+  if ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) then true else false
+
+ unfolding the definitions shows that the theorem reduces to proving an equivalence between
+ the proposition
+  P ≡ ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+ and the Boolean value that is “if P then true else false.”
+• A common proof plan is to perform a case analysis (using by_cases) on whether P is true or false. In the true case, the if-expression evaluates to true; in the false case, it evaluates to false. In each branch the equivalence holds trivially.
+
+──────────────────────────────
+Step 5. Similar Patterns and Final Plan
+
+• The pattern of “if P then true else false” is often used to “cast” a decidable proposition P into a Bool.
+• Thus, in the proof, one simply needs to unfold definitions, perform case (by_cases) on the condition P,
+ and then simplify with “dif_pos” or “dif_neg” to conclude the equivalence.
+
+──────────────────────────────
+Detailed Final Plan
+
+A. Implementation Plan:
+ 1. Write the function hasOppositeSign using an if-expression.
+ 2. Use the disjunction ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) as the test condition.
+ 3. Return true if the condition holds, false otherwise.
+
+B. Proof Plan:
+ 1. Unfold both hasOppositeSign and hasOppositeSign_spec.
+ 2. Use by_cases on the disjunction condition ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)).
+  – In the case where the condition is true, the if-expression returns true.
+  – In the case where the condition is false, the if-expression returns false.
+ 3. In both cases show that the proposition equivalence holds, concluding the proof.
+
+──────────────────────────────
+Below is the complete Lean 4 code following the plan:
+
+-------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasOppositeSign (a : Int) (b : Int) : Bool :=
+  -- << CODE START >>
+  if ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) then true else false
+  -- << CODE END >>
+
+-- Theorem: The result is true if a and b have opposite signs
+def hasOppositeSign_spec (a : Int) (b : Int) (result: Bool) : Prop :=
+  -- << SPEC START >>
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result
+  -- << SPEC END >>
+
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  -- << PROOF START >>
+  -- Unfold the definitions
+  unfold hasOppositeSign hasOppositeSign_spec
+  -- Let P be the disjunction condition.
+  by_cases h : ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+  · -- When h holds, the if-expression is evaluated with dif_pos h.
+    simp [h]
+  · -- When h does not hold, the if-expression evaluates via dif_neg.
+    simp [h]
+  -- << PROOF END >>
+
+-------------------------------------------------
+
+This completes the detailed plan and code for both the function implementation and the proof that it satisfies the specification.

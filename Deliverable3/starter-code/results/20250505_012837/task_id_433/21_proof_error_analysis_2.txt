@@ -1,0 +1,29 @@
+The problem isn’t with your theorem or its logical structure but with how you use List.all in your definition of isGreater. In Lean 4’s standard library the function List.all is defined to take a list of Booleans (i.e. List Bool → Bool) rather than a predicate and a list. Your code
+
+  List.all (fun x => decide (n > x)) a.toList
+
+is written as if List.all were a higher‐order function that applies the predicate (fun x => decide (n > x)) to each element of a.toList (as in some libraries or in Lean 3’s mathlib) to produce a list of Booleans. Instead, Lean 4’s List.all expects you to have already produced a list of Booleans. What then happens is that
+
+  List.all (fun x => decide (n > x))
+
+is interpreted as applying List.all to the first argument, producing a Boolean value (or more accurately something that is not a function), and then that Boolean value is “applied” to a.toList. (The error message “function expected at … term has type Bool” is telling you that Lean tried to apply a Boolean as if it were a function.) 
+
+How can you fix this? There are two common directions:
+
+1. Map the predicate over the list first and then use List.all. For example:
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+   List.all (List.map (fun x => decide (n > x)) a.toList)
+This way, List.map applies (fun x => decide (n > x)) to every element of a.toList, producing a List Bool, and then List.all combines them (typically by taking the “and” of all the elements).
+
+2. Alternatively, you may define your own higher‐order function that takes a predicate and a list:
+  def listAll {α : Type} (p : α → Bool) (xs : List α) : Bool :=
+   List.all (List.map p xs)
+and then write:
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+   listAll (fun x => decide (n > x)) a.toList
+
+Either approach “fixes” the issue by ensuring that List.all is given a list of Booleans rather than misinterpreting its arguments.
+
+Once you address this root cause the remaining parts of your proof will be reached (though you might then have to adjust your proofs if they relied on a different behavior for List.all).
+
+In summary, the error occurs because you are treating List.all as if it were a function that takes a predicate and then a list, when in Lean 4 it expects first a list of booleans. The fix is to map your predicate over the list before using List.all.

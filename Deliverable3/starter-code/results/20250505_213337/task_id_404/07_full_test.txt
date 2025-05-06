@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:22:2: error: tactic 'introN' failed, insufficient number of binders
+a b : ℤ
+⊢ ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧
+    ((if a ≤ b then a else b) = a ∨ (if a ≤ b then a else b) = b)
+lean_playground/TempTest.lean:23:0: error: unexpected identifier; expected command

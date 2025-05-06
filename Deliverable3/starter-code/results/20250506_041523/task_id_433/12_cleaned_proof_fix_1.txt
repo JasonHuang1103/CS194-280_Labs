@@ -1,0 +1,7 @@
+intro; 
+apply Iff.intro;
+{ intro h;
+  intro i H;
+  exact h i H },
+{ intro h i H;
+  apply h i H }

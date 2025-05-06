@@ -1,0 +1,4 @@
+{
+  "code": "a.any (\u03bb x => b.contains x)",
+  "proof": "rw [Array.any_iff_mem, Array.contains_eq]\n  constructor\n  \u00b7 rintro \u27e8i, hi, h\u27e9\n    use i, hi\n    exact h\n  \u00b7 rintro \u27e8i, hi, h\u27e9\n    use i, Array.indexOf b (a[i]!)\n    rw [Array.contains_eq] at h\n    rcases h with \u27e8j, hj, h_eq\u27e9\n    use j, hj\n    rw [h_eq]"
+}

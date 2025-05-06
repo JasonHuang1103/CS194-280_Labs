@@ -1,0 +1,9 @@
+theorem cubeElements_spec_satisfied (a : Array Int) :
+  cubeElements_spec a (cubeElements a) := by
+  unfold cubeElements cubeElements_spec
+  constructor
+  case left =>
+    exact Array.size_map _ _
+  case right =>
+    intro i hi
+    simp [Array.getElem, Array.map]

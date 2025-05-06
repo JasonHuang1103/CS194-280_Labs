@@ -1,0 +1,15 @@
+The error comes from using the angled-bracket pattern (⟨ha, hb⟩) in the cases tactic. In Lean 4 the syntax for destructuring a conjunction (or a pair) in a tactic pattern has changed. (In Lean 3 one could write that, but Lean 4 requires a different pattern syntax.) For example, instead of
+
+  cases h with
+  | inl ⟨ha, hb⟩ => … 
+  | inr ⟨ha, hb⟩ => … 
+
+you must write
+
+  cases h with
+  | inl (ha, hb) => … 
+  | inr (ha, hb) => … 
+
+In other words, Lean 4 does not accept the ⟨…⟩ syntax for splitting up the proofs of a conjunction inside a disjunct. This mismatch in pattern syntax is what causes the “unexpected token '⟨'; expected '=>'" error message, as well as the related errors about insufficient binders.
+
+To fix the proof, you should update the pattern-matching syntax so that you use parentheses (or otherwise use a valid destructuring method) instead of ⟨…⟩. That should resolve the errors about unexpected tokens and unsolved goals.

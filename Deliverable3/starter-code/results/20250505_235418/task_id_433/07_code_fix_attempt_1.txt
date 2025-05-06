@@ -1,0 +1,37 @@
+Below is our step-by-step analysis and the fixed version of the function:
+
+─────────────────────────────  
+Step 1. Identify the error source  
+• The error is reported at the line  
+  a.all? (fun x => n > x)  
+• Lean complains that the environment does not contain the field “all?” on type Array.
+
+─────────────────────────────  
+Step 2. Explain why this is causing an issue  
+• The method “all?” is being called on an Array, but Lean’s Array type (in the standard library and Mathlib) does not have a method with that name.  
+• This causes a type error because Lean cannot find any declaration or field “all?” attached to Array Int.
+
+─────────────────────────────  
+Step 3. Consider the Lean type system and requirements  
+• Lean’s Array type must be used with functions that are defined for it.  
+• Although the idea is to check that every element of the array satisfies the predicate (n > x), Lean provides this functionality for List via List.all.  
+• Since Array supports conversion to List via a.toList, we can leverage this conversion to use List.all.
+
+─────────────────────────────  
+Step 4. Think through potential solutions  
+• One solution is to define our own “all?” function for arrays.  
+• A simpler and effective solution is to use a.toList and then call List.all on it.  
+• Hence, replacing a.all? with (a.toList).all will serve the intended purpose.
+
+─────────────────────────────  
+Step 5. Test each solution in your head  
+• Converting the array to a list and then using List.all works:  
+ – If the array is empty, List.all returns true (as expected).  
+ – For a nonempty array, List.all correctly checks the predicate on every element.  
+• The type of (a.toList).all (fun x => n > x) is Bool, matching the expected return type.
+
+─────────────────────────────  
+Fixed Implementation of the isGreater Function  
+
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  (a.toList).all (fun x => n > x)

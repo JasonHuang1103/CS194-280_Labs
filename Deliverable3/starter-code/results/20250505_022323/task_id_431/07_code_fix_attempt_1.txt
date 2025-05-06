@@ -1,0 +1,8 @@
+The error occurs because Lean’s Array type does not have a method called any?. Instead, you should use the Array.any function. Here’s the fixed version of the function implementation:
+
+--------------------------------------------------
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  Array.any a fun x => Array.any b fun y => x = y
+--------------------------------------------------
+
+This change replaces the invalid any? calls with the proper Array.any function.

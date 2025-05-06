@@ -1,0 +1,17 @@
+```lean
+induction a using Array.inductionOn with
+| nil =>
+    simp
+| cons x xs ih =>
+    simp [Array.foldl, ih]
+    constructor
+    · intro h i hi
+      cases hi with
+      | head => exact h.1
+      | tail hi' => exact h.2 i hi'
+    · intro h
+      constructor
+      · exact h 0 (Nat.zero_lt_succ _)
+      · intro i hi
+        exact h (i + 1) (Nat.succ_lt_succ hi)
+```

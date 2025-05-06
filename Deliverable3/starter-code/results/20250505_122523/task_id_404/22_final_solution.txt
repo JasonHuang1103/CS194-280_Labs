@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then a else b",
+  "proof": "split_ifs\ncase pos =>\n  exact \u27e8\u27e8le_refl a, h\u27e9, Or.inl rfl\u27e9\ncase neg =>\n  exact \u27e8\u27e8not_le.mp h, le_refl b\u27e9, Or.inr rfl\u27e9"
+}

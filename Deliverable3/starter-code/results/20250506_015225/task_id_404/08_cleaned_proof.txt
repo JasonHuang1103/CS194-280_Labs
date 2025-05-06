@@ -1,0 +1,17 @@
+split
+· split
+  · by_cases h : a ≤ b
+    · rw [if_pos h]
+    · rw [if_neg h]
+      apply Int.le_of_not_le h
+  · by_cases h : a ≤ b
+    · rw [if_pos h]
+      apply Int.le_of_not_le
+      intro h'
+      exact lt_irrefl _ (lt_of_lt_of_le h' h)
+    · rw [if_neg h]
+· by_cases h : a ≤ b
+  · left
+    rw [if_pos h]
+  · right
+    rw [if_neg h]

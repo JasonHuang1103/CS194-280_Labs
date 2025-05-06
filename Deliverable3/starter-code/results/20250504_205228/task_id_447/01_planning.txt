@@ -1,0 +1,97 @@
+Below is a detailed plan outlining the approach to solving the problem, both for the function implementation and for its accompanying correctness proof.
+
+─────────────────────────────  
+1. Overview of the Task
+
+• We need to write a function cubeElements that, given an array a : Array Int, returns an array where every element has been replaced by its cube (i.e., multiplied by itself three times).
+
+• Then, we must prove that the returned array meets the specification:
+  - It has the same length as the input array.
+  - For every valid index i, the element in the result array is exactly the cube of the corresponding element in the input array.
+
+─────────────────────────────  
+2. Implementation Strategy
+
+The intuitive and Lean-friendly way to perform a transformation on all elements of an array is to use the array’s built-in map function. The transformation function here is “λ x, x * x * x.” Thus, the implementation step is:
+  
+  • Define cubeElements a := a.map (fun x => x * x * x)
+
+This automatically ensures that the size of the array is unchanged. (Lean’s standard library for Array defines map in such a way that it does not change the size of the array.)
+
+─────────────────────────────  
+3. Proof Strategy
+
+The goal of the theorem cubeElements_spec_satisfied is to show that for every input array a, cubeElements_spec a (cubeElements a) holds. We need to prove two things:
+
+(a) (Size preservation) Prove that (cubeElements a).size = a.size.
+
+  – Since cubeElements is defined as a.map f, use the fact that a.map preserves the size of the array. Lean’s library for Array usually has a lemma or property (perhaps named Array.map_size) that guarantees (a.map f).size = a.size.
+
+(b) (Correct element transformation) Prove that for every index i, if i < a.size then (cubeElements a)[i]! = a[i]! * a[i]! * a[i]! 
+
+  – Again, under the definition cubeElements a = a.map (fun x => x * x * x), we can invoke the property of map that relates get on the mapped array with applying the function to the corresponding element of the original array. In other words, for any i that is a valid index, (a.map f)[i]! = f (a[i]!).
+
+─────────────────────────────  
+4. Detailed Steps of the Proof
+
+Step 1: Unfold the definitions. Begin the proof by unfolding cubeElements and cubeElements_spec.
+
+Step 2: Prove size preservation:
+
+  – Show that (a.map (λ x => x * x * x)).size = a.size using the lemma on Array.map size preservation.
+
+Step 3: Prove the transformation property for each index:
+
+  – For every i with i < a.size, apply the lemma (or property) that states (a.map f)[i]! = f (a[i]!)
+  – Then, replacing f with “λ x, x * x * x,” we see that (a.map (λ x, x * x * x))[i]! = a[i]! * a[i]! * a[i]! as desired.
+
+Step 4: Combine the two parts with a conjunction to conclude cubeElements_spec a (cubeElements a).
+
+─────────────────────────────  
+5. Coding the Implementation and Proof in Lean
+
+• Implementation Code: Use Array.map to define cubeElements.
+• Proof Code: Use the basic array lemmas (e.g., on map preservation of size and retrieving mapped elements) to show both parts of the spec.
+
+Your Lean code template, with our plan, might look roughly as follows:
+
+─────────────────────────────  
+import Mathlib
+import Aesop
+
+-- Implementation
+def cubeElements (a : Array Int) : Array Int :=
+  -- << CODE START >>
+  a.map (fun x => x * x * x)
+  -- << CODE END >>
+
+-- Specification: The result array has the same size as the input and each element is cubed.
+def cubeElements_spec (a : Array Int) (result : Array Int) : Prop :=
+  -- << SPEC START >>
+  (result.size = a.size) ∧
+  (∀ i, i < a.size → result[i]! = a[i]! * a[i]! * a[i]!)
+  -- << SPEC END >>
+
+theorem cubeElements_spec_satisfied (a : Array Int) :
+  cubeElements_spec a (cubeElements a) := by
+  -- << PROOF START >>
+  dsimp [cubeElements, cubeElements_spec]  -- unfold the definitions
+  constructor
+  · -- Prove the size is preserved:
+    -- Here we use the property that map preserves size.
+    -- Depending on your version of Lean, you might have a lemma like Array.map_size.
+    rw [Array.size_map]
+  · -- Prove that for every index i, the cube transformation holds.
+    intro i hi
+    -- If your library has a lemma for `get_map`, it may state that (a.map f)[i]! = f (a[i]!).
+    rw [Array.get_map hi]
+  -- << PROOF END >>
+
+─────────────────────────────  
+6. Final Remarks
+
+• Note that the specific names of lemmas, such as Array.size_map or Array.get_map, might differ based on your version of Mathlib. Check your available lemmas or adjust accordingly.
+
+• The overall approach uses functional programming paradigms combined with properties of Array.map to ensure both correctness and size preservation, leading to a clear and concise implementation and proof.
+
+This plan outlines the key steps required to both code the function and prove its correctness in Lean 4.

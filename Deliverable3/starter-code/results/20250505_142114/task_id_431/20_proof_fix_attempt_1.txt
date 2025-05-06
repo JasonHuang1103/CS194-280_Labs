@@ -1,0 +1,13 @@
+```lean
+constructor
+· intro ⟨i, j, h₁, h₂, h₃⟩
+  use a[i]!
+  apply Array.any_of_mem _ h₃
+  exact ⟨i, h₁⟩
+· intro h
+  obtain ⟨x, hx⟩ := Array.mem_of_any h
+  obtain ⟨i, hi⟩ := hx.imp $
+    λ i hi, ⟨i, hi, x, Array.get_of_mem _ hi⟩
+  rcases hi with ⟨i, hi₁, x, hi₂⟩
+  exact ⟨i, b.indexOf x, hi₁, b.indexOf_lt_size hi₂, hi₂⟩
+```

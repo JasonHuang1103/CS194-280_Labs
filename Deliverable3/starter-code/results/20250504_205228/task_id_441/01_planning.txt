@@ -1,0 +1,69 @@
+Below is a plan outlining the steps to solve the problem, followed by an explanation of the approach.
+
+──────────────────────────────
+1. Implementation of cubeSurfaceArea
+
+• We need to implement a function that computes the surface area of a cube.
+• The surface area formula is 6 * (edge length)^2.
+• Given Lean’s arithmetic on integers and associativity of multiplication, writing 6 * size * size directly is acceptable.
+
+──────────────────────────────
+2. Specification of the Function
+
+• We provide a specification predicate cubeSurfaceArea_spec that says the result should equal 6 * size * size.
+• This is meant to be a property showing that our function meets the intended formula.
+
+──────────────────────────────
+3. Theorem to Prove Correctness (cubeSurfaceArea_spec_satisfied)
+
+• We need to prove that for every size, cubeSurfaceArea_spec size (cubeSurfaceArea size) holds.
+• This involves unfolding the definitions of cubeSurfaceArea and cubeSurfaceArea_spec.
+• After the definitions are unfolded, the statement becomes “6 * size * size = 6 * size * size.”
+• Since this equality is trivial, the proof can be completed by using reflexivity (rfl).
+
+──────────────────────────────
+4. Detailed Steps in the Lean Code
+
+a. Define cubeSurfaceArea so that it computes 6 * size * size.
+b. Write the cubeSurfaceArea_spec predicate as given.
+c. In the theorem cubeSurfaceArea_spec_satisfied, start a proof block.
+d. Unfold the definitions so that the goal becomes 6 * size * size = 6 * size * size.
+e. Use rfl (i.e. reflexivity) to finish the proof.
+
+──────────────────────────────
+5. Putting It All Together
+
+When you implement the code in Lean, it will follow the above structure. Thanks to the simplicity of the arithmetic involved, the key steps are:
+
+• Function Implementation: Straightforward arithmetic.
+• Specification: Direct equality to the computed expression.
+• Proof: Unfolding and then using rfl.
+
+──────────────────────────────
+Below is an illustration in Lean pseudocode with the placeholders replaced:
+
+--------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def cubeSurfaceArea (size : Int) : Int :=
+  -- << CODE START >>
+  6 * size * size
+  -- << CODE END >>
+
+-- Theorem: The surface area of the cube is calculated correctly
+def cubeSurfaceArea_spec (size : Int) (result : Int) : Prop :=
+  -- << SPEC START >>
+  result = 6 * size * size
+  -- << SPEC END >>
+
+theorem cubeSurfaceArea_spec_satisfied (size : Int):
+  cubeSurfaceArea_spec size (cubeSurfaceArea size) := by
+  -- << PROOF START >>
+  unfold cubeSurfaceArea cubeSurfaceArea_spec
+  rfl
+  -- << PROOF END >>
+--------------------------------------------------
+
+This plan shows how to approach the implementation and the correctness proof in Lean 4.

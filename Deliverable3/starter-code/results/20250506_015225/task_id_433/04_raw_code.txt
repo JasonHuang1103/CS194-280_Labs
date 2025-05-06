@@ -1,0 +1,3 @@
+```lean
+a.foldl (fun acc x => acc && (n > x)) true
+```

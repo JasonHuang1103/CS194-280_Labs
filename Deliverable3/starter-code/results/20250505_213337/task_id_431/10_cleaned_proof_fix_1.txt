@@ -1,0 +1,11 @@
+rw [Array.any_iff_mem, Array.contains_eq]
+  constructor
+  · rintro ⟨i, hi, h⟩
+    use i, hi
+    exact h
+  · rintro ⟨i, hi, h⟩
+    use i, Array.indexOf b (a[i]!)
+    rw [Array.contains_eq] at h
+    rcases h with ⟨j, hj, h_eq⟩
+    use j, hj
+    rw [h_eq]

@@ -1,0 +1,10 @@
+Lean Error: lean_playground/TempTest.lean:23:8: error: invalid constructor ⟨...⟩, expected type must be an inductive type with only one constructor 
+  a = a ∨ a = b
+lean_playground/TempTest.lean:23:9: error: application type mismatch
+  And.intro (le_refl ?m.493)
+argument
+  le_refl ?m.493
+has type
+  ?m.493 ≤ ?m.493 : Prop
+but is expected to have type
+  a ≤ a ∧ a ≤ b : Prop

@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:21:2: error: simp made no progress
+lean_playground/TempTest.lean:22:0: error: unexpected token 'have'; expected command

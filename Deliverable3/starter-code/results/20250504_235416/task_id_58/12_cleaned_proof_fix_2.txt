@@ -1,0 +1,29 @@
+intro h
+  split
+  · intro hab
+    cases hab
+    · have : a * b < 0 := mul_neg_of_neg_of_pos hab.1 hab.2
+      simp [this] 
+    · have : a * b < 0 := mul_neg_of_pos_of_neg hab.1 hab.2
+      simp [this] 
+  · intro hab
+    simp at hab
+    cases lt_trichotomy a 0 with ha ha
+    · cases lt_trichotomy b 0 with hb hb
+      · exfalso
+        have : a * b > 0 := mul_pos ha.1 hb.1
+        linarith
+      · cases hb
+        · exfalso
+          simp only [hb, mul_zero, lt_irrefl] at hab
+        · left; exact ⟨ha.1, hb.2⟩      
+    · cases ha
+      · exfalso
+        simp only [ha, zero_mul, lt_irrefl] at hab
+      · cases lt_trichotomy b 0 with hb hb
+        · right; exact ⟨ha.2, hb.1⟩
+        · exfalso
+          simp only [hb, mul_zero, lt_irrefl] at hab
+        · exfalso
+          have : a * b > 0 := mul_pos ha.2 hb.2
+          linarith

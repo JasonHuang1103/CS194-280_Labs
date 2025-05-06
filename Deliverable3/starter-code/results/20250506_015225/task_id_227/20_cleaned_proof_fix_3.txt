@@ -1,0 +1,26 @@
+intro
+split_ifs with h1 h2 h3 h4
+all_goals {
+  rw minOfThree_spec,
+  apply And.intro,
+}
+· -- Case 1: a ≤ b and a ≤ c
+  exact ⟨h1, h2, le_refl _⟩,
+  left,
+  rfl
+· -- Case 2: a ≤ b and ¬ a ≤ c
+  have hc : c < a := lt_of_not_le h2,
+  exact ⟨le_of_lt hc, h1, le_refl _⟩,
+  right, right,
+  rfl
+· -- Case 3: ¬ a ≤ b and b ≤ c
+  have ha : a < b := lt_of_not_le h1,
+  exact ⟨le_of_lt ha, le_refl _, h3⟩,
+  right, left,
+  rfl   
+· -- Case 4: ¬ a ≤ b and ¬ b ≤ c
+  have hb : c < b := lt_of_not_le h3,
+  have ha : a < b := lt_of_not_le h1,
+  exact ⟨le_of_lt (lt_trans hb ha), le_of_lt hb, le_refl _⟩,
+  right, right,
+  rfl

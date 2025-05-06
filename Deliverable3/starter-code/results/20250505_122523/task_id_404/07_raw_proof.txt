@@ -1,0 +1,13 @@
+```lean
+split
+· simp
+  split_ifs
+  · exact ⟨le_refl a, le_trans h (le_of_eq h).symm⟩
+  · exact ⟨le_trans h (le_of_eq h).symm, le_refl b⟩
+simp
+split_ifs
+· left
+  rfl
+right
+rfl
+```

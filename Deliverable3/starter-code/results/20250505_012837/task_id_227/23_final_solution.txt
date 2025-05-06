@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then\n    if a \u2264 c then a else c\n  else\n    if b \u2264 c then b else c",
+  "proof": "simp [minOfThree]\nsplit\n\u00b7 by_cases h1 : a \u2264 b\n  \u00b7 by_cases h2 : a \u2264 c\n    \u00b7 simp [h1, h2]\n    \u00b7 simp [h1, h2]; exact And.intro (le_of_not_le h2) le_rfl\n  \u00b7 by_cases h3 : b \u2264 c\n    \u00b7 simp [h1, h3]; exact And.intro (le_of_not_le h1) le_rfl\n    \u00b7 simp [h1, h3]; exact And.intro (le_of_not_le h1) (le_of_not_le h3)\n\u00b7 by_cases h1 : a \u2264 b\n  \u00b7 by_cases h2 : a \u2264 c\n    \u00b7 simp [h1, h2]\n    \u00b7 simp [h1, h2]\n  \u00b7 by_cases h3 : b \u2264 c\n    \u00b7 simp [h1, h3]\n    \u00b7 simp [h1, h3]"
+}

@@ -1,0 +1,61 @@
+To address the issues, let's focus on the necessary modifications in the proof. Notice that there is one primary error with the proof:
+
+1. **Duplicated Theorem Declaration**: The theorem `minOfThree_spec_satisfied` is declared twice, which is unnecessary and incorrect. You only need to declare it once.
+
+2. **Proof Structure**: The proof should handle all possible logical branches of the `if-else` structure in `minOfThree` clearly and should ensure to correctly deduce the inequalities from the assumptions (`a <= b`, `b <= c`, etc.).
+
+Here's a corrected version of the proof:
+
+```lean
+theorem minOfThree_spec_satisfied (a : Int) (b : Int) (c : Int) :
+  minOfThree_spec a b c (minOfThree a b c) := by
+  unfold minOfThree minOfThree_spec
+  split
+  · -- Prove result <= a ∧ result <= b ∧ result <= c
+    split
+    · -- Prove result <= a
+      by_cases h₁ : a <= b
+      · by_cases h₂ : a <= c
+        · simp [h₁, h₂] -- result = a
+        · simp [h₁, h₂] -- result = c
+          exact le_of_not_ge h₂
+      · by_cases h₂ : b <= c
+        · simp [h₁, h₂] -- result = b
+        · simp [h₁, h₂] -- result = c
+          exact le_of_not_ge h₂
+    · split
+      · -- Prove result <= b
+        by_cases h₁ : a <= b
+        · by_cases h₂ : a <= c
+          · simp [h₁, h₂] -- result = a
+            exact h₁
+          · simp [h₁, h₂] -- result = c
+            exact le_trans (le_of_not_ge h₂) h₁
+        · by_cases h₂ : b <= c
+          · simp [h₁, h₂] -- result = b
+          · simp [h₁, h₂] -- result = c
+            exact le_of_not_ge h₂
+      · -- Prove result <= c
+        by_cases h₁ : a <= b
+        · by_cases h₂ : a <= c
+          · simp [h₁, h₂] -- result = a
+            exact h₂
+          · simp [h₁, h₂] -- result = c
+        · by_cases h₂ : b <= c
+          · simp [h₁, h₂] -- result = b
+            exact h₂
+          · simp [h₁, h₂] -- result = c
+  · -- Prove result = a ∨ result = b ∨ result = c
+    by_cases h₁ : a <= b
+    · by_cases h₂ : a <= c
+      · simp [h₁, h₂] -- result = a
+      · simp [h₁, h₂] -- result = c
+    · by_cases h₂ : b <= c
+      · simp [h₁, h₂] -- result = b
+      · simp [h₁, h₂] -- result = c
+```
+
+Key changes and improvements:
+- Removed the duplicate theorem declaration.
+- Ensured each branch is properly concluded with `exact` to resolve the goals.
+- Improved clarity on assumptions handling (`le_of_not_ge`) and result deductions.

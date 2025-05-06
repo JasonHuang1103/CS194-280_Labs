@@ -1,0 +1,4 @@
+{
+  "code": "a.map (fun x => x * x * x)",
+  "proof": "constructor\n\u00b7 simp [Array.size_map]\n\u00b7 intro i hi\n  simp [Array.getElem_map]"
+}

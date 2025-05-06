@@ -1,0 +1,112 @@
+Below is a complete, step‐by‐step explanation followed by a detailed plan for the implementation and proof.
+
+─────────────────────────────  
+Step 1. Understand the Function's Purpose
+
+• The function isDivisibleBy11 should determine if an integer n is divisible by 11.  
+• That is, it should return true exactly when n mod 11 equals 0, and false otherwise.
+
+─────────────────────────────  
+Step 2. Break Down the Problem
+
+1. Implementation Subproblem  
+   • Compute n % 11 (the remainder when n is divided by 11).  
+   • Compare this remainder with 0.  
+   • Return a Boolean based on that comparison.
+
+2. Specification and Proof Subproblem  
+   • The specification (isDivisibleBy11_spec) states:  
+     “n % 11 = 0 ↔ result”  
+   • When we substitute our function (result = isDivisibleBy11 n), we need to show:  
+     n % 11 = 0 if and only if (n % 11 == 0)  
+   • Essentially, once we define the function in a “definitionally” straightforward way, the proof should unfold by rewriting the definition and checking that both sides match.
+
+─────────────────────────────  
+Step 3. Consider Input Types, Edge Cases, and Expected Behavior
+
+• Input Type: n is an Int. Remember that Lean’s Int type supports the modulo operator (%) and equality checks.  
+• Edge Cases:  
+   – n = 0: Zero is divisible by 11 (0 % 11 = 0), so the function should return true.  
+   – Negative numbers: The % operation works with negative numbers as well; the function should correctly decide divisibility even for negatives.  
+• Expected Behavior:  
+   – For any n, isDivisibleBy11 n returns (n % 11 == 0).
+
+─────────────────────────────  
+Step 4. Proof Technique
+
+• The proof goal is to show the equivalence:  
+  n % 11 = 0 ↔ isDivisibleBy11 n  
+• Because our definition of isDivisibleBy11 will simply be “n % 11 == 0”, once we unfold the definitions, both sides of the equivalence will be the same.  
+• The proof will be by unfolding definitions and using reflexivity (or a simple simp) to show that the equivalence holds.
+
+─────────────────────────────  
+Step 5. Similar Patterns from Examples
+
+• Much like standard definitions checking for divisibility in Lean examples, we compare a computed remainder to 0.  
+• The use of “unfold” in the proof is a common technique to reveal the definitions of functions and predicates.  
+• The simplicity of the operation (a direct comparison) typically allows us to discharge the proof by “rfl” (reflexivity) if the definitions are exactly the same.
+
+─────────────────────────────  
+Detailed Plan for Implementation and Proof
+
+1. Implementation:  
+   • Define isDivisibleBy11 so that it computes n % 11 and checks if it is equal to 0 using the equality operator (==).  
+   • In Lean 4, the expression “n % 11 == 0” evaluates to a Bool.
+
+2. Specification:  
+   • The predicate isDivisibleBy11_spec is already given as “n % 11 = 0 ↔ result”.  
+   • Here, result will be instantiated with (isDivisibleBy11 n).
+
+3. Proof:  
+   • In theorem isDivisibleBy11_spec_satisfied, start by unfolding both definitions:  
+     – unfold isDivisibleBy11 reveals that it is defined as (n % 11 == 0).  
+     – unfolding isDivisibleBy11_spec reveals that the goal is:  
+       n % 11 = 0 ↔ (n % 11 == 0)
+   • The goal is then to prove the equivalence between “n % 11 = 0” (a proposition stating that n leaves remainder 0) and “n % 11 == 0” (a boolean test).  
+   • Lean’s built-in definition for “==” on Int, combined with the decidability of equality on integers, ensures that these are equivalent.  
+   • This equivalence is usually ensured by a lemma (or may be definitionally equal) so that one can solve the goal with “rfl” or by invoking simplification tactics (e.g., simp).
+
+─────────────────────────────  
+Final Lean 4 Code Outline
+
+Below is the final code that implements the function and proves the specification. (Note: The exact tactics might differ slightly depending on your Lean 4 environment, but the overall idea is the same.)
+
+----------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def isDivisibleBy11 (n : Int) : Bool :=
+  -- << CODE START >>
+  n % 11 == 0
+  -- << CODE END >>
+
+-- Theorem specification: The result is true if n is divisible by 11
+def isDivisibleBy11_spec (n : Int) (result : Bool) : Prop :=
+  -- << SPEC START >>
+  n % 11 = 0 ↔ result
+  -- << SPEC END >>
+
+theorem isDivisibleBy11_spec_satisfied (n : Int) :
+  isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+  -- << PROOF START >>
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  -- After unfolding, the goal becomes: n % 11 = 0 ↔ (n % 11 == 0)
+  -- This equivalence holds because the boolean test "n % 11 == 0" is defined to capture the proposition "n % 11 = 0"
+  apply Iff.intro
+  · intro h
+    -- Since h : n % 11 = 0, then by definition of (==), we get n % 11 == 0 is true.
+    exact decide_eq_true (by simp [h])
+  · intro h
+    -- For the reverse direction, if h : n % 11 == 0, reason by decidability:
+    apply Bool.eq_true_iff.1 h
+  -- Alternatively, if the definitions are definitionally equal, one could simply use:
+  -- rfl
+  -- << PROOF END >>
+
+----------------------------------------------------
+
+─────────────────────────────  
+Conclusion
+
+The plan first implements isDivisibleBy11 by computing the remainder modulo 11 and returning whether that equals zero. The proof then unfolds the definitions and uses the equivalence between the proposition “n % 11 = 0” and the boolean test “n % 11 == 0”. With these steps detailed, you now have both an implementation and a proof that they meet the specification.

@@ -1,0 +1,21 @@
+Here's a corrected proof for the theorem `cubeElements_spec_satisfied`. The error likely stems from the overly aggressive use of `unfold` and mismanagement of array indices. Let's fix that:
+
+```lean
+theorem cubeElements_spec_satisfied (a : Array Int) :
+  cubeElements_spec a (cubeElements a) := by
+  unfold cubeElements cubeElements_spec
+  constructor
+  case left =>
+    exact Array.size_map (fun x => x * x * x) a
+  case right =>
+    intro i hi
+    simp [Array.getElem, Array.map]
+    apply congrArg
+    apply Array.getElem_map
+    exact hi
+```
+
+Changes made:
+- Removed the second `unfold` statement that was unnecessary after the initial unfolding.
+- Explicitly specified the function in `Array.size_map`.
+- Used `Array.getElem_map` to help manage the index operation correctly.

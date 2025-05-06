@@ -1,0 +1,80 @@
+Below is a detailed plan for both implementing the function and proving its specification.
+
+─────────────────────────────  
+Step 1. Implementation Plan
+
+• The goal is to decide if two integers a and b have opposite signs.  
+• Recall that zero should not count as either positive or negative. Therefore, if either a or b is zero, then the result should be false.  
+• We can directly check the two accepted cases:
+  – one integer is negative and the other is positive: (a < 0 ∧ b > 0)  
+  – or a is positive and b is negative: (a > 0 ∧ b < 0)  
+• In Lean 4, we can directly use boolean expressions involving relational operators.  
+• Thus, the implementation can be written simply as:  
+  (a < 0 && b > 0) || (a > 0 && b < 0)  
+This expression gives true for exactly the two desired cases, and false otherwise.
+
+─────────────────────────────  
+Step 2. Specification of the Theorem
+
+• The specification is:
+  hasOppositeSign_spec a b result : Prop :=
+    (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result  
+• This means that if and only if the arithmetic condition for opposite signs holds, then our function should return true.
+
+─────────────────────────────  
+Step 3. Proof Plan
+
+• We need to prove:  
+  hasOppositeSign_spec a b (hasOppositeSign a b)  
+• That is, unfolding definitions we need to show:  
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ ((a < 0 && b > 0) || (a > 0 && b < 0))
+• The proof strategy here is to unfold both the function and the spec. Notice that Lean’s boolean operations (&&, ||) reflect exactly the operations on propositions (∧, ∨) when the operands are interpreted appropriately—and in our case, comparisons like (a < 0) are of type Bool (see Lean’s mathlib, which defines Int comparisons returning Bool).  
+• Because our comparisons yield booleans and the spec uses the same form but as a Prop (using ∧ vs. &&, the only difference is in notation), you should check that you are using mathlib’s conversion or simply use rewriting.  
+• One approach is to note that our function is defined by the same boolean formula as in the specification. Therefore, once you "unfold" the definitions, the equivalence is immediate (by reflexivity or by a conversion lemma).  
+• If needed, the proof may need some case splitting on the sign of a and b:
+  – Case 1: a > 0, b > 0  
+  – Case 2: a < 0, b < 0  
+  – Case 3: a = 0 or b = 0  
+  – Case 4: a > 0, b < 0  
+  – Case 5: a < 0, b > 0  
+In Cases 4 and 5 the equivalence holds.
+  In all other cases, both sides are false.
+
+• With Aesop tactics (or by manual reasoning with "by cases") you can complete the proof.
+
+─────────────────────────────  
+Step 4. Pseudocode Example
+
+1. For the function:
+
+  def hasOppositeSign (a : Int) (b : Int) : Bool :=
+    (a < 0 && b > 0) || (a > 0 && b < 0)
+
+2. For the theorem, we start with:
+
+  theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+    hasOppositeSign_spec a b (hasOppositeSign a b) := by
+    unfold hasOppositeSign hasOppositeSign_spec
+    -- At this point the goal becomes:
+    -- ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ ((a < 0 && b > 0) || (a > 0 && b < 0))
+    -- Then proceed by case analysis on a and b or use equivalence rewriting.
+    sorry    -- replace with actual proof steps
+
+3. A direct approach could be to use the fact that the boolean operators (&& and ||) behave like ∧ and ∨ when used in these identities, letting Lean’s simplifier solve the goal.
+
+─────────────────────────────  
+Step 5. Final Considerations
+
+• It is important in Lean to note the difference between propositional conjunction (∧) and boolean conjunction (&&).  
+• In our case, since the relations (like a < 0) are booleans (Lean’s standard library defines these operations over Int to yield Bool), the two forms coincide when interpreted appropriately.  
+• If a mismatch arises, you might need to use functions like "decide" or "toBool" to bridge the propositional/boolean gap.
+
+─────────────────────────────  
+Summary
+
+1. Implement the function using the boolean expression:  
+  (a < 0 && b > 0) || (a > 0 && b < 0)
+2. Define the spec such that the given condition is equivalent to the function result.
+3. Prove the spec by unfolding the definitions and showing the equivalence by a case split or by letting the simplifier conclude the equivalence—leveraging that the boolean operators correspond directly to the logical connectives.
+
+This plan provides the necessary steps to implement the function and construct the proof in Lean 4.

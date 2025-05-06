@@ -1,0 +1,14 @@
+```lean
+constructor
+· intro h
+  obtain ⟨x, hx⟩ := Array.exists_mem_iff_any.mp ((Bool.decide_eq_true_iff _).mp h)
+  obtain ⟨y, hy, rfl⟩ := Array.exists_mem_iff_any.mp ((Bool.decide_eq_true_iff _).mp hx)
+  exact ⟨a.indexOf x, b.indexOf y, Array.indexOf_lt_length _ _, Array.indexOf_lt_length _ _, rfl⟩
+· rintro ⟨i, j, hi, hj, rfl⟩
+  apply (Bool.decide_eq_true_iff _).mpr
+  apply Array.exists_mem_iff_any.mpr
+  use a[i]!
+  apply (Bool.decide_eq_true_iff _).mpr
+  apply Array.exists_mem_iff_any.mpr
+  use b[j]!
+```

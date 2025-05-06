@@ -1,0 +1,4 @@
+theorem multiply_spec_satisfied (a : Int) (b : Int) :
+  multiply_spec a b (multiply a b) := by
+  unfold multiply_spec
+  rfl

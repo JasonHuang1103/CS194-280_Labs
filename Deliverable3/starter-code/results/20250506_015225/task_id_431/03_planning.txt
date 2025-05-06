@@ -1,0 +1,114 @@
+Below is an example of how one might reason through and plan both the implementation and the proof.
+
+──────────────────────────────
+Step 1. Understanding the Specification
+
+• The function hasCommonElement takes two arrays of integers, a and b.  
+• It should return true if there is some integer x that appears in both a and b; that is, if ∃ i, j with i < a.size, j < b.size such that a[i]! = b[j]!.  
+• If either array is empty or no element appears in both arrays then the function must return false.
+
+──────────────────────────────
+Step 2. Breaking Down the Problem
+
+It is convenient to “search” for a common element by checking for each element x in a whether x occurs in b.
+• For each x in a, determine if x appears in b.  
+• Lean’s Array module offers ways to “check membership” or apply a predicate to each element (for example, using a function along the lines of exists or any).  
+• Thus, one can implement hasCommonElement as:  
+  a.any (λ x => b.any (λ y => x = y))
+This code “loops” over a and for each element uses an inner loop over b to check if x is equal to some y in b.
+
+──────────────────────────────
+Step 3. Considering Input Types, Edge Cases, and Expected Behavior
+
+• The arrays are of type Array Int.  
+• If either a or b is empty, then there is no candidate for a common element so the answer is false.  
+• The method using a.any (λ x => b.any (λ y => x = y)) naturally returns false when a is empty. In addition, if b is empty then b.any will always answer false. Thus, we cover all edge cases.
+
+──────────────────────────────
+Step 4. Appropriate Proof Techniques
+
+Our specification (hasCommonElement_spec) is an “if and only if” statement:
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result.
+When proving that hasCommonElement satisfies this spec we need to show that:
+1. If there exist indices i and j for which a[i]! = b[j]! then hasCommonElement returns true.
+2. Conversely, if hasCommonElement returns true then there must exist such indices.
+The proof plan is as follows:
+• Unfold the definitions of hasCommonElement and hasCommonElement_spec.  
+• In one direction, assume the existence of indices i and j so that a[i]! = b[j]!. Then conclude that there is an element x ∈ a (namely, a[i]) for which b.any (λ y => x = y) holds.  
+• In the other direction, assume a.any (λ x => b.any (λ y => x = y)) returns true, which tells us there is some x ∈ a such that b.any returns true. Then, by the definition of Array.any, there must be some index i in a and some index j in b with a[i]! = x and b[j]! = x.  
+• We can use tactics such as “cases” or “rcases” to extract the indices from the existentials.
+
+──────────────────────────────
+Step 5. Similar Patterns from Examples
+
+• The Lean documentation examples use tactics like constructor, cases, and intro to prove iff statements.  
+• We can mimic these patterns: first introduce the hypothesis, then use cases to extract witnesses, and finally apply the “iff.intro” or “constructor” tactic to break the proof into two directions.
+• The structure of our proof will be similar to a typical “exists (∃)" proof in Lean.
+
+──────────────────────────────
+Plan Summary
+
+Implementation Plan:
+1. Define hasCommonElement by iterating through each element x in a.
+2. For each x, check if b contains any element equal to x.
+3. Use the built-in method any on arrays (i.e. a.any and b.any):
+  def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+    a.any (λ x => b.any (λ y => x = y))
+
+Proof Plan:
+1. Unfold the definitions of hasCommonElement and hasCommonElement_spec.  
+2. Prove the (→) direction:
+  a. Assume ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!.  
+  b. Extract the index i (and j) such that a[i]! = b[j]!; let x = a[i] and note that x ∈ a.  
+  c. Because b[j]! equals x and j < b.size, we have (λ y => x = y) holds for some y in b.  
+  d. Then by definition a.any (λ x => b.any (λ y => x = y)) returns true.
+3. Prove the (←) direction:
+  a. Assume hasCommonElement returns true, that is a.any (λ x => b.any (λ y => x = y)) holds.  
+  b. Use the definition of any to extract an element x ∈ a such that b.any (λ y => x = y) holds.  
+  c. Similarly, use the definition of b.any to extract an index j such that b[j]! = x.  
+  d. Use the fact that x came from a to witness a corresponding index i with a[i]! = x.
+4. Conclude this shows the bi-implication, so the specification is satisfied.
+
+──────────────────────────────
+Detailed Plan (Pseudocode)
+
+Implementation:
+
+  def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+    a.any (λ x => b.any (λ y => x = y))
+
+Proof (in tactic mode):
+
+  theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+      hasCommonElement_spec a b (hasCommonElement a b) :=
+  by
+    unfold hasCommonElement hasCommonElement_spec
+    apply Iff.intro
+    · -- Show that if ∃ i j, a[i]! = b[j]! then hasCommonElement returns true.
+      intro h
+      cases h with
+      | intro i hi =>
+        cases hi with
+        | intro j hij =>
+          -- From hij, we have i < a.size, j < b.size and a[i]! = b[j]!
+          -- Let x = a[i]!; because i < a.size, x ∈ a.
+          -- Since j < b.size and a[i]! = b[j]!, b.any (λ y => x = y) is true.
+          -- So the predicate in a.any is true for x.
+          sorry
+    · -- Show that if hasCommonElement returns true then ∃ i j with a[i]! = b[j]!
+      intro h
+      -- From h, by the definition of a.any, there exists x ∈ a such that b.any (λ y => x = y) is true.
+      -- Thus, by the definition of b.any, there exists j with b[j]! = x and j < b.size.
+      -- Also since x came from a, there exists i with x = a[i]! and i < a.size.
+      sorry
+
+In the actual Lean proof we would replace the “sorry” placeholders with concrete tactics (using cases, rcases, and similar tactics) to obtain the witnesses and complete the proof.
+
+──────────────────────────────
+Conclusion
+
+The overall plan is to implement hasCommonElement using a double iteration (via a.any and b.any) to find a common element, and then prove that this implementation meets the following bi-implication:  
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ hasCommonElement a b.  
+The proof is done by unfolding the definitions and then, for each direction, using tactics to extract indices that witness the required equalities.
+
+This detailed breakdown gives you both an implementation strategy and a guide to a structured proof in Lean 4.

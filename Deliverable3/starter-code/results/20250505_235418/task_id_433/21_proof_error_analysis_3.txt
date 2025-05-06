@@ -1,0 +1,77 @@
+Below is a step‐by‐step analysis of what is going wrong.
+
+──────────────────────────────
+1. The tactic that fails
+
+The first failure comes when you try to simplify using
+  simp [isGreater, isGreater_spec, List.all_iff_forall]
+Lean complains that it “unknown constant ‘List.all_iff_forall’.” In other words, the simplifier was instructed to use a lemma or equivalence named List.all_iff_forall, but no such constant is available (or “in scope”) in your Lean 4 environment.
+
+Later in the proof the tactic
+  obtain ⟨i, hi, rfl⟩ := List.mem_of_get_eq hx
+also fails with “unknown constant ‘List.mem_of_get_eq’” and then the rcases tactic complains that the hypothesis is “not an inductive datatype.” This happens because you are trying to deconstruct a term using a lemma that doesn’t exist (or isn’t imported) into the current context.
+
+──────────────────────────────
+2. Thoughts on the proof state
+
+When you unfold the definitions of isGreater and isGreater_spec, you get an equivalence between a ∀‑statement over array indices and a property about the “all” predicate on the list a.toList. In many proofs one would use the result that
+  (List.all a p) ↔ (∀ x ∈ a, p x)
+but Lean’s Mathlib in Lean 4 does not (yet) export a lemma called List.all_iff_forall. (A similar comment applies to the “mem_of_get_eq” lemma.) Thus, your proof state contains goals involving these “bridging” lemmas, but they are missing. Furthermore, when you do
+  intro h i hi; exact h i hi
+Lean tells you that h i hi has type a[i]! < n while the goal expects a[i] < n. (Note that n > a[i]! is equivalent to a[i]! < n; Lean sometimes “flips” the inequality.) The error message is indicating a type mismatch due to a slight difference in the way the expressions appear, even though mathematically they are equivalent.
+
+──────────────────────────────
+3. Does the proof approach match the specification?
+
+Your specification is that
+  (∀ i, i < a.size → n > a[i]!) ↔ result,
+and your implementation defines result as (a.toList).all (λ x, n > x). Intuitively, you want to use the well‐known equivalence between “all elements of the list satisfy p” and “for every index (or element) in the list, p holds.”
+
+Your proof approach is on track but relies on two lemmas:
+ • One that “converts” List.all to a ∀‑quantifier (the missing List.all_iff_forall) and
+ • A lemma to “convert” membership (List.mem_of_get_eq) from the array get! extraction.
+
+Because these bridging lemmas are not available in your environment, the proof does not go through.
+
+──────────────────────────────
+4. Type mismatches and incorrect assumptions
+
+The specific type mismatch error:
+  h i hi has type a[i]! < n but is expected to have type a[i] < n,
+is coming from the fact that in one branch you are directly applying h (which is a conversion from List.all) to the index i and its proof hi; however, the type coming from a[i]! is “pegged” as the result of the “!‐indexing” (which is a safe extraction that already carries a proof of in‐bounds). In practice the statements “n > a[i]!” and “a[i]! < n” are equivalent to “a[i] < n” (after “flipping” the inequality), but the error tells you that Lean cannot see them as identical. This subtle ordering difference (or the presence of the “!”) is causing a technical mismatch.
+
+──────────────────────────────
+5. Alternative strategies and a suggestion for a fix
+
+(a) One possible fix is to prove, locally in your file, the two missing lemmas. For example, you might prove something like:
+
+  lemma list_all_iff_forall {α : Type} (l : List α) (p : α → Prop) :
+   (l.all (λ a => if p a then true else false)) ↔ ∀ a ∈ l, p a :=
+  by
+   induction l with
+   | nil => simp
+   | cons hd tl ih =>
+    simp [List.all, ih]
+    -- You may need to massage the definitions so that “if p a then true else false” becomes just p a
+
+and similarly for the conversion from array indexing to list membership. (Note that in the Lean 4 standard library—or in Mathlib 4—the exact names and statements might differ from Lean 3.) Alternatively, you might change your specification or proof so that you avoid using these lemmas entirely.
+
+(b) Another strategy is to avoid converting the array to a list and prove the specification by directly working with the array. Since arrays come with a vetted indexing operation a[i]! (or similar) and a proof that indices are valid when i < a.size, you can try to write the proof so that you don’t need to relate list.all to the ∀‑statement.
+
+For instance, you can prove
+  (∀ i, i < a.size → n > a[i]!) ↔ (∀ x ∈ (a.toList), n > x)
+directly by induction on a.toList. Then you can finish your bidirectional proof without invoking unknown constants.
+
+──────────────────────────────
+Conclusion and root cause
+
+The root cause of your proof failure is that you are trying to use constants (and tactics that depend on them) that Lean 4 does not recognize—namely, List.all_iff_forall and List.mem_of_get_eq. This leads not only to “unknown constant” errors but also, once you get past simplification, to a type mismatch in the handling of the inequality. The slight difference between a[i]! and a[i] in the type is part of this technical mismatch.
+
+To fix the problem, you should either:
+
+ • Prove your own lemmas that relate the list “all” predicate and membership to the equivalent ∀‑statements, or
+ • Rewrite your proof to avoid converting the array to a list (or to rephrase your specification so that it matches the implementation more directly).
+
+Either approach will require you to “bridge the gap” between the definitions of the array lookup and the list predicate you are using. This is the key adjustment needed to satisfy Lean’s type checker and complete the proof.
+
+By following one of these strategies, you should be able to repair the proof.

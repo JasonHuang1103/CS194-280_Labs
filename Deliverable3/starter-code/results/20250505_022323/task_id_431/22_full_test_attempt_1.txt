@@ -1,0 +1,10 @@
+Lean Error: lean_playground/TempTest.lean:9:82: error: unexpected token 'def'; expected 'in'
+lean_playground/TempTest.lean:20:54: error: unsolved goals
+case mp
+a b : Array ℤ
+⊢ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) → sorry = true
+
+case mpr
+a b : Array ℤ
+⊢ sorry = true → ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!
+lean_playground/TempTest.lean:24:0: error: unexpected token '·'; expected command

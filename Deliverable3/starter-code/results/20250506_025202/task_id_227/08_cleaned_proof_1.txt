@@ -1,0 +1,34 @@
+by_cases h₁ : a ≤ b
+· simp only [if_pos h₁]
+  by_cases h₂ : a ≤ c
+  · simp only [if_pos h₂]
+    constructor
+    · constructor
+      · apply Int.le_refl
+      · exact h₁
+      · exact h₂
+    · left; rfl
+  · simp only [if_neg h₂]
+    constructor
+    · constructor
+      · exact Int.le_of_lt (Int.lt_of_not_ge h₂)
+      · constructor
+        · apply le_trans (Int.le_of_lt (Int.lt_of_not_ge h₂)) h₁
+        · apply Int.le_refl
+    · right; right; rfl
+· simp only [if_neg h₁]
+  by_cases h₃ : b ≤ c
+  · simp only [if_pos h₃]
+    constructor
+    · constructor
+      · exact Int.le_of_lt (Int.lt_of_not_ge h₁)
+      · apply Int.le_refl
+      · exact h₃
+    · right; left; rfl
+  · simp only [if_neg h₃]
+    constructor
+    · constructor
+      · exact Int.le_of_lt (Int.lt_of_lt_of_le (Int.lt_of_not_ge h₃) (Int.lt_of_not_ge h₁).le)
+      · exact Int.le_of_lt (Int.lt_of_not_ge h₃)
+      · apply Int.le_refl
+    · right; right; rfl

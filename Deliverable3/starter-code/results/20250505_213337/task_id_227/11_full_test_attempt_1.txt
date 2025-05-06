@@ -1,0 +1,19 @@
+Lean Error: lean_playground/TempTest.lean:24:23: warning: unused name: h₃
+lean_playground/TempTest.lean:21:46: error: unsolved goals
+case pos
+a b c : ℤ
+h₁ : a ≤ b ∧ a ≤ c
+⊢ (a ≤ a ∧ a ≤ b ∧ a ≤ c) ∧ (a = a ∨ a = b ∨ a = c)
+
+case pos
+a b c : ℤ
+h₁ : ¬(a ≤ b ∧ a ≤ c)
+h₂ : b ≤ c
+⊢ (b ≤ a ∧ b ≤ b ∧ b ≤ c) ∧ (b = a ∨ b = b ∨ b = c)
+
+case neg
+a b c : ℤ
+h₁ : ¬(a ≤ b ∧ a ≤ c)
+h₂ : ¬b ≤ c
+⊢ (c ≤ a ∧ c ≤ b ∧ c ≤ c) ∧ (c = a ∨ c = b ∨ c = c)
+lean_playground/TempTest.lean:25:0: error: unexpected token '·'; expected command

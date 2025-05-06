@@ -1,0 +1,3 @@
+a.foldl (fun acc x => acc && (n > x)) true
+
+This change ensures that the folding operation is using a defined method on Array in Lean 4, and the function now type-checks correctly.

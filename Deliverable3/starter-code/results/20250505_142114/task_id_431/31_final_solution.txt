@@ -1,0 +1,4 @@
+{
+  "code": "a.any (\u03bb x => b.contains x)\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nWith the extraneous text removed (or commented out), Lean will now accept the code without errors.",
+  "proof": "apply Iff.intro\nfocus\n  intro \u27e8i, j, h\u2081, h\u2082, h\u2083\u27e9\n  apply Array.any_of_mem\n  exact \u27e8a[i]!, Array.get_mem \u27e8i, h\u2081\u27e9, b.contains_iff.mpr \u27e8j, h\u2082, h\u2083\u27e9\u27e9\nfocus\n  intro h\n  let \u27e8x, hx\u2081, hx\u2082\u27e9 := Array.mem_of_any h\n  obtain \u27e8j, hj\u2081, hj\u2082\u27e9 := b.contains_iff.mp hx\u2082\n  obtain \u27e8i, hi\u27e9 := Array.exists_of_mem hx\u2081\n  exact \u27e8i, j, hi, hj\u2081, hj\u2082\u27e9"
+}

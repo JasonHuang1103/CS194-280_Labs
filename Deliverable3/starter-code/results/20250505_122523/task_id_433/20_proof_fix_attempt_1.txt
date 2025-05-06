@@ -1,0 +1,13 @@
+simp [List.all, decide, decide_eq_true_eq]
+apply Iff.intro
+· intros h i hi
+  have : a[i] ∈ a.toList := by 
+    apply List.get_mem
+    assumption
+  exact h _ this
+· intro h
+  intros x hx
+  specialize h (a.toList.indexOfₛₒₘₑ hx)
+  apply h
+  apply List.indexOf_lt_size
+  assumption

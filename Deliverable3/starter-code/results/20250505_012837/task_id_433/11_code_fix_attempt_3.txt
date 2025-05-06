@@ -1,0 +1,10 @@
+The issue is that the code is attempting to use method‐notation to call all on a List (i.e. writing a.toList.all …), but Lean 4’s List type does not have an all method defined as a member. Instead, all is defined as a function in the List namespace. In other words, you need to call List.all by supplying the predicate and the list.
+
+Below is the fixed version of the function implementation:
+
+---------------------------------------------------------
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  List.all (fun x => decide (n > x)) a.toList
+---------------------------------------------------------
+
+This change ensures that List.all is correctly applied to the list a.toList with the given predicate.

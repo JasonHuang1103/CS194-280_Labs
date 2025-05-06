@@ -1,0 +1,67 @@
+Below is a detailed plan for approaching the implementation and the proof.
+
+──────────────────────────────
+1. Implementation Plan
+
+• Use the built‐in “min” operation on integers. In Lean’s Mathlib, you can compute the minimum of two integers using Int.min. One standard way to get the minimum of three values is to write:
+  minOfThree a b c = Int.min a (Int.min b c)
+
+• This implementation uses associativity of the “min” function. Note that if you define a = Int.min a (Int.min b c), then you can clearly see that the result is one of the three values because either it is equal to a, or else it is the minimum of b and c (which means it is equal to b or to c).
+
+──────────────────────────────
+2. Specification Analysis
+
+The specification minOfThree_spec requires two parts:
+  a) The result must be less than or equal to each of a, b, and c.
+  b) The result must equal one of the numbers a, b, or c.
+
+For our candidate implementation (i.e., Int.min a (Int.min b c)), we know:
+- From the properties of Int.min (or “min”), it holds that Int.min a m ≤ a and Int.min a m ≤ m for any integers a and m.
+- If we let m = Int.min b c, then by the properties of Int.min for two numbers, m ≤ b and m ≤ c, and m = b or m = c.
+- Altogether, we have: 
+  Int.min a m ≤ a, and Int.min a m ≤ m, and since m ≤ b, m ≤ c, we get that Int.min a (Int.min b c) is ≤ a, b, c.
+- Regarding the “choice” property, either Int.min a m = a or it is equal to m; and if it equals m then because m = b or m = c, the condition is met.
+
+──────────────────────────────
+3. Proof Plan
+
+• Unfold the definitions for minOfThree and minOfThree_spec. (That is, replace minOfThree a b c with Int.min a (Int.min b c).)
+
+• Prove the two conjuncts separately:
+  
+  a) For the inequality part:
+   – Prove that Int.min a (Int.min b c) ≤ a by the definition of Int.min.
+   – Prove that Int.min a (Int.min b c) ≤ Int.min b c, then invoke the property for Int.min b c being ≤ b and ≤ c.
+  
+  b) For the “choice” part:
+   – Show that by properties of min, either Int.min a (Int.min b c) = a or it equals Int.min b c.
+   – In the second case, apply the property of Int.min b c to conclude that it equals either b or c.
+  
+• You may need the known lemmas about Int.min such as:
+  – For any x, y : Int, Int.min x y ≤ x and Int.min x y ≤ y.
+  – For any x, y : Int, (Int.min x y = x) ∨ (Int.min x y = y).
+
+• With these lemmas, proceed by “cases” on the result of the lemma using “by cases” or “match” tactics.
+
+• Finally, conclude that the function minOfThree satisfies the specification: the returned value is no greater than any of a, b, or c and is one of the given inputs.
+
+──────────────────────────────
+4. Summary of Key Steps
+
+1. Define minOfThree using the standard integer minimum:
+  minOfThree a b c := Int.min a (Int.min b c)
+
+2. Unfold the spec minOfThree_spec:
+  – Prove result ≤ a by the definition of Int.min.
+  – Prove result ≤ b, c by chaining the inequalities from Int.min b c.
+  – Use the fact that for any two numbers, the minimum is either one or the other to show that result is equal to a, or to b, or to c.
+
+3. Structure the proof:
+  – Unfold the definitions.
+  – Use known properties of Int.min.
+  – Handle the disjunction by case splitting on the equality of the min value.
+
+──────────────────────────────
+Conclusion
+
+By following this plan, one can implement the function in Lean 4 and then prove that the returned value is indeed the minimum among the three numbers, both in terms of being no larger than each input and being one of the inputs.

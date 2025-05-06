@@ -1,0 +1,5 @@
+```lean
+split_ifs
+· exact Iff.rfl
+· simp
+```

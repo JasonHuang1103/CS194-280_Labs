@@ -1,0 +1,15 @@
+intros
+  split
+  · rintro ⟨i, j, hi, hj, h_eq⟩
+    apply Array.any_iff_exists.mpr
+    use i
+    refine ⟨hi, _⟩
+    apply Array.any_iff_exists.mpr
+    use j
+    exact ⟨hj, h_eq⟩
+  · intro h
+    apply Array.any_iff_exists.mp at h
+    obtain ⟨i, hi, h⟩ := h
+    apply Array.any_iff_exists.mp at h
+    obtain ⟨j, hj, h_eq⟩ := h
+    exact ⟨i, j, hi, hj, h_eq⟩

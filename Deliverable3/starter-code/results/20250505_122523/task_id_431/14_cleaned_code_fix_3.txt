@@ -1,0 +1,8 @@
+(a.toList).any (fun x => (b.toList).contains x)
+
+Alternatively, you could write it without the extra parentheses as:
+
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  List.any a.toList (fun x => List.contains (b.toList) x)
+
+Both versions compile successfully in Lean 4.

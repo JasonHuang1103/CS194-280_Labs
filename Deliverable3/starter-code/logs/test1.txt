@@ -1,0 +1,91 @@
+Starting test of 2 tasks: task_id_0, task_id_58
+
+==================================================
+Processing task task_id_0...
+Reading problem description and code template from tasks/task_id_0...
+Problem description length: 310 characters
+Reading unit tests...
+Unit tests length: 69 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250504_202218
+Processing task: task_id_0 (Task index: 0)
+Response saved to results/20250504_202218/task_id_0/01_planning.txt
+RAG retrieval failed: cannot access local variable 'embedding_database_file' where it is not associated with a value
+Response saved to results/20250504_202218/task_id_0/02_raw_code.txt
+Response saved to results/20250504_202218/task_id_0/03_cleaned_code.txt
+Response saved to results/20250504_202218/task_id_0/04_code_test.txt
+Response saved to results/20250504_202218/task_id_0/05_raw_proof.txt
+Response saved to results/20250504_202218/task_id_0/06_cleaned_proof.txt
+Response saved to results/20250504_202218/task_id_0/07_full_test.txt
+Response saved to results/20250504_202218/task_id_0/08_proof_fix_attempt_1.txt
+Response saved to results/20250504_202218/task_id_0/09_cleaned_proof_fix_1.txt
+Response saved to results/20250504_202218/task_id_0/10_full_test_attempt_1.txt
+Response saved to results/20250504_202218/task_id_0/11_proof_fix_attempt_2.txt
+Response saved to results/20250504_202218/task_id_0/12_cleaned_proof_fix_2.txt
+Response saved to results/20250504_202218/task_id_0/13_full_test_attempt_2.txt
+Response saved to results/20250504_202218/task_id_0/14_proof_fix_attempt_3.txt
+Response saved to results/20250504_202218/task_id_0/15_cleaned_proof_fix_3.txt
+Response saved to results/20250504_202218/task_id_0/16_full_test_attempt_3.txt
+Response saved to results/20250504_202218/task_id_0/17_final_solution.txt
+Solution generated in 96.87 seconds
+Generated code length: 1 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_58...
+Reading problem description and code template from tasks/task_id_58...
+Problem description length: 700 characters
+Reading unit tests...
+Unit tests length: 462 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250504_202218
+Processing task: task_id_58 (Task index: 1)
+Response saved to results/20250504_202218/task_id_58/01_planning.txt
+RAG retrieval failed: cannot access local variable 'embedding_database_file' where it is not associated with a value
+Response saved to results/20250504_202218/task_id_58/02_raw_code.txt
+Response saved to results/20250504_202218/task_id_58/03_cleaned_code.txt
+Response saved to results/20250504_202218/task_id_58/04_code_test.txt
+Response saved to results/20250504_202218/task_id_58/05_raw_proof.txt
+Response saved to results/20250504_202218/task_id_58/06_cleaned_proof.txt
+Response saved to results/20250504_202218/task_id_58/07_full_test.txt
+Response saved to results/20250504_202218/task_id_58/08_proof_fix_attempt_1.txt
+Response saved to results/20250504_202218/task_id_58/09_cleaned_proof_fix_1.txt
+Response saved to results/20250504_202218/task_id_58/10_full_test_attempt_1.txt
+Response saved to results/20250504_202218/task_id_58/11_proof_fix_attempt_2.txt
+Response saved to results/20250504_202218/task_id_58/12_cleaned_proof_fix_2.txt
+Response saved to results/20250504_202218/task_id_58/13_full_test_attempt_2.txt
+Response saved to results/20250504_202218/task_id_58/14_proof_fix_attempt_3.txt
+Response saved to results/20250504_202218/task_id_58/15_cleaned_proof_fix_3.txt
+Response saved to results/20250504_202218/task_id_58/16_full_test_attempt_3.txt
+Response saved to results/20250504_202218/task_id_58/17_final_solution.txt
+Solution generated in 125.99 seconds
+Generated code length: 36 characters
+Generated proof length: 867 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:18:52: error: unsolved goals
+a b : ℤ
+⊢ a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 ↔ (decide (a < 0) && decide (b > 0) || decide (a > ...
+✅ Implementation passes unit tests
+❌ Proof has errors
+Testing Summary:
+Task task_id_0:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 96.87260484695435 seconds
+---
+Task task_id_58:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 125.98513102531433 seconds
+---

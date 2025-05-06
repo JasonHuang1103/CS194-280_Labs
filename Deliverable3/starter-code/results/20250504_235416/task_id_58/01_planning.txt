@@ -1,0 +1,78 @@
+Below is a high‐level plan for how to solve the problem, including both the implementation and the corresponding proof. The overall idea is to implement the function by checking the sign of the product a * b, and then prove that this check is equivalent to saying “one integer is negative and the other is positive.”
+
+─────────────────────────────  
+Step 1. Implementation
+
+There are two natural approaches:
+
+1.1. Direct pairwise checking:
+ • If a is less than 0 and b is greater than 0, return true.
+ • Else if a is greater than 0 and b is less than 0, return true.
+ • Otherwise (including the case where one or both are zero), return false.
+
+1.2. Using Multiplication:  
+Notice that if one number is negative and the other is positive, then their product is negative. Also, if one of them is zero (or both are non-negative/non-positive), then the product is not negative. Thus, you can simply return (a * b < 0).
+
+Both versions meet the specification, but option 1.2 is more concise.
+
+─────────────────────────────  
+Step 2. The Specification and Theorem
+
+The specification is given as:  
+   (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result  
+Our goal is to prove that result is exactly (a * b < 0). In other words, we need to show:
+   (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ (a * b < 0).
+
+─────────────────────────────  
+Step 3. Proof Strategy
+
+When proving the theorem, the plan is to “unfold” the definitions and prove the two directions of the equivalence:
+  
+3.1. → Direction:  
+Assume (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0).  
+Then, consider the two cases:
+  - If a < 0 and b > 0:  
+    Multiplying a negative and a positive number gives a negative product (i.e. a * b < 0).
+  - If a > 0 and b < 0:  
+    Similarly, a positive times a negative is negative.
+Thus, you can conclude a * b < 0.
+
+3.2. ← Direction:  
+Assume a * b < 0.  
+Now, observe that if a * b is negative then it cannot be that either a or b is zero. This forces a and b to have opposite signs. In other words, either a < 0 and b > 0 or a > 0 and b < 0.
+Thus, the desired equivalence holds.
+
+Depending on Lean’s built-in libraries and lemmas, you might be able to use or reference linear arithmetic lemmas. Otherwise, you can simply perform a case analysis (or use "by_cases") on the sign of a and/or b, and use basic arithmetic reasoning.
+
+─────────────────────────────  
+Step 4. Writing the Lean Code
+
+Given the plan, the Lean code should have two parts:
+
+(A) The function implementation:
+  def hasOppositeSign (a : Int) (b : Int) : Bool := a * b < 0
+
+(B) The theorem and its proof:
+  The theorem will start by unfolding the definitions of hasOppositeSign and hasOppositeSign_spec.
+  Then, it will split the proof into two directions (↔ split) and use arithmetic reasoning to conclude the equivalence.
+
+─────────────────────────────  
+Step 5. Summary of Key Steps
+
+1. Choose your implementation style. In our plan we use a * b < 0 since it automatically returns false when either integer is zero.
+2. Write the specification predicate that expresses the equivalence.
+3. During the proof:
+   - Unfold the definitions to expose the expressions.
+   - For the forward direction, reason that having one negative and one positive number implies a negative product.
+   - For the backward direction, reason that a product being negative forces the two numbers to have opposite inherent signs.
+4. Use Lean’s tactics (e.g. "split" for the equivalence, "intro", "cases", "rw", etc.) and arithmetic decision procedures or lemmas if available.
+
+─────────────────────────────  
+Conclusion
+
+By following the plan above, you develop:
+ • A clear implementation for hasOppositeSign.
+ • A theorem that establishes the equivalence between our method’s return value (a * b < 0) and the statement that exactly one of a and b is negative.
+ • A proof that breaks down the equivalence in two directions, handling the sign analysis case by case.
+
+This plan provides a roadmap to write correct Lean 4 code and proof as required by the assignment.

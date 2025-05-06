@@ -1,0 +1,110 @@
+Below is our detailed reasoning and plan for both the implementation and proof.
+
+─────────────────────────────  
+Step 1. Understand the Function Requirements
+
+• The function must take a non-negative integer n (of type Nat) and return the last digit.
+• The last digit is computed as the remainder when n is divided by 10 (i.e., n % 10).
+• By definition of modulo, for any natural n and any positive m, we always have 0 ≤ n % m < m. Hence, for m = 10, the returned value is between 0 and 9.
+• The specification property (lastDigit_spec) demands that the returned digit satisfies two things:
+  - It lies between 0 and 9.
+  - It equals n % 10.
+
+─────────────────────────────  
+Step 2. Break Down the Problem into Smaller Tasks
+
+a. Implementation
+   • Define the function lastDigit so that it returns n % 10.
+   • This is straightforward since Lean’s Nat type already supports the % operator, and by definition n % 10 will take a value in [0, 10).
+
+b. Specification
+   • The predicate lastDigit_spec should capture:
+       (0 ≤ result ∧ result < 10) ∧ (n % 10 = result)
+   • Since our function will be defined as lastDigit n = n % 10, the second part of the conjunct is by definition true.
+
+c. Proof Obligations
+   • Prove that for any n : Nat, lastDigit_spec n (lastDigit n) holds.
+   • To do this, we need to show:
+       - The returned value is not negative (which is inherent to n % 10).
+       - The returned value is less than 10. This is assured by the Lean lemma Nat.mod_lt, which states that if m > 0 then n % m < m.
+       - And lastly, that n % 10 = n % 10 (a trivial equality).
+
+─────────────────────────────  
+Step 3. Consider Input Types and Edge Cases
+
+• The input type is Nat (non-negative integers), so no special handling is required for negative numbers.
+• The edge case n = 0 is handled by the modulo operation since 0 % 10 = 0.
+• There are no additional complexities; the modulo operator directly provides the correct behavior.
+
+─────────────────────────────  
+Step 4. Proof Techniques
+
+• For the first part of the specification:
+   - We use the fact that modulo always yields a non-negative result and apply Nat.mod_nonneg.
+   - We also apply Nat.mod_lt when m > 0 (for m = 10) to show the value is strictly less than 10.
+• For the second part of the specification:
+   - We note that lastDigit is defined as n % 10, so the equality n % 10 = lastDigit n holds by definitional equality, making the proof trivial (for example, by using rfl, which stands for “reflexivity”).
+
+─────────────────────────────  
+Step 5. Similar Patterns from Documentation Examples
+
+• In Lean's documentation, you often see “unfold” to expand definitions and “split” to handle conjunctions.
+• We can use “by decide” for simple numeric comparisons to automatically discharge proofs about bounds.
+• The proof structure is similar to many elementary proofs in Lean where you simply invoke known lemmas (e.g., Nat.mod_nonneg and Nat.mod_lt).
+
+─────────────────────────────  
+Detailed Plan for Implementation and Proof
+
+1. Implementation:
+   • Define lastDigit such that it returns n % 10.
+     Code snippet:  
+          def lastDigit (n : Nat) : Nat := 
+            n % 10
+
+2. Specification:
+   • Write lastDigit_spec to capture the property:
+         (0 ≤ result ∧ result < 10) ∧ (n % 10 = result)
+
+3. Proof:
+   • Unfold the definitions of lastDigit and lastDigit_spec.
+   • Use split tactics to separate the proof into two main parts (for bounds and for equality).
+   • For the bounds:
+       - Prove 0 ≤ n % 10 using Nat.mod_nonneg.
+       - Prove n % 10 < 10 using Nat.mod_lt (and by confirming that 10 > 0, for which “by decide” can be used).
+   • For the equality, it is by definition (rfl).
+
+─────────────────────────────  
+Final Code Implementation
+
+Below is the complete Lean 4 code with the function and its specification proof:
+
+------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def lastDigit (n : Nat) : Nat :=
+  -- << CODE START >>
+  n % 10
+  -- << CODE END >>
+
+-- Theorem: The returned digit d should be between 0 and 9; d should be the last digit of the input number n
+def lastDigit_spec (n : Nat) (result : Nat) : Prop :=
+  -- << SPEC START >>
+  (0 ≤ result ∧ result < 10) ∧
+  (n % 10 = result)
+  -- << SPEC END >>
+
+theorem lastDigit_spec_satisfied (n : Nat) :
+  lastDigit_spec n (lastDigit n) := by
+  -- << PROOF START >>
+  unfold lastDigit lastDigit_spec
+  split
+  · split
+    · exact Nat.mod_nonneg n (by decide)
+    · exact Nat.mod_lt n (by decide)
+  · rfl
+  -- << PROOF END >>
+------------------------------------------------
+
+This completes our plan and implementation.

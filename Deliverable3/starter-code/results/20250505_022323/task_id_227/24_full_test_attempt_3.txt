@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:22:2: error: tactic 'split' failed, consider using `set_option trace.split.failure true`
+a b c : ℤ
+⊢ (a ⊓ b ⊓ c ≤ a ∧ a ⊓ b ⊓ c ≤ b ∧ a ⊓ b ⊓ c ≤ c) ∧ (a ⊓ b ⊓ c = a ∨ a ⊓ b ⊓ c = b ∨ a ⊓ b ⊓ c = c)
+lean_playground/TempTest.lean:23:0: error: unexpected token '{'; expected command

@@ -1,0 +1,9 @@
+by_cases h : a ≤ b
+· rw [if_pos h]
+  split
+  · exact ⟨le_refl a, h⟩
+  · exact Or.inl rfl
+· rw [if_neg h]
+  split
+  · exact ⟨le_of_lt (Int.lt_of_not_ge h), le_refl b⟩
+  · exact Or.inr rfl

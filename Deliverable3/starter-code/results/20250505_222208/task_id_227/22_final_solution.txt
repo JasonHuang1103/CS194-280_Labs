@@ -1,0 +1,4 @@
+{
+  "code": "min (min a b) c",
+  "proof": "apply And.intro\n\u00b7 apply And.intro\n  \u00b7 exact le_trans (min_le_left a b) (min_le_left (a \u2293 b) c)\n  \u00b7 exact le_trans (min_le_right a b) (min_le_left (a \u2293 b) c)\n\u00b7 exact le_trans (le_min (min_le_left a b) (min_le_right a b)) (min_le_right (a \u2293 b) c)\n\u00b7 have : min (min a b) c = min a b \u2228 min (min a b) c = c := min_eq_left_or_eq_right (a \u2293 b) c\n  cases this with\n  | inl heq => exact Or.inl (heq.symm \u25b8 min_eq_left_of_le (min_le_left a b))\n  | inr heq => cases min_eq_left_or_eq_right a b with\n    | inl heq' => exact Or.inl (heq'.symm \u25b8 heq.symm)\n    | inr heq' => exact Or.inr (Or.inl (heq'.symm \u25b8 heq.symm))"
+}

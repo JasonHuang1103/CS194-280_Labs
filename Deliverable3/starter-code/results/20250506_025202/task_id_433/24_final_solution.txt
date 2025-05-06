@@ -1,0 +1,4 @@
+{
+  "code": "(a.toList.foldr (fun x acc => (n > x) && acc) true)",
+  "proof": "simp [List.all?, Array.toList, List.foldr_eq_foldl', foldl_and]\napply Iff.intro\n\u00b7 intro h1\n  induction a.toList with\n  | nil => simp\n  | cons x xs ih => simp at h1 \u22a2\n    cases h1 x (List.mem_cons_self x xs) with\n    | intro h\u2082 h\u2083 =>\n      apply And.intro h\u2082\n      apply ih\n      intro y hy\n      apply h\u2083\n      apply List.mem_cons_of_mem\n      assumption\n\u00b7 intro h\n  intro i hi\n  have h_toList := Array.getElem_toList i hi\n  rw [Array.getElem_toList] at h_toList\n  cases List.mem_iff_nth_le.mpr \u27e8i, h_toList.symm\u27e9 with\n  | intro _ h_n =>\n    exact List.all?_iff_forall.mp h \u27e8i, rfl\u27e9"
+}

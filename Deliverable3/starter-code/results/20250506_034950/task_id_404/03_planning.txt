@@ -1,0 +1,116 @@
+Below is our complete walkthrough of the solution.
+
+──────────────────────────────
+Step 1. Understanding the Function Specification
+
+We need a function, myMin, that takes two integers a and b and returns the smaller value. In Lean the most natural way to do this is by using an “if…then…else” conditional:  
+ if a ≤ b then a else b  
+When a equals b the condition a ≤ b holds, so our function will return a. This choice is acceptable since the specification allows returning either a or b when they are equal.
+
+──────────────────────────────
+Step 2. Breaking Down the Problem
+
+The problem separates into two parts:  
+1. The function’s implementation.  
+2. A proof that the chosen output (result) satisfies the specification:
+   • result ≤ a and result ≤ b  
+   • result = a or result = b
+
+For the proof we need to consider two cases (based on the “if”):
+• Case 1: a ≤ b. Then result = a, which clearly satisfies a ≤ a and, by the hypothesis, a ≤ b.
+• Case 2: ¬ (a ≤ b). Then result = b. Since a ≤ b does not hold, we know that b < a (recalling that integers have a total order), so b ≤ a, and, trivially, b ≤ b.
+
+──────────────────────────────
+Step 3. Considering Inputs, Edge Cases, and Behavior
+
+Inputs a and b are both integers. The “if” handles:
+• a equal to b (we get a, and since a = b, every inequality holds)  
+• a less than b (we get a which is clearly less than or equal to both)  
+• a greater than b (we get b which will then be less than or equal to both results)
+
+No unexpected edge cases occur since the conditional “if a ≤ b then a else b” naturally handles all integer comparisons.
+
+──────────────────────────────
+Step 4. Proof Techniques
+
+For proving that our function meets the specification, we use:
+• Unfolding the definitions of myMin and our spec myMin_spec.
+• Then we use the tactic “split_ifs” (or alternatively “by_cases”) to split the proof into the two cases mentioned.
+• In each branch, we prove the two required properties:
+  – The result is less than or equal to both a and b.
+  – The result equals either a or b.
+
+This approach is similar to many simple case analyses found in Lean documentation.
+
+──────────────────────────────
+Step 5. Similar Patterns from Examples
+
+Examples from Lean documentation show:
+• Using “if…then…else” for definitions.
+• How to structure proofs with tactics between “unfold” and “split_ifs” or “by_cases.”
+• Structuring proofs by handling each branch completely.
+
+──────────────────────────────
+Conclusion: Detailed Implementation and Proof Plan
+
+1. Implementation:
+   • Write myMin using an “if a ≤ b then a else b” conditional.
+2. Proof Strategy:
+   • Unfold the definitions of myMin and myMin_spec.
+   • Use “split_ifs” to handle the two cases:
+  – When a ≤ b: Conclude that the result equals a, which trivially satisfies result ≤ a and, by hypothesis, a ≤ b.
+  – When ¬ (a ≤ b): Conclude the result equals b; then justify that b < a (and hence b ≤ a) and that b ≤ b.
+   • Conclude that in each branch, myMin_spec holds.
+
+──────────────────────────────
+Final Lean 4 Code Plan
+
+Here is the complete skeleton with our implementation and proof:
+
+---------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def myMin (a : Int) (b : Int) : Int :=
+  -- << CODE START >>
+  if a ≤ b then a else b
+  -- << CODE END >>
+
+-- Specification: result is less than or equal to both a and b,
+-- and result is equal to one of a or b.
+def myMin_spec (a : Int) (b : Int) (result : Int) : Prop :=
+  -- << SPEC START >>
+  (result ≤ a ∧ result ≤ b) ∧
+  (result = a ∨ result = b)
+  -- << SPEC END >>
+
+theorem myMin_spec_satisfied (a : Int) (b : Int) :
+  myMin_spec a b (myMin a b) :=
+by
+  -- << PROOF START >>
+  unfold myMin myMin_spec
+  split_ifs
+  case pos (h : a ≤ b) =>
+    -- In this branch, result = a.
+    constructor
+    · -- Prove a ≤ a and a ≤ b.
+      exact ⟨le_refl a, h⟩
+    · -- Prove result = a.
+      left; rfl
+  case neg (h : ¬ a ≤ b) =>
+    -- In this branch, result = b.
+    -- Since a ≤ b is false and the order on Int is total, we have b < a.
+    constructor
+    · -- Prove b ≤ a and b ≤ b.
+      -- From b < a we deduce b ≤ a.
+      exact ⟨Int.le_of_lt (by
+        have h' : b < a := Int.lt_of_not_ge h
+        exact h'), le_refl b⟩
+    · -- Prove result = b.
+      right; rfl
+  -- << PROOF END >>
+
+---------------------------------------------------------
+
+This plan implements our minimum function and provides a proof that it meets the required specification.

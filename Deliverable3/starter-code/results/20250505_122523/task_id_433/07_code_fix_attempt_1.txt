@@ -1,0 +1,11 @@
+The error is because Lean’s Array type in the current environment does not define a method named all?. One way to fix this is to convert the array to a list and then use List.all, which does what you need.
+
+Here’s the corrected version of the function implementation:
+
+-------------------------------------------------
+-- Fixed version of isGreater
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  a.toList.all (fun x => n > x)
+-------------------------------------------------
+
+This uses a.toList to convert the array to a list and then applies List.all with the predicate (fun x => n > x).

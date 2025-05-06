@@ -1,0 +1,52 @@
+Below is a detailed plan that outlines the main steps for both writing the function and then proving its specification.
+
+───────────────────────────── 
+Step 1. Choose an Implementation for minOfThree  
+───────────────────────────── 
+• We need a function that takes three integers (a, b, c) and returns one of them that is less than or equal to all.  
+• A common approach is to use nested if-then-else expressions:  
+  – First, compare a and b.  
+  – If a is less than or equal to b, then compare a and c: if a is also less than or equal to c then a is the minimum; otherwise, c is the minimum.  
+  – Otherwise (if b is less than a) then compare b and c: if b is less than or equal to c then b is the minimum; otherwise, c is the minimum.  
+• This approach guarantees that the returned value is either a, b, or c and is the smallest (i.e., it’s ≤ every input).
+
+───────────────────────────── 
+Step 2. Define the Specification (minOfThree_spec)  
+───────────────────────────── 
+• The specification requires two properties:  
+  1. The returned result is less than or equal to a, b, and c.  
+  2. The result is equal to one of the given integers a, b, or c.  
+• This is conveniently captured as:  
+  (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c)
+
+───────────────────────────── 
+Step 3. Prove the Specification (minOfThree_spec_satisfied)  
+───────────────────────────── 
+• Our proof will use case analysis on the if-then-else structure of minOfThree.  
+• The proof outline:
+  1. Unfold the definition of minOfThree and minOfThree_spec so that we can see the structure.  
+  2. Use a case-split for the top-level if condition (i.e., whether a ≤ b) and then further split on the nested if.  
+  3. In each branch:
+   - Show that the chosen value (a, b, or c) satisfies the three inequalities with respect to a, b, and c.  
+   - Use the corresponding assumptions from the if conditions (for example, if we assume that a ≤ b and a ≤ c, then clearly a is ≤ a, b, and c).
+  4. In addition, confirm that the value is one of a, b, or c by the branch construction.
+• The tactic “by cases” (or Lean’s if simplification techniques) might be used to manage each branch.
+• Each branch of the proof will almost directly follow from the properties of ordering on integers and the “if” assumptions.
+
+───────────────────────────── 
+Step 4. Summarize the Strategy in the Lean Template  
+───────────────────────────── 
+• In the code, replace the placeholder {{code}} with the full implementation as described.  
+• Under the proof section ({{proof}}), write the corresponding Lean proof that unfolds the definitions and does the case analysis on the conditionals.  
+• You might use “simp” or “decide” tactics in some branches, but the proof is best done by explicit case-by-case analysis to show that the output meets both parts of the specification.
+
+───────────────────────────── 
+Additional Notes  
+───────────────────────────── 
+• The strategy relies on well-known properties: reflexivity (x ≤ x) and the fact that if the condition a ≤ b holds in one branch, then we can use this fact in the proof for that branch.  
+• Though Lean may simplify many parts automatically, it is good to show explicitly the reasoning for clarity.  
+
+───────────────────────────── 
+Conclusion  
+───────────────────────────── 
+The outlined plan consists of implementing the function with nested if-then-else comparisons and then proving by case analysis that the returned value is indeed the minimum. This realization ensures the two key points of the specification (being less than or equal to all inputs, and being one of them), which is central to satisfying the problem description.

@@ -1,0 +1,59 @@
+Below is an explanation of what’s going wrong.
+
+──────────────────────────────
+Summary of the Issue
+
+The root cause is that Lean 4 is mis‐parsing the lambda you pass to .all. In your definition
+
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    a.toList.all (fun x => decide (n > x))
+
+if you omit the parentheses around the lambda (or otherwise “disambiguate” it), Lean doesn’t see a function there. Instead it parses
+  a.toList.all fun x => decide (n > x)
+in a way that “loses” the lambda. The error message “function expected at a.toList.all fun x => decide (n > x)” tells you that Lean was expecting a function but ended up with a Bool value. 
+
+In Lean 4 the dot notation and the syntax for lambda expressions can lead to ambiguities. To convince Lean that the entire lambda should be given as an argument to all, you need to put parentheses (or otherwise adjust the syntax). (The code comment you wrote even explains that you intend for Lean to “see the entire lambda” as the argument.)
+
+──────────────────────────────
+Details of the Problem
+
+1. In Lean 4, the expression
+  a.toList.all fun x => decide (n > x)
+must be parsed correctly. Without the right grouping, Lean may think that “fun” is not being used as part of the argument to all.
+
+2. When Lean sees the dot notation (a.toList.all), it expects that what comes next is the argument to the function all. However, because of the syntax rules and operator precedences, the lambda without explicit parentheses can be misinterpreted:
+  a.toList.all fun x => decide (n > x)
+is parsed in a way that leaves “all fun x” not recognized as a proper function application.
+
+3. The error “function expected … term has type Bool” is indicating that after applying the “all” keyword, Lean is not receiving a function but a result of type Bool. This is exactly what happens when the lambda isn’t being passed correctly.
+
+──────────────────────────────
+Other Issues in the Code
+
+There are additional messages in your error log:
+• A deprecation warning recommending you use List.idxOf instead of List.indexOf.
+• An “unsolved goals” error: your proof has a part that remains incomplete (Lean shows a goal involving “↔ sorry () = true”). This is likely due to a “sorry” or incomplete proof in your second half.
+• A syntax error (“unexpected token 'to'; expected command”) that comes from misinterpretation of the code layout—often a cascading error after the initial parsing problem.
+
+──────────────────────────────
+How to Fix It
+
+1. Fix the Lambda Parsing:
+  Ensure that the lambda is grouped as the sole argument to .all. For example, change the definition to either
+
+  • Use parentheses:
+   def isGreater (n : Int) (a : Array Int) : Bool :=
+    (a.toList).all (fun x => decide (n > x))
+
+  or, if you prefer method-call syntax, ensure that the lambda is properly parenthesized.
+
+2. Address the Other Issues:
+  – Replace List.indexOf with List.idxOf following the deprecation note.
+  – Complete the unfinished proof (avoid leaving “sorry”). The unsolved goal about showing “(∀ i, i < a.size → n > a[i]!) ↔ result” indicates that one direction of the proof (or both) is not fully provided. You’ll need to fill in the details.
+
+──────────────────────────────
+Conclusion
+
+The core error is syntactic: the lambda isn’t being parsed as the expected argument to “.all” because of missing parentheses (or other disambiguation). Fixing the lambda grouping should resolve the “function expected” error. After that, you will need to complete the remaining proof obligations and update deprecated names.
+
+By adjusting the syntax as described and then addressing the unfinished proof parts, your theorem should eventually compile.

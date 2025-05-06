@@ -1,0 +1,4 @@
+{
+  "code": "a.toList.all (\u03bb m => n > m)",
+  "proof": "have h : (\u2200 m, m \u2208 a.toList \u2192 n > m) \u2194 (\u2200 i, i < a.size \u2192 n > a[i]!) := by\n  constructor\n  \u00b7 intro h i hi\n    have : a[i]! \u2208 a.toList := Array.get_mem_toList _ i hi\n    exact h _ this\n  \u00b7 intro h m hm\n    obtain \u27e8i, hi, rfl\u27e9 := List.mem_iff_get.1 hm\n    exact h i hi\nrw [Bool.of_decide_eq_iff, h]"
+}

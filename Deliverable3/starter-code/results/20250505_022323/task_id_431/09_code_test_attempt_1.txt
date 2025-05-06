@@ -1,0 +1,6 @@
+Lean Error: lean_playground/TempTest.lean:7:48: error: function expected at
+  y
+term has type
+  ℤ
+lean_playground/TempTest.lean:9:44: error: unexpected token 'with'; expected command
+lean_playground/TempTest.lean:19:8: warning: declaration uses 'sorry'

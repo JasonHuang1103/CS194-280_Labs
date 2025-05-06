@@ -1,0 +1,36 @@
+Below is a step‐by‐step explanation of what’s going wrong in your proof. In summary, the error arises because the use of split_ifs is not “structured” correctly: you’re writing commands one after the other without clearly separating the two resulting cases. Lean then complains about leftover unsolved goals and an “unexpected identifier” when it sees the second branch’s commands outside their proper context.
+
+Let’s break that down:
+
+1. • The failing tactic is split_ifs. 
+  – When you write “split_ifs with h”, Lean examines the conditional in your definition of myMin and produces two separate proof obligations. One obligation comes with the hypothesis h : a ≤ b (the “if” branch) and the other with h : ¬(a ≤ b) (the “else” branch). 
+  – After split_ifs, you must prove both of these goals separately.
+
+2. • Look at the proof state:
+  – In the “if” branch (when a ≤ b holds), your goal becomes 
+   (a ≤ a ∧ a ≤ b) ∧ (a = a ∨ a = b)
+  and you then write “exact ⟨⟨le_refl a, h⟩, Or.inl rfl⟩” which successfully solves that goal.
+  – In the “else” branch (the case when a ≤ b is false, i.e. h : ¬(a ≤ b)), the target is
+   (b ≤ a ∧ b ≤ b) ∧ (b = a ∨ b = b).
+  You intend to prove this by “have : b < a := Int.not_le.mp h” followed by “exact ⟨⟨le_of_lt this, le_refl b⟩, Or.inr rfl⟩”, and that is correct when taken on its own.
+
+3. • The proof approach does indeed match the specification: if a ≤ b then myMin returns a and if not it returns b. Your idea is to split on that condition and prove each case accordingly.
+
+4. • The problem is one of improper “branch structuring”. In Lean’s tactic mode, after a split_ifs you must use bullet notation (or some other delimiting method) so that the tactics for each branch are clearly separated. Without these bullets or indentation, Lean treats the “have : …” command as if it were continuing the proof of the first branch. When it then sees the second “exact”, it finds that one branch is already solved while the other remains unsolved. This is why you get one error message for the “case pos” (with h : a ≤ b) and one for the “case neg” (with h : ¬a ≤ b).
+
+5. • In addition, the error “unexpected identifier; expected command” comes from the fact that Lean’s parser did not see a clear break between the two branches. The command “have : b < a := …” is left hanging outside the solved branch because of missing bullet “levels” that would have told Lean “this belongs to the else‐branch.”
+
+Root Cause & Direction for Fixing It:
+  – The error is not in your mathematical reasoning but in the structure of your tactic script. You have not used the bullet–notation (or some equivalent structuring) to separate the two cases created by split_ifs.
+  – To fix the issue, rewrite the proof so that each branch’s tactics are properly indented under the split_ifs. For example, you can write something like:
+
+   split_ifs with h
+   · -- branch for h : a ≤ b
+     exact ⟨⟨le_refl a, h⟩, Or.inl rfl⟩
+   · -- branch for h : ¬(a ≤ b)
+     have : b < a := Int.not_le.mp h
+     exact ⟨⟨le_of_lt this, le_refl b⟩, Or.inr rfl⟩
+
+This way the two branches are clearly separated and Lean knows which commands belong to which goal.
+
+In summary, the root cause of the error is the lack of proper structuring/bulleting of the two branches produced by split_ifs. The commands intended for the else case aren’t grouped as such, leaving unsolved goals and causing parsing errors. Using bullet notation to separate the branches will resolve the error.

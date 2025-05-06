@@ -1,0 +1,14 @@
+```lean
+simp [List.all, decide, decide_eq_true_eq, List.get_mem, Option.mem_def, List.indexOf]
+apply Iff.intro
+· intros h i hi
+  rw [List.mem_indexOf] at *
+  have h' : Some (a[i]!) ∈ a.toList.indexOf a[i]! := by apply List.mem_indexOf_self
+  cases Option.mem_def.mp h' with h'' _
+  exact h _ h''
+· intro h
+  apply List.all_iff_forall.mpr
+  intros x hx
+  specialize h (a.toList.indexOfₛₒₘₑ hx)
+  apply h
+```

@@ -1,0 +1,25 @@
+The error in the proof arises from a mix-up in handling the conversion between `Bool` and `Prop` and a duplicated declaration of the theorem. Specifically, the `decide_eq_true` and `of_decide_eq_true` tactics are used incorrectly. Let's correct the proof:
+
+```lean
+unfold hasCommonElement hasCommonElement_spec
+apply Iff.intro
+· -- Prove the direction: if hasCommonElement a b is true, then ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!
+  intro h
+  simp only [Array.any_eq_true, decide_eq_true_eq] at h
+  obtain ⟨i, hi, h_inner⟩ := h
+  obtain ⟨j, hj, h_eq⟩ := h_inner
+  exact ⟨i, j, hi, hj, h_eq⟩
+
+· -- Prove the direction: if ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!, then hasCommonElement a b is true
+  intro h
+  simp only [Array.any_eq_true, decide_eq_true_eq]
+  obtain ⟨i, j, hi, hj, h_eq⟩ := h
+  use i, hi
+  use j, hj
+  exact h_eq
+```
+
+Here are the main corrections:
+1. Remove the duplicate definition of the theorem `hasCommonElement_spec_satisfied`.
+2. Replace `of_decide_eq_true` and `decide_eq_true rfl` with the more direct handling of equality using `decide_eq_true_eq`.
+3. Correct the unfolding of `Array.any_eq_true` combined with `decide_eq_true_eq` for handling `Bool` to `Prop` conversion correctly.

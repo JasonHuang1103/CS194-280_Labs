@@ -1,0 +1,30 @@
+Below is a step‐by‐step analysis of what’s going wrong and why:
+
+─────────────────────────────  
+1. Failing tactic:  
+The error message points to a failure when using the nested by_cases tactics. In the branch for example when a ≤ b is true and then by_cases h₂ : a ≤ c is used, the “exact h₂” is applied. However, h₂ is a proof that a ≤ c, not a proof that (if a ≤ c then a else c) ≤ a (which is what the goal becomes, since if a ≤ c holds the if‐expression reduces to a). In that branch the goal should be “a ≤ a” (trivially true) but instead the proof uses h₂, which does not match.  
+─────────────────────────────  
+2. Proof state at the failure:  
+When the first by_cases on “a ≤ b” is in the isTrue branch, the hypotheses include h₁ : a ≤ b. Then, in the subsequent branch when by_cases h₂ : a ≤ c is introduced, in the “isTrue” branch of h₂ the term  
+  if a ≤ c then a else c  
+reduces by definition to a. Hence, the goal becomes to prove that a ≤ a (and similar things for the other conjuncts). The proof state thus expects a straightforward (often reflexivity-based) proof, but the tactic “exact h₂” gives you a proof of a different inequality (a ≤ c).  
+─────────────────────────────  
+3. Mismatch between the proof approach and the specification:  
+The specification minOfThree_spec requires proving two things: (a) that the returned value is ≤ a, ≤ b, and ≤ c; (b) that the returned value equals one of a, b, or c. Given the definition of minOfThree uses nested ifs, the natural proof idea is to “split” according to the conditions. The proof as written attempts to do this manually with by_cases but does not use Lean’s “split_ifs” or similar simplification tactics that would reduce the if‐expressions. This approach makes it hard to see that, for example, when a ≤ b and a ≤ c hold the if‐expression simplifies to a – so you only need to prove things like a ≤ a (true by reflexivity).  
+─────────────────────────────  
+4. Type mismatches and incorrect assumptions:  
+– In the branch where a ≤ b and a ≤ c both hold, the if expression reduces to a. Hence, the goal “(if a ≤ c then a else c) ≤ a” is just “a ≤ a,” which is trivial. But the proof “exact h₂” mistakenly assumes that proving a ≤ c will automatically prove a ≤ a.  
+– Similar mistakes occur in other branches: proofs like “exact le_of_not_le (not_le.mp h₂)” are expected to yield a proof for an inequality between “if … then … else …” and one of the inputs, but the hypothesis provided does not match that goal. In other words, the tactic “exact” is being given a proof of the wrong proposition.  
+– In addition, the “·” bullet at the start of a line (as seen with “lean_playground/TempTest.lean:26:0: error: unexpected token '·'; expected command”) suggests that the indentation or bullet hierarchy is off, so Lean does not know how to parse the subsequent proof block. This is a syntactic issue that might be caused by misplaced bullet markers or inconsistent indentation.  
+─────────────────────────────  
+5. Alternative proof strategies:  
+A recommended strategy is to use the tactic “split_ifs” (or “simp only [if_true, if_false, …]”) after unfolding the definitions. For example, by adding a line such as  
+  split_ifs  
+after the “unfold” step, Lean will automatically replace “if a ≤ b then … else …” by the corresponding branch according to each case. Then each case is reduced to verifying trivial facts (e.g., a ≤ a, b ≤ b) by reflexivity or basic inequalities. This eliminates the need for manually doing nested “by_cases” and avoids mismatches.  
+─────────────────────────────  
+Conclusion and Root Cause Analysis:  
+The error ultimately comes from two intertwined issues:  
+• The manual case splitting via “by_cases” is not properly aligned with the way Lean reduces “if” expressions. In the branch where the “if” simplifies, the proof should use a trivial reflexivity step (or appropriate inequality facts) rather than reusing the condition (like h₂) which is not of the correct type.  
+• There is also a formatting/syntax error (indicated by the unexpected token “·”) which hints that the bullet structure is misused—possibly due to the misaligned case blocks or stray bullet markers after the unsolved goals.  
+
+To fix the proof, one should either adjust each branch to correctly use the fact that the “if” expression reduces to one of a, b, or c (and then prove the required inequalities using reflexivity or other simple lemmas) or, more simply, use tactics like “split_ifs” to let Lean simplify the conditional expressions automatically. This will resolve the type mismatches and keep the bullet indentation correct.

@@ -1,0 +1,101 @@
+Below is one way of breaking down the task into clear implementation and proof steps.
+
+─────────────────────────────  
+Step-by-Step Plan
+
+1. Understand the Specification
+
+ • You must implement a function, hasCommonElement, that takes two arrays a and b of type Int.  
+ • It must return true if there exists some index i in a and some index j in b such that a[i] = b[j].  
+ • By the specification, if at least one array is empty then the result should be false (this happens automatically if you use an “exists” style check).
+
+2. Choose an Implementation Strategy
+
+A straightforward way to implement this is to use the built-in Array.any? function. One can “scan” through the first array and, for each element, check if it occurs in the second array. In Lean 4 you might write:
+  a.any? (fun x => b.any? (fun y => x = y))
+  
+This form:
+ • Returns false if a is empty because Array.any? over an empty array is false  
+ • Returns false if b is empty because then b.any? … will be false for every x, and thus a.any? … will be false  
+ • Returns true exactly when there is some element x in a for which there is some element y in b with x = y.
+
+3. Define the Specification for the Theorem
+
+The provided specification, hasCommonElement_spec, requires showing the boolean output is equivalent to the existence of indices i and j satisfying the equality (and the bounds conditions on the indices).
+
+4. Plan the Proof
+
+The theorem hasCommonElement_spec_satisfied states that for all arrays a and b:
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ hasCommonElement a b
+
+The proof plan is as follows:
+
+ a. Unfold the definition of hasCommonElement and hasCommonElement_spec.
+  
+ b. Use the general lemma (or “folklore facts”) about Array.any? that relates the Boolean test with an existential quantifier:
+  – Specifically, show that for any predicate P, the statement a.any? P = true is equivalent to ∃ i (with i < a.size) such that P (a[i]!) is true.
+  
+ c. Apply that lemma first to the outer any? over array a:
+  – a.any? (fun x => b.any? (fun y => x = y)) = true  
+    ⟺ ∃ i < a.size such that (b.any? (fun y => a[i]! = y)) = true.
+  
+ d. Then apply the same idea to b.any? (fun y => a[i]! = y):
+    ⟺ ∃ j < b.size such that a[i]! = b[j]!.
+
+ e. Combine the two existential quantifiers to yield:
+    ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!.
+  
+ f. This completes the bi-implication with the boolean result.
+
+5. Structure Your Code in Lean 4
+
+Place the implementation inside the placeholder in the template between “{{code}}” markers. Then inside your proof (starting at “{{proof}}”) provide the unfolding and rewriting steps using the any? lemmas (or by doing a case analysis if those lemmas are not directly available).
+
+─────────────────────────────  
+Possible Lean 4 Code Sketch
+
+Below is a sketch (without markdown formatting, as requested):
+
+------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  a.any? (fun x => b.any? (fun y => x = y))
+
+-- Theorem: If the method returns true, there exists at least one common element between the two arrays;
+-- if the method returns false, there are no common elements between the two arrays.
+def hasCommonElement_spec (a : Array Int) (b : Array Int) (result : Bool) : Prop :=
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  hasCommonElement_spec a b (hasCommonElement a b) := by
+  -- Step 1: Unfold the definitions.
+  unfold hasCommonElement hasCommonElement_spec
+  -- Step 2: Use the existential characterization of "any?".
+  -- Suppose that we have a lemma: Array.any?_iff : 
+  --   a.any? P = true ↔ ∃ i, i < a.size ∧ P (a[i]!)
+  -- We use it on both any? calls.
+  rw [← Array.any?_iff (fun x => b.any? (fun y => x = y))]
+  rw [← Array.any?_iff (fun y => a[?]! = y)]  -- Here, we need to apply this lemma for each fixed i.
+  -- At this point, the proof should be completed by rearranging the quantifiers.
+  -- (This proof outline assumes the existence of lemmas that connect the "any?" functions with existential quantifiers.)
+  sorry  -- The remaining proof details will follow from applying these rewrites and then using the standard logical equivalences.
+
+------------------------------------------------------
+
+Note:
+• If the Array.any?_iff lemma is not immediately available in your imports, then you may have to prove it as an auxiliary lemma.  
+• In your final submission you would replace "sorry" with the detailed proof. The outline above explains the essential rewriting steps.
+
+─────────────────────────────  
+Summary
+
+Key steps include:
+ 1. Implementing hasCommonElement using Array.any? over a to test for an element that is also in b.
+ 2. Proving that a.any? (fun x => b.any? (fun y => x = y)) returns true if and only if there exist indices i and j such that a[i]! = b[j]!.
+ 3. Using lemmas that relate the Boolean any? function with an existential quantifier over the array indices.
+ 4. Unfolding definitions and performing rewrites to complete the proof of hasCommonElement_spec_satisfied.
+
+This plan, with the function implementation and the sketch of the proof strategy, should guide you through developing your final Lean 4 solution.

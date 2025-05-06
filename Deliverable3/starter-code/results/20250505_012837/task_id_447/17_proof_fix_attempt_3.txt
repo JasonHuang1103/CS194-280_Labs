@@ -1,0 +1,6 @@
+```lean
+apply And.intro
+· simp
+· intros i hi
+  simp [Array.get!, Array.map]
+```

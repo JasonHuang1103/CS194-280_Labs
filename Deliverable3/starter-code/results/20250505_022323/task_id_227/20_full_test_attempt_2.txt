@@ -1,0 +1,9 @@
+Lean Error: lean_playground/TempTest.lean:19:46: error: unsolved goals
+case left
+a b c : ℤ
+⊢ a ⊓ b ⊓ c ≤ a ∧ a ⊓ b ⊓ c ≤ b ∧ a ⊓ b ⊓ c ≤ c
+
+case right
+a b c : ℤ
+⊢ a ⊓ b ⊓ c = a ∨ a ⊓ b ⊓ c = b ∨ a ⊓ b ⊓ c = c
+lean_playground/TempTest.lean:23:0: error: unexpected token '{'; expected command

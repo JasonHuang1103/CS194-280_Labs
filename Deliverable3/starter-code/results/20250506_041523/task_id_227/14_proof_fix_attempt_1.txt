@@ -1,0 +1,31 @@
+```lean
+split
+· intro
+  by_cases h₁ : a ≤ b
+  · have m_eq : minOfThree a b c = if a ≤ c then a else c := by simp [minOfThree, h₁]
+    split <;> simp [m_eq]
+    · split
+      · exact le_of_lt (if_neg (le_of_not_le (not_le.mpr (not_le.mpr h₁))))
+      · intro
+        cases lt_or_ge (if a ≤ c then a else c) b with h2 h2
+        · exact le_trans h2 (if_neg (le_of_not_le (not_le.mpr (not_le.mpr h₁))))
+        · find_and_replace
+      · intro
+        find_and_replace
+    · left
+      cases lt_or_ge (if a ≤ c then a else c) c with h3 h3
+      · exact le_of_lt (if_neg h3)
+      · exact le_refl (if a ≤ c then a else c)
+  · have m_eq : minOfThree a b c = if b ≤ c then b else c := by simp [minOfThree, h₁]
+    split <;> simp [m_eq]
+    · intro
+      cases lt_or_ge (if b ≤ c then b else c) a with h2 h2 <;> find_and_replace
+    · cases lt_or_ge (if b ≤ c then b else c) c with h3 h3
+      · right; left
+        find_and_replace
+      · right; intro
+        cases (not_le.mpr h3 (if_neg (le_of_not_le (not_le.mpr (not_le.mpr h₁))))) with h4
+        · left,
+          find_and_replace
+        · cases lt_or_ge (if b ≤ b then b else c) b with h5 h5 <+> find_and_replace
+```

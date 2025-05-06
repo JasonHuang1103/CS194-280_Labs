@@ -1,0 +1,24 @@
+theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :
+  isGreater_spec n a (isGreater n a) := by
+  unfold isGreater isGreater_spec
+  induction a using Array.inductionOn with
+  | empty =>
+    simp
+  | push x a ih =>
+    rw [Array.foldl_push, ih]
+    simp
+    split
+    · intro h
+      constructor
+      · apply h
+        apply Nat.lt.base
+      · intro i hi
+        apply h
+        apply Nat.succ_lt_succ
+        exact hi
+    · intro ⟨hx, h⟩
+      intro i
+      apply Nat.casesOn i
+      · exact hx
+      · intro i
+        exact h i

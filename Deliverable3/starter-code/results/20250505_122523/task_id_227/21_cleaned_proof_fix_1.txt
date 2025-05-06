@@ -1,0 +1,6 @@
+simp only [minOfThree_spec]
+split_ifs
+· exact ⟨⟨le_rfl, h, h_1⟩, Or.inl rfl⟩
+· exact ⟨⟨le_rfl, h, le_of_not_le h_1⟩, Or.inr $ Or.inr rfl⟩
+· exact ⟨⟨h_1, le_rfl, h⟩, Or.inr $ Or.inl rfl⟩
+· exact ⟨⟨h_1, le_rfl, le_of_not_le h⟩, Or.inr $ Or.inr rfl⟩

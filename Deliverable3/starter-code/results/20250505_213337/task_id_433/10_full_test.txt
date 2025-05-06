@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:9:0: error: unknown identifier 'This'
+lean_playground/TempTest.lean:9:5: error: unknown identifier 'change'
+lean_playground/TempTest.lean:9:50: error: unexpected token 'using'; expected command
+lean_playground/TempTest.lean:23:20: error: unknown constant 'Array.inductionOn'

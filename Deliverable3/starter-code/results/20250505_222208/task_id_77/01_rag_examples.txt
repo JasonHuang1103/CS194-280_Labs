@@ -1,0 +1,5691 @@
+ize.
+Here we consider a few ways to do it.
+To start with, we can use the
+cases
+tactic and the fact that the
+successor function respects the ordering on the natural numbers.
+theorem
+two_le
+{
+m
+:
+ℕ
+}
+(
+h0
+:
+m
+≠
+0
+)
+(
+h1
+:
+m
+≠
+1
+)
+:
+2
+≤
+m
+:=
+by
+cases
+m
+;
+contradiction
+case
+succ
+m
+=>
+cases
+m
+;
+contradiction
+repeat
+apply
+Nat.succ_le_succ
+apply
+zero_le
+Another strategy is to use the tactic
+interval_cases
+,
+which automatically splits the goal into cases when
+the variable in question is contained in an interval
+of natural numbers or integers.
+Remember that you can hover over it to see its documentation.
+example
+{
+m
+:
+ℕ
+}
+(
+h0
+:
+m
+≠
+0
+)
+(
+h1
+:
+m
+≠
+1
+)
+:
+2
+≤
+m
+:=
+by
+by_contra
+h
+push_neg
+at
+h
+interval_cases
+m
+<;>
+contradiction
+Recall that the semicolon after
+interval_cases
+m
+means
+that the next tactic is applied to each of the cases that it generates.
+Yet another option is to use the tactic
+decide
+, which tries
+to find a decision procedure to solve the problem.
+Lean knows that you can decide the truth value of a statement that
+begins with a bounded quantifier
+∀
+x,
+x
+<
+n
+→
+...
+or
+∃
+x,
+x
+<
+n
+∧
+...
+by deciding each of the finitely many instances.
+example
+{
+m
+:
+ℕ
+}
+(
+h0
+:
+m
+≠
+0
+)
+(
+h1
+:
+m
+≠
+1
+)
+:
+2
+≤
+m
+:=
+by
+by_contra
+h
+push_neg
+at
+h
+revert
+h0
+h1
+revert
+h
+m
+decide
+With the theorem
+two_le
+in hand, let’s start by showing that every
+natural number greater than two has a prime divisor.
+Mathlib contains a function
+Nat.minFac
+that
+returns the smallest prime divisor,
+but for the sake of learning new parts of the library,
+we’ll avoid using it and prove the theorem directly.
+Here, ordinary induction isn’t enough.
+We want to use
+strong induction
+, which allows us to prove
+that every natural number
+\(n\)
+has a property
+\(P\)
+by showing that for every number
+\(n\)
+, if
+\(P\)
+holds
+of all values less than
+\(n\)
+, it holds at
+\(n\)
+as well.
+In Lean, this principle is called
+Nat.strong_induction_on
+,
+and we can use the
+using
+keyword to tell the induction tactic
+to use it.
+Notice that when we do that, there is no base case; it is subsumed
+by the general induction step.
+The argument is simply as follows. Assuming
+\(n ≥ 2\)
+,
+if
+\(n\)
+is prime, we’re done. If it isn’t,
+then by one of the characterizations of what it means to be a prime number,
+it has a nontrivial factor,
+\(m\)
+,
+and we can apply the inductive hypothesis to that.
+Step through the next proof to see how that plays out.
+theorem
+exists_prime_factor
+{
+n
+:
+Nat
+}
+(
+h
+:
+2
+≤
+n
+)
+:
+∃
+p
+:
+Nat
+,
+p.Prime
+∧
+p
+∣
+n
+:=
+by
+by_cases
+np
+:
+n.Prime
+·
+use
+n
+,
+np
+induction'
+n
+using
+Nat.strong_induction_on
+with
+n
+ih
+rw
+[
+Nat.prime_def_lt
+]
+at
+np
+push_neg
+at
+np
+rcases
+np
+h
+with
+⟨
+m
+,
+mltn
+,
+mdvdn
+,
+mne1
+⟩
+have
+:
+m
+≠
+0
+:=
+by
+intro
+mz
+rw
+[
+mz
+,
+zero_dvd_iff
+]
+at
+mdvdn
+linarith
+have
+mgt2
+:
+2
+≤
+m
+:=
+two_le
+this
+mne1
+by_cases
+mp
+:
+m.Prime
+·
+use
+m
+,
+mp
+·
+rcases
+ih
+m
+mltn
+mgt2
+mp
+with
+⟨
+p
+,
+pp
+,
+pdvd
+⟩
+use
+p
+,
+pp
+apply
+pdvd.trans
+mdvdn
+We can now prove the following formulation of our theorem.
+See if you can fill out the sketch.
+You can use
+Nat.factorial_pos
+,
+Nat.dvd_factorial
+,
+and
+Nat.dvd_sub'
+.
+theorem
+primes_infinite
+:
+∀
+n
+,
+∃
+p
+>
+n
+,
+Nat.Prime
+p
+:=
+by
+intro
+n
+have
+:
+2
+≤
+Nat.factorial
+n
++
+1
+:=
+by
+sorry
+rcases
+exists_prime_factor
+this
+with
+⟨
+p
+,
+pp
+,
+pdvd
+⟩
+refine
+⟨
+p
+,
+?
+_
+,
+pp
+⟩
+show
+p
+>
+n
+by_contra
+ple
+push_neg
+at
+ple
+have
+:
+p
+∣
+Nat.factorial
+n
+:=
+by
+sorry
+have
+:
+p
+∣
+1
+:=
+by
+sorry
+show
+False
+sorry
+Let’s consider a variation of the proof above, where instead
+of using the factorial function,
+we suppose that we are given by a finite set
+\(\{ p_1, \ldots, p_n \}\)
+and we consider a prime factor of
+\(\prod_{i = 1}^n p_i + 1\)
+.
+That prime factor has to be distinct from each
+\(p_i\)
+, showing that there is no finite set that contains
+all the prime numbers.
+Formalizing this argument requires us to reason about finite
+sets. In Lean, for any type
+α
+, the type
+Finset
+α
+represents finite sets of elements of type
+α
+.
+Reasoning about finite sets computationally requires having
+a procedure to test equality on
+α
+, which is why the snippet
+below includes the assumption
+[DecidableEq
+α]
+.
+For concrete data types like
+ℕ
+,
+ℤ
+, and
+ℚ
+,
+the assumption is satisfied automatically. When reasoning about
+the real numbers, it can be satisfied using classical logic
+and abandoning the computational interpretation.
+We use the command
+open
+Finset
+to avail ourselves of shorter names
+for the relevant theorems. Unlike the case with sets,
+most equivalences involving finsets do not hold definitionally,
+so they need to be expanded manually using equivalences like
+Finset.subset_iff
+,
+Finset.mem_union
+,
+Finset.mem_inter
+,
+and
+Finset.mem_sdiff
+. The
+ext
+tactic can still be used
+to show that two finite sets are equal by showing
+that every element of one is an element of the other.
+open
+Finset
+section
+variable
+{
+α
+:
+Type
+*
+}
+[
+DecidableEq
+α
+]
+(
+r
+s
+t
+:
+Finset
+α
+)
+example
+:
+r
+∩
+(
+s
+∪
+t
+)
+⊆
+r
+∩
+s
+∪
+r
+∩
+t
+:=
+by
+rw
+[
+subset_iff
+]
+intro
+x
+rw
+[
+mem_inter
+,
+mem_union
+,
+mem_union
+,
+mem_inter
+,
+mem_inter
+]
+tauto
+example
+:
+r
+∩
+(
+s
+∪
+t
+)
+⊆
+r
+∩
+s
+∪
+r
+∩
+t
+:=
+by
+simp
+[
+subset_iff
+]
+intro
+x
+tauto
+example
+:
+r
+∩
+s
+∪
+r
+∩
+t
+⊆
+r
+∩
+(
+s
+∪
+t
+)
+:=
+by
+simp
+[
+subset_iff
+]
+intro
+x
+tauto
+example
+:
+r
+∩
+s
+∪
+r
+∩
+t
+=
+r
+∩
+(
+s
+∪
+t
+)
+:=
+by
+ext
+x
+simp
+tauto
+end
+We have used a new trick: the
+tauto
+tactic (and a strengthened
+version,
+tauto!
+, which uses classical logic) can be used to
+dispense with propositional tautologies. See if you can use
+these methods to prove the two examples below.
+example
+:
+(
+r
+∪
+s
+)
+∩
+(
+r
+∪
+t
+)
+=
+r
+∪
+s
+∩
+t
+:=
+by
+sorry
+example
+:
+(
+r
+\
+s
+)
+\
+t
+=
+r
+\
+(
+s
+∪
+t
+)
+:=
+by
+sorry
+The theorem
+Finset.dvd_prod_of_mem
+tells us that if an
+n
+is an element of a finite set
+s
+, then
+n
+divides
+∏
+i
+∈
+s,
+i
+.
+example
+(
+s
+:
+Finset
+ℕ
+)
+(
+n
+:
+ℕ
+)
+(
+h
+:
+n
+∈
+s
+)
+:
+n
+∣
+∏
+i
+∈
+s
+,
+i
+:=
+Finset.dvd_prod_of_mem
+_
+h
+We also need to know that the converse holds in the case where
+n
+is prime and
+s
+is a set of primes.
+To show that, we need the following lemma, which you should
+be able to prove using the theorem
+Nat.Prime.eq_one_or_self_of_dvd
+.
+theorem
+_root_.Nat.Prime.eq_of_dvd_of_prime
+{
+p
+q
+:
+ℕ
+}
+(
+prime_p
+:
+Nat.Prime
+p
+)
+(
+prime_q
+:
+Nat.Prime
+q
+)
+(
+h
+:
+p
+∣
+q
+)
+:
+p
+=
+q
+:=
+by
+sorry
+We can use this lemma to show that if a prime
+p
+divides a product of a finite
+set of primes, then it is equal to one of them.
+Mathlib provides a useful principle of induction on finite sets:
+to show that a property holds of an arbitrary finite set
+s
+,
+show that it holds of the empty set, and show that it is preserved
+when we add a single new element
+a
+∉
+s
+.
+The principle is known as
+Finset.induction_on
+.
+When we tell the induction tactic to use it, we can also specify the names
+a
+and
+s
+, the name for the assumption
+a
+∉
+s
+in the inductive step,
+and the name of the inductive hypothesis.
+The expression
+Finset.insert
+a
+s
+denotes the union of
+s
+with the singleton
+a
+.
+The identities
+Finset.prod_empty
+and
+Finset.prod_insert
+then provide
+the relevant rewrite rules for the product.
+In the proof below, the first
+simp
+applies
+Finset.prod_empty
+.
+Step through the beginning of the proof to see the induction unfold,
+and then finish it off.
+theorem
+mem_of_dvd_prod_primes
+{
+s
+:
+Finset
+ℕ
+}
+{
+p
+:
+ℕ
+}
+(
+prime_p
+:
+p.Prime
+)
+:
+(
+∀
+n
+∈
+s
+,
+Nat.Prime
+n
+)
+→
+(
+p
+∣
+∏
+n
+∈
+s
+,
+n
+)
+→
+p
+∈
+s
+:=
+by
+intro
+h₀
+h₁
+induction'
+s
+using
+Finset.induction_on
+with
+a
+s
+ans
+ih
+·
+simp
+at
+h₁
+linarith
+[
+prime_p.two_le
+]
+simp
+[
+Finset.prod_insert
+ans
+,
+prime_p.dvd_mul
+]
+at
+h₀
+h₁
+rw
+[
+mem_insert
+]
+sorry
+We need one last property of finite sets.
+Given an element
+s
+:
+Set
+α
+and a predicate
+P
+on
+α
+, in
+Chapter 4
+we wrote
+{
+x
+∈
+s
+|
+P
+x
+}
+for the set of
+elements of
+s
+that satisfy
+P
+.
+Given
+s
+:
+Finset
+α
+,
+the analogous notion is written
+s.filter
+P
+.
+example
+(
+s
+:
+Finset
+ℕ
+)
+(
+x
+:
+ℕ
+)
+:
+x
+∈
+s.filter
+Nat.Prime
+↔
+x
+∈
+s
+∧
+x.Prime
+:=
+mem_filter
+We now prove an alternative formulation of the statement that there are infinitely many
+primes, namely, that given any
+s
+:
+Finset
+ℕ
+, there is a prime
+p
+that is not
+an element of
+s
+.
+Aiming for a contradiction, we assume that all the primes are in
+s
+, and then
+cut down to a set
+s'
+that contains all and only the primes.
+Taking the product of that set, adding one, and finding a prime factor
+of the result
+leads to the contradiction we are looking for.
+See if you can complete the sketch below.
+You can use
+Finset.prod_pos
+in the proof of the first
+have
+.
+theorem
+primes_infinite'
+:
+∀
+s
+:
+Finset
+Nat
+,
+∃
+p
+,
+Nat.Prime
+p
+∧
+p
+∉
+s
+:=
+by
+intro
+s
+by_contra
+h
+push_neg
+at
+h
+set
+s'
+:=
+s.filter
+Nat.Prime
+with
+s'_def
+have
+mem_s'
+:
+∀
+{
+n
+:
+ℕ
+},
+n
+∈
+s'
+↔
+n.Prime
+:=
+by
+intro
+n
+simp
+[
+s'_def
+]
+apply
+h
+have
+:
+2
+≤
+(
+∏
+i
+∈
+s'
+,
+i
+)
++
+1
+:=
+by
+sorry
+rcases
+exists_prime_factor
+this
+with
+⟨
+p
+,
+pp
+,
+pdvd
+⟩
+have
+:
+p
+∣
+∏
+i
+∈
+s'
+,
+i
+:=
+by
+sorry
+have
+:
+p
+∣
+1
+:=
+by
+convert
+Nat.dvd_sub
+pdvd
+this
+simp
+show
+False
+sorry
+We have thus seen two ways of saying that there are infinitely many primes:
+saying that they are not bounded by any
+n
+, and saying that they are
+not contained in any finite set
+s
+.
+The two proofs below show that these formulations are equivalent.
+In the second, in order to form
+s.filter
+Q
+, we have to assume that there
+is a procedure for deciding whether or not
+Q
+holds. Lean knows that there
+is a procedure for
+Nat.Prime
+. In general, if we use classical logic
+by writing
+open
+Classical
+,
+we can dispense with the assumption.
+In Mathlib,
+Finset.sup
+s
+f
+denotes the supremum of the values of
+f
+x
+as
+x
+ranges over
+s
+, returning
+0
+in the case where
+s
+is empty and
+the codomain of
+f
+is
+ℕ
+. In the first proof, we use
+s.sup
+id
+,
+where
+id
+is the identity function, to refer to the maximum value in
+s
+.
+theorem
+bounded_of_ex_finset
+(
+Q
+:
+ℕ
+→
+Prop
+)
+:
+(
+∃
+s
+:
+Finset
+ℕ
+,
+∀
+k
+,
+Q
+k
+→
+k
+∈
+s
+)
+→
+∃
+n
+,
+∀
+k
+,
+Q
+k
+→
+k
+<
+n
+:=
+by
+rintro
+⟨
+s
+,
+hs
+⟩
+use
+s.sup
+id
++
+1
+intro
+k
+Qk
+apply
+Nat.lt_succ_of_le
+show
+id
+k
+≤
+s.sup
+id
+apply
+le_sup
+(
+hs
+k
+Qk
+)
+theorem
+ex_finset_of_bounded
+(
+Q
+:
+ℕ
+→
+Prop
+)
+[
+DecidablePred
+Q
+]
+:
+(
+∃
+n
+,
+∀
+k
+,
+Q
+k
+→
+k
+≤
+n
+)
+→
+∃
+s
+:
+Finset
+ℕ
+,
+∀
+k
+,
+Q
+k
+↔
+k
+∈
+s
+:=
+by
+rintro
+⟨
+n
+,
+hn
+⟩
+use
+(
+range
+(
+n
++
+1
+))
+.
+filter
+Q
+intro
+k
+simp
+[
+Nat.lt_succ_iff
+]
+exact
+hn
+k
+A small variation on our second proof that there are infinitely many primes
+shows that there are infinitely many primes congruent to 3 modulo 4.
+The argument goes as follows.
+First, notice that if the product of two numbers
+\(m\)
+and
+\(n\)
+is equal to 3 modulo 4, then one of the two numbers is congruent to 3 modulo 4.
+After all, both have to be odd, and if they are both congruent to 1 modulo 4,
+so is their product.
+We can use this observation to show that if some number
+greater than 2 is congruent to 3 modulo 4,
+then that number has a prime divisor that is also congruent to 3 modulo 4.
+Now suppose there are only finitely many prime numbers congruent to 3
+modulo 4, say,
+\(p_1, \ldots, p_k\)
+.
+Without loss of generality, we can assume that
+\(p_1 = 3\)
+.
+Consider the product
+\(4 \prod_{i = 2}^k p_i + 3\)
+.
+It is easy to see that this is congruent to 3 modulo 4, so it has
+a prime factor
+\(p\)
+congruent to 3 modulo 4.
+It can’t be the case that
+\(p = 3\)
+; since
+\(p\)
+divides
+\(4 \prod_{i = 2}^k p_i + 3\)
+, if
+\(p\)
+were equal to 3 then it would also divide
+\(\prod_{i = 2}^k p_i\)
+,
+which implies that
+\(p\)
+is equal to
+one of the
+\(p_i\)
+for
+\(i = 2, \ldots, k\)
+;
+and we have excluded 3 from this list.
+So
+\(p\)
+has to be one of the other elements
+\(p_i\)
+.
+But in that case,
+\(p\)
+divides
+\(4 \prod_{i = 2}^k p_i\)
+and hence 3, which contradicts the fact that it is not 3.
+In Lean, the notation
+n
+%
+m
+, read “
+n
+modulo
+m
+,”
+denotes the remainder of the division of
+n
+by
+m
+.
+example
+:
+27
+%
+4
+=
+3
+:=
+by
+norm_num
+We can then render the statement “
+n
+is congruent to 3 modulo 4”
+as
+n
+%
+4
+=
+3
+. The following example and theorems sum up
+the facts about this function that we will need to use below.
+The first named theorem is another illustration of reasoning by
+a small number of cases.
+In the second named theorem, remember that the semicolon means that
+the subsequent tactic block is applied to all the goals created by the
+preceding tactic.
+example
+(
+n
+:
+ℕ
+)
+:
+(
+4
+*
+n
++
+3
+)
+%
+4
+=
+3
+:=
+by
+rw
+[
+add_comm
+,
+Nat.add_mul_mod_self_left
+]
+theorem
+mod_4_eq_3_or_mod_4_eq_3
+{
+m
+n
+:
+ℕ
+}
+(
+h
+:
+m
+*
+n
+%
+4
+=
+3
+)
+:
+m
+%
+4
+=
+3
+∨
+n
+%
+4
+=
+3
+:=
+by
+revert
+h
+rw
+[
+Nat.mul_mod
+]
+have
+:
+m
+%
+4
+<
+4
+:=
+Nat.mod_lt
+m
+(
+by
+norm_num
+)
+interval_cases
+m
+%
+4
+<;>
+simp
+[
+-
+Nat.mul_mod_mod
+]
+have
+:
+n
+%
+4
+<
+4
+:=
+Nat.mod_lt
+n
+(
+by
+norm_num
+)
+interval_cases
+n
+%
+4
+<;>
+simp
+theorem
+two_le_of_mod_4_eq_3
+{
+n
+:
+ℕ
+}
+(
+h
+:
+n
+%
+4
+=
+3
+)
+:
+2
+≤
+n
+:=
+by
+apply
+two_le
+<;>
+·
+intro
+neq
+rw
+[
+neq
+]
+at
+h
+norm_num
+at
+h
+We will also need the following fact, which says that if
+m
+is a nontrivial divisor of
+n
+, then so is
+n
+/
+m
+.
+See if you can complete the proof using
+Nat.div_dvd_of_dvd
+and
+Nat.div_lt_self
+.
+theorem
+aux
+{
+m
+n
+:
+ℕ
+}
+(
+h₀
+:
+m
+∣
+n
+)
+(
+h₁
+:
+2
+≤
+m
+)
+(
+h₂
+:
+m
+<
+n
+)
+:
+n
+/
+m
+∣
+n
+∧
+n
+/
+m
+<
+n
+:=
+by
+sorry
+Now put all the pieces together to prove that any
+number congruent to 3 modulo 4 has a prime divisor with that
+same property.
+theorem
+exists_prime_factor_mod_4_eq_3
+{
+n
+:
+Nat
+}
+(
+h
+:
+n
+%
+4
+=
+3
+)
+:
+∃
+p
+:
+Nat
+,
+p.Prime
+∧
+p
+∣
+n
+∧
+p
+%
+4
+=
+3
+:=
+by
+by_cases
+np
+:
+n.Prime
+·
+use
+n
+induction'
+n
+using
+Nat.strong_induction_on
+with
+n
+ih
+rw
+[
+Nat.prime_def_lt
+]
+at
+np
+push_neg
+at
+np
+rcases
+np
+(
+two_le_of_mod_4_eq_3
+h
+)
+with
+⟨
+m
+,
+mltn
+,
+mdvdn
+,
+mne1
+⟩
+have
+mge2
+:
+2
+≤
+m
+:=
+by
+apply
+two_le
+_
+mne1
+intro
+mz
+rw
+[
+mz
+,
+zero_dvd_iff
+]
+at
+mdvdn
+linarith
+have
+neq
+:
+m
+*
+(
+n
+/
+m
+)
+=
+n
+:=
+Nat.mul_div_cancel'
+mdvdn
+have
+:
+m
+%
+4
+=
+3
+∨
+n
+/
+m
+%
+4
+=
+3
+:=
+by
+apply
+mod_4_eq_3_or_mod_4_eq_3
+rw
+[
+neq
+,
+h
+]
+rcases
+this
+with
+h1
+|
+h1
+.
+sorry
+.
+sorry
+We are in the home stretch. Given a set
+s
+of prime
+numbers, we need to talk about the result of removing 3 from that
+set, if it is present. The function
+Finset.erase
+handles that.
+example
+(
+m
+n
+:
+ℕ
+)
+(
+s
+:
+Finset
+ℕ
+)
+(
+h
+:
+m
+∈
+erase
+s
+n
+)
+:
+m
+≠
+n
+∧
+m
+∈
+s
+:=
+by
+rwa
+[
+mem_erase
+]
+at
+h
+example
+(
+m
+n
+:
+ℕ
+)
+(
+s
+:
+Finset
+ℕ
+)
+(
+h
+:
+m
+∈
+erase
+s
+n
+)
+:
+m
+≠
+n
+∧
+m
+∈
+s
+:=
+by
+simp
+at
+h
+assumption
+We are now ready to prove that there are infinitely many primes
+congruent to 3 modulo 4.
+Fill in the missing parts below.
+Our solution uses
+Nat.dvd_add_iff_left
+and
+Nat.dvd_sub'
+along the way.
+theorem
+primes_mod_4_eq_3_infinite
+:
+∀
+n
+,
+∃
+p
+>
+n
+,
+Nat.Prime
+p
+∧
+p
+%
+4
+=
+3
+:=
+by
+by_contra
+h
+push_neg
+at
+h
+rcases
+h
+with
+⟨
+n
+,
+hn
+⟩
+have
+:
+∃
+s
+:
+Finset
+Nat
+,
+∀
+p
+:
+ℕ
+,
+p.Prime
+∧
+p
+%
+4
+=
+3
+↔
+p
+∈
+s
+:=
+by
+apply
+ex_finset_of_bounded
+use
+n
+contrapose
+!
+hn
+rcases
+hn
+with
+⟨
+p
+,
+⟨
+pp
+,
+p4
+⟩,
+pltn
+⟩
+exact
+⟨
+p
+,
+pltn
+,
+pp
+,
+p4
+⟩
+rcases
+this
+with
+⟨
+s
+,
+hs
+⟩
+have
+h₁
+:
+((
+4
+*
+∏
+i
+∈
+erase
+s
+3
+,
+i
+)
++
+3
+)
+%
+4
+=
+3
+:=
+by
+sorry
+rcases
+exists_prime_factor_mod_4_eq_3
+h₁
+with
+⟨
+p
+,
+pp
+,
+pdvd
+,
+p4eq
+⟩
+have
+ps
+:
+p
+∈
+s
+:=
+by
+sorry
+have
+pne3
+:
+p
+≠
+3
+:=
+by
+sorry
+have
+:
+p
+∣
+4
+*
+∏
+i
+∈
+erase
+s
+3
+,
+i
+:=
+by
+sorry
+have
+:
+p
+∣
+3
+:=
+by
+sorry
+have
+:
+p
+=
+3
+:=
+by
+sorry
+contradiction
+If you managed to complete the proof, congratulations! This has been a serious
+feat of formalization.
+Previous
+Next
+© Copyright 2020, Jeremy Avigad, Patrick Massot.
+Built with
+Sphinx
+using a
+theme
+provided by
+Read the Docs
+.
+5. Elementary Number Theory — Mathematics in Lean 0.1 documentation
+Mathematics in Lean
+1. Introduction
+2. Basics
+3. Logic
+4. Sets and Functions
+5. Elementary Number Theory
+5.1. Irrational Roots
+5.2. Induction and Recursion
+5.3. Infinitely Many Primes
+6. Structures
+7. Hierarchies
+8. Groups and Rings
+9. Linear algebra
+10. Topology
+11. Differential Calculus
+12. Integration and Measure Theory
+Index
+Mathematics in Lean
+5.
+Elementary Number Theory
+View page source
+5.
+Elementary Number Theory
+
+In this chapter, we show you how to formalize some elementary
+results in number theory.
+As we deal with more substantive mathematical content,
+the proofs will get longer and more involved,
+building on the skills you have already mastered.
+5.1.
+Irrational Roots
+
+Let’s start with a fact known to the ancient Greeks, namely,
+that the square root of 2 is irrational.
+If we suppose otherwise,
+we can write
+\(\sqrt{2} = a / b\)
+as a fraction
+in lowest terms. Squaring both sides yields
+\(a^2 = 2 b^2\)
+,
+which implies that
+\(a\)
+is even.
+If we write
+\(a = 2c\)
+, then we get
+\(4c^2 = 2 b^2\)
+and hence
+\(b^2 = 2 c^2\)
+.
+This implies that
+\(b\)
+is also even, contradicting
+the fact that we have assumed that
+\(a / b\)
+has been
+reduced to lowest terms.
+Saying that
+\(a / b\)
+is a fraction in lowest terms means
+that
+\(a\)
+and
+\(b\)
+do not have any factors in common,
+which is to say, they are
+coprime
+.
+Mathlib defines the predicate
+Nat.Coprime
+m
+n
+to be
+Nat.gcd
+m
+n
+=
+1
+.
+Using Lean’s anonymous projection notation, if
+s
+and
+t
+are
+expressions of type
+Nat
+, we can write
+s.Coprime
+t
+instead of
+Nat.Coprime
+s
+t
+, and similarly for
+Nat.gcd
+.
+As usual, Lean will often unfold the definition of
+Nat.Coprime
+automatically
+when necessary,
+but we can also do it manually by rewriting or simplifying with
+the identifier
+Nat.Coprime
+.
+The
+norm_num
+tactic is smart enough to compute concrete values.
+#print
+Nat.Coprime
+example
+(
+m
+n
+:
+Nat
+)
+(
+h
+:
+m.Coprime
+n
+)
+:
+m.gcd
+n
+=
+1
+:=
+h
+example
+(
+m
+n
+:
+Nat
+)
+(
+h
+:
+m.Coprime
+n
+)
+:
+m.gcd
+n
+=
+1
+:=
+by
+rw
+[
+Nat.Coprime
+]
+at
+h
+exact
+h
+example
+:
+Nat.Coprime
+12
+7
+:=
+by
+norm_num
+example
+:
+Nat.gcd
+12
+8
+=
+4
+:=
+by
+norm_num
+We have already encountered the
+gcd
+function in
+Section 2.4
+.
+There is also a version of
+gcd
+for the integers;
+we will return to a discussion of the relationship between
+different number systems below.
+There are even a generic
+gcd
+function and generic
+notions of
+Prime
+and
+Coprime
+that make sense in general classes of algebraic structures.
+We will come to understand how Lean manages this generality
+in the next chapter.
+In the meanwhile, in this section, we will restrict attention
+to the natural numbers.
+We also need the notion of a prime number,
+Nat.Prime
+.
+The theorem
+Nat.prime_def_lt
+provides one familiar characterization,
+and
+Nat.Prime.eq_one_or_self_of_dvd
+provides another.
+#check
+Nat.prime_def_lt
+example
+(
+p
+:
+ℕ
+)
+(
+prime_p
+:
+Nat.Prime
+p
+)
+:
+2
+≤
+p
+∧
+∀
+m
+:
+ℕ
+,
+m
+<
+p
+→
+m
+∣
+p
+→
+m
+=
+1
+:=
+by
+rwa
+[
+Nat.prime_def_lt
+]
+at
+prime_p
+#check
+Nat.Prime.eq_one_or_self_of_dvd
+example
+(
+p
+:
+ℕ
+)
+(
+prime_p
+:
+Nat.Prime
+p
+)
+:
+∀
+m
+:
+ℕ
+,
+m
+∣
+p
+→
+m
+=
+1
+∨
+m
+=
+p
+:=
+prime_p.eq_one_or_self_of_dvd
+example
+:
+Nat.Prime
+17
+:=
+by
+norm_num
+-- commonly used
+example
+:
+Nat.Prime
+2
+:=
+Nat.prime_two
+example
+:
+Nat.Prime
+3
+:=
+Nat.prime_three
+In the natural numbers, a prime number has the property that it cannot
+be written as a product of nontrivial factors.
+In a broader mathematical context, an element of a ring that has this property
+is said to be
+irreducible
+.
+An element of a ring is said to be
+prime
+if whenever it divides a product,
+it divides one of the factors.
+It is an important property of the natural numbers
+that in that setting the two notions coincide,
+giving rise to the theorem
+Nat.Prime.dvd_mul
+.
+We can use this fact to establish a key property in the argument
+above:
+if the square of a number is even, then that number is even as well.
+Mathlib defines the predicate
+Even
+in
+Algebra.Group.Even
+,
+but for reasons that will become clear below,
+we will simply use
+2
+∣
+m
+to express that
+m
+is even.
+#check
+Nat.Prime.dvd_mul
+#check
+Nat.Prime.dvd_mul
+Nat.prime_two
+#check
+Nat.prime_two.dvd_mul
+theorem
+even_of_even_sqr
+{
+m
+:
+ℕ
+}
+(
+h
+:
+2
+∣
+m
+^
+2
+)
+:
+2
+∣
+m
+:=
+by
+rw
+[
+pow_two
+,
+Nat.prime_two.dvd_mul
+]
+at
+h
+cases
+h
+<;>
+assumption
+example
+{
+m
+:
+ℕ
+}
+(
+h
+:
+2
+∣
+m
+^
+2
+)
+:
+2
+∣
+m
+:=
+Nat.Prime.dvd_of_dvd_pow
+Nat.prime_two
+h
+As we proceed, you will need to become proficient at finding the facts you
+need.
+Remember that if you can guess the prefix of the name and
+you have imported the relevant library,
+you can use tab completion (sometimes with
+ctrl-tab
+) to find
+what you are looking for.
+You can use
+ctrl-click
+on any identifier to jump to the file
+where it is defined, which enables you to browse definitions and theorems
+nearby.
+You can also use the search engine on the
+Lean community web pages
+,
+and if all else fails,
+don’t hesitate to ask on
+Zulip
+.
+example
+(
+a
+b
+c
+:
+Nat
+)
+(
+h
+:
+a
+*
+b
+=
+a
+*
+c
+)
+(
+h'
+:
+a
+≠
+0
+)
+:
+b
+=
+c
+:=
+-- apply? suggests the following:
+(
+mul_right_inj'
+h'
+)
+.
+mp
+h
+The heart of our proof of the irrationality of the square root of two
+is contained in the following theorem.
+See if you can fill out the proof sketch, using
+even_of_even_sqr
+and the theorem
+Nat.dvd_gcd
+.
+example
+{
+m
+n
+:
+ℕ
+}
+(
+coprime_mn
+:
+m.Coprime
+n
+)
+:
+m
+^
+2
+≠
+2
+*
+n
+^
+2
+:=
+by
+intro
+sqr_eq
+have
+:
+2
+∣
+m
+:=
+by
+sorry
+obtain
+⟨
+k
+,
+meq
+⟩
+:=
+dvd_iff_exists_eq_mul_left.mp
+this
+have
+:
+2
+*
+(
+2
+*
+k
+^
+2
+)
+=
+2
+*
+n
+^
+2
+:=
+by
+rw
+[
+←
+sqr_eq
+,
+meq
+]
+ring
+have
+:
+2
+*
+k
+^
+2
+=
+n
+^
+2
+:=
+sorry
+have
+:
+2
+∣
+n
+:=
+by
+sorry
+have
+:
+2
+∣
+m.gcd
+n
+:=
+by
+sorry
+have
+:
+2
+∣
+1
+:=
+by
+sorry
+norm_num
+at
+this
+In fact, with very few changes, we can replace
+2
+by an arbitrary prime.
+Give it a try in the next example.
+At the end of the proof, you’ll need to derive a contradiction from
+p
+∣
+1
+.
+You can use
+Nat.Prime.two_le
+, which says that
+any prime number is greater than or equal to two,
+and
+Nat.le_of_dvd
+.
+example
+{
+m
+n
+p
+:
+ℕ
+}
+(
+coprime_mn
+:
+m.Coprime
+n
+)
+(
+prime_p
+:
+p.Prime
+)
+:
+m
+^
+2
+≠
+p
+*
+n
+^
+2
+:=
+by
+sorry
+Let us consider another approach.
+Here is a quick proof that if
+\(p\)
+is prime, then
+\(m^2 \ne p n^2\)
+: if we assume
+\(m^2 = p n^2\)
+and consider the factorization of
+\(m\)
+and
+\(n\)
+into primes,
+then
+\(p\)
+occurs an even number of times on the left side of the equation
+and an odd number of times on the right, a contradiction.
+Note that this argument requires that
+\(n\)
+and hence
+\(m\)
+are not equal to zero.
+The formalization below confirms that this assumption is sufficient.
+The unique factorization theorem says that any natural number other
+than zero can be written as the product of primes in a unique way.
+Mathlib contains a formal version of this, expressed in terms of a function
+Nat.primeFactorsList
+, which returns the list of
+prime factors of a number in nondecreasing order.
+The library proves that all the elements of
+Nat.primeFactorsList
+n
+are prime, that any
+n
+greater than zero is equal to the
+product of its factors,
+and that if
+n
+is equal to the product of another list of prime numbers,
+then that list is a permutation of
+Nat.primeFactorsList
+n
+.
+#check
+Nat.primeFactorsList
+#check
+Nat.prime_of_mem_primeFactorsList
+#check
+Nat.prod_primeFactorsList
+#check
+Nat.primeFactorsList_unique
+You can browse these theorems and others nearby, even though we have not
+talked about list membership, products, or permutations yet.
+We won’t need any of that for the task at hand.
+We will instead use the fact that Mathlib has a function
+Nat.factorization
+,
+that represents the same data as a function.
+Specifically,
+Nat.factorization
+n
+p
+, which we can also write
+n.factorization
+p
+, returns the multiplicity of
+p
+in the prime
+factorization of
+n
+. We will use the following three facts.
+theorem
+factorization_mul'
+{
+m
+n
+:
+ℕ
+}
+(
+mnez
+:
+m
+≠
+0
+)
+(
+nnez
+:
+n
+≠
+0
+)
+(
+p
+:
+ℕ
+)
+:
+(
+m
+*
+n
+)
+.
+factorization
+p
+=
+m.factorization
+p
++
+n.factorization
+p
+:=
+by
+rw
+[
+Nat.factorization_mul
+mnez
+nnez
+]
+rfl
+theorem
+factorization_pow'
+(
+n
+k
+p
+:
+ℕ
+)
+:
+(
+n
+^
+k
+)
+.
+factorization
+p
+=
+k
+*
+n.factorization
+p
+:=
+by
+rw
+[
+Nat.factorization_pow
+]
+rfl
+theorem
+Nat.Prime.factorization'
+{
+p
+:
+ℕ
+}
+(
+prime_p
+:
+p.Prime
+)
+:
+p.factorization
+p
+=
+1
+:=
+by
+rw
+[
+prime_p.factorization
+]
+simp
+In fact,
+n.factorization
+is defined in Lean as a function of finite support,
+which explains the strange notation you will see as you step through the
+proofs above. Don’t worry about this now. For our purposes here, we can use
+the three theorems above as a black box.
+The next example shows that the simplifier is smart enough to replace
+n^2
+≠
+0
+by
+n
+≠
+0
+. The tactic
+simpa
+just calls
+simp
+followed by
+assumption
+.
+See if you can use the identities above to fill in the missing parts
+of the proof.
+example
+{
+m
+n
+p
+:
+ℕ
+}
+(
+nnz
+:
+n
+≠
+0
+)
+(
+prime_p
+:
+p.Prime
+)
+:
+m
+^
+2
+≠
+p
+*
+n
+^
+2
+:=
+by
+intro
+sqr_eq
+have
+nsqr_nez
+:
+n
+^
+2
+≠
+0
+:=
+by
+simpa
+have
+eq1
+:
+Nat.factorization
+(
+m
+^
+2
+)
+p
+=
+2
+*
+m.factorization
+p
+:=
+by
+sorry
+have
+eq2
+:
+(
+p
+*
+n
+^
+2
+)
+.
+factorization
+p
+=
+2
+*
+n.factorization
+p
++
+1
+:=
+by
+sorry
+have
+:
+2
+*
+m.factorization
+p
+%
+2
+=
+(
+2
+*
+n.factorization
+p
++
+1
+)
+%
+2
+:=
+by
+rw
+[
+←
+eq1
+,
+sqr_eq
+,
+eq2
+]
+rw
+[
+add_comm
+,
+Nat.add_mul_mod_self_left
+,
+Nat.mul_mod_right
+]
+at
+this
+norm_num
+at
+this
+A nice thing about this proof is that it also generalizes. There is
+nothing special about
+2
+; with small changes, the proof shows that
+whenever we write
+m^k
+=
+r
+*
+n^k
+, the multiplicity of any prime
+p
+in
+r
+has to be a multiple of
+k
+.
+To use
+Nat.count_factors_mul_of_pos
+with
+r
+*
+n^k
+,
+we need to know that
+r
+is positive.
+But when
+r
+is zero, the theorem below is trivial, and easily
+proved by the simplifier.
+So the proof is carried out in cases.
+The line
+rcases
+r
+with
+_
+|
+r
+replaces the goal with two versions:
+one in which
+r
+is replaced by
+0
+,
+and the other in which
+r
+is replaces by
+r
++
+1
+.
+In the second case, we can use the theorem
+r.succ_ne_zero
+, which
+establishes
+r
++
+1
+≠
+0
+(
+succ
+stands for successor).
+Notice also that the line that begins
+have
+:
+npow_nz
+provides a
+short proof-term proof of
+n^k
+≠
+0
+.
+To understand how it works, try replacing it with a tactic proof,
+and then think about how the tactics describe the proof term.
+See if you can fill in the missing parts of the proof below.
+At the very end, you can use
+Nat.dvd_sub'
+and
+Nat.dvd_mul_right
+to finish it off.
+Note that this example does not assume that
+p
+is prime, but the
+conclusion is trivial when
+p
+is not prime since
+r.factorization
+p
+is then zero by definition, and the proof works in all cases anyway.
+example
+{
+m
+n
+k
+r
+:
+ℕ
+}
+(
+nnz
+:
+n
+≠
+0
+)
+(
+pow_eq
+:
+m
+^
+k
+=
+r
+*
+n
+^
+k
+)
+{
+p
+:
+ℕ
+}
+:
+k
+∣
+r.factorization
+p
+:=
+by
+rcases
+r
+with
+_
+|
+r
+·
+simp
+have
+npow_nz
+:
+n
+^
+k
+≠
+0
+:=
+fun
+npowz
+↦
+nnz
+(
+pow_eq_zero
+npowz
+)
+have
+eq1
+:
+(
+m
+^
+k
+)
+.
+factorization
+p
+=
+k
+*
+m.factorization
+p
+:=
+by
+sorry
+have
+eq2
+:
+((
+r
++
+1
+)
+*
+n
+^
+k
+)
+.
+factorization
+p
+=
+k
+*
+n.factorization
+p
++
+(
+r
++
+1
+)
+.
+factorization
+p
+:=
+by
+sorry
+have
+:
+r.succ.factorization
+p
+=
+k
+*
+m.factorization
+p
+-
+k
+*
+n.factorization
+p
+:=
+by
+rw
+[
+←
+eq1
+,
+pow_eq
+,
+eq2
+,
+add_comm
+,
+Nat.add_sub_cancel
+]
+rw
+[
+this
+]
+sorry
+There are a number of ways in which we might want to improve on these results.
+To start with, a proof that the square root of two is irrational
+should say something about the square root of two,
+which can be understood as an element of the
+real or complex numbers.
+And stating that it is irrational should say something about the
+rational numbers, namely, that no rational number is equal to it.
+Moreover, we should extend the theorems in this section to the integers.
+Although it is mathematically obvious that if we could write the square root of
+two as a quotient of two integers then we could write it as a quotient
+of two natural numbers,
+proving this formally requires some effort.
+In Mathlib, the natural numbers, the integers, the rationals, the reals,
+and the complex numbers are represented by separate data types.
+Restricting attention to the separate domains is often helpful:
+we will see that it is easy to do induction on the natural numbers,
+and it is easiest to reason about divisibility of integers when the
+real numbers are not part of the picture.
+But having to mediate between the different domains is a headache,
+one we will have to contend with.
+We will return to this issue later in this chapter.
+We should also expect to be able to strengthen the conclusion of the
+last theorem to say that the number
+r
+is a
+k
+-th power,
+since its
+k
+-th root is just the product of each prime dividing
+r
+raised to its multiplicity in
+r
+divided by
+k
+.
+To be able to do that we will need better means for reasoning about
+products and sums over a finite set,
+which is also a topic we will return to.
+In fact, the results in this section are all established in much
+greater generality in Mathlib,
+in
+Data.Real.Irrational
+.
+The notion of
+multiplicity
+is defined for an
+arbitrary commutative monoid,
+and that it takes values in the extended natural numbers
+enat
+,
+which adds the value infinity to the natural numbers.
+In the next chapter, we will begin to develop the means to
+appreciate the way that Lean supports this sort of generality.
+5.2.
+Induction and Recursion
+
+The set of natural numbers
+\(\mathbb{N} = \{ 0, 1, 2, \ldots \}\)
+is not only fundamentally important in its own right,
+but also a plays a central role in the construction of new mathematical objects.
+Lean’s foundation allows us to declare
+inductive types
+,
+which are types generated inductively by a given list of
+constructors
+.
+In Lean, the natural numbers are declared as follows.
+inductive
+Nat
+where
+|
+zero
+:
+Nat
+|
+succ
+(
+n
+:
+Nat
+)
+:
+Nat
+You can find this in the library by writing
+#check
+Nat
+and
+then using
+ctrl-click
+on the identifier
+Nat
+.
+The command specifies that
+Nat
+is the datatype generated
+freely and inductively by the two constructors
+zero
+:
+Nat
+and
+succ
+:
+Nat
+→
+Nat
+.
+Of course, the library introduces notation
+ℕ
+and
+0
+for
+nat
+and
+zero
+respectively. (Numerals are translated to binary
+representations, but we don’t have to worry about the details of that now.)
+What “freely” means for the working mathematician is that the type
+Nat
+has an element
+zero
+and an injective successor function
+succ
+whose image does not include
+zero
+.
+example
+(
+n
+:
+Nat
+)
+:
+n.succ
+≠
+Nat.zero
+:=
+Nat.succ_ne_zero
+n
+example
+(
+m
+n
+:
+Nat
+)
+(
+h
+:
+m.succ
+=
+n.succ
+)
+:
+m
+=
+n
+:=
+Nat.succ.inj
+h
+What the word “inductively” means for the working mathematician is that
+the natural numbers comes with a principle of proof by induction
+and a principle of definition by recursion.
+This section will show you how to use these.
+Here is an example of a recursive definition of the factorial
+function.
+def
+fac
+:
+ℕ
+→
+ℕ
+|
+0
+=>
+1
+|
+n
++
+1
+=>
+(
+n
++
+1
+)
+*
+fac
+n
+The syntax takes some getting used to.
+Notice that there is no
+:=
+on the first line.
+The next two lines provide the base case and inductive step
+for a recursive definition.
+These equations hold definitionally, but they can also
+be used manually by giving the name
+fac
+to
+simp
+or
+rw
+.
+example
+:
+fac
+0
+=
+1
+:=
+rfl
+example
+:
+fac
+0
+=
+1
+:=
+by
+rw
+[
+fac
+]
+example
+:
+fac
+0
+=
+1
+:=
+by
+simp
+[
+fac
+]
+example
+(
+n
+:
+ℕ
+)
+:
+fac
+(
+n
++
+1
+)
+=
+(
+n
++
+1
+)
+*
+fac
+n
+:=
+rfl
+example
+(
+n
+:
+ℕ
+)
+:
+fac
+(
+n
++
+1
+)
+=
+(
+n
++
+1
+)
+*
+fac
+n
+:=
+by
+rw
+[
+fac
+]
+example
+(
+n
+:
+ℕ
+)
+:
+fac
+(
+n
++
+1
+)
+=
+(
+n
++
+1
+)
+*
+fac
+n
+:=
+by
+simp
+[
+fac
+]
+The factorial function is actually already defined in Mathlib as
+Nat.factorial
+. Once again, you can jump to it by typing
+#check
+Nat.factorial
+and using
+ctrl-click.
+For illustrative purposes, we will continue using
+fac
+in the examples.
+The annotation
+@[simp]
+before the definition
+of
+Nat.factorial
+specifies that
+the defining equation should be added to the database of identities
+that the simplifier uses by default.
+The principle of induction says that we can prove a general statement
+about the natural numbers by proving that the statement holds of 0
+and that whenever it holds of a natural number
+\(n\)
+,
+it also holds of
+\(n + 1\)
+.
+The line
+induction'
+n
+with
+n
+ih
+in the proof
+below therefore results in two goals:
+in the first we need to prove
+0
+<
+fac
+0
+,
+and in the second we have the added assumption
+ih
+:
+0
+<
+fac
+n
+and a required to prove
+0
+<
+fac
+(n
++
+1)
+.
+The phrase
+with
+n
+ih
+serves to name the variable and
+the assumption for the inductive hypothesis,
+and you can choose whatever names you want for them.
+theorem
+fac_pos
+(
+n
+:
+ℕ
+)
+:
+0
+<
+fac
+n
+:=
+by
+induction'
+n
+with
+n
+ih
+·
+rw
+[
+fac
+]
+exact
+zero_lt_one
+rw
+[
+fac
+]
+exact
+mul_pos
+n.succ_pos
+ih
+The
+induction
+tactic is smart enough to include hypotheses
+that depend on the induction variable as part of the
+induction hypothesis.
+Step through the next example to see what is going on.
+theorem
+dvd_fac
+{
+i
+n
+:
+ℕ
+}
+(
+ipos
+:
+0
+<
+i
+)
+(
+ile
+:
+i
+≤
+n
+)
+:
+i
+∣
+fac
+n
+:=
+by
+induction'
+n
+with
+n
+ih
+·
+exact
+absurd
+ipos
+(
+not_lt_of_ge
+ile
+)
+rw
+[
+fac
+]
+rcases
+Nat.of_le_succ
+ile
+with
+h
+|
+h
+·
+apply
+dvd_mul_of_dvd_right
+(
+ih
+h
+)
+rw
+[
+h
+]
+apply
+dvd_mul_right
+The following example provides a crude lower bound for the factorial
+function.
+It turns out to be easier to start with a proof by cases,
+so that the remainder of the proof starts with the case
+\(n = 1\)
+.
+See if you can complete the argument with a proof by induction using
+pow_succ
+or
+pow_succ'
+.
+theorem
+pow_two_le_fac
+(
+n
+:
+ℕ
+)
+:
+2
+^
+(
+n
+-
+1
+)
+≤
+fac
+n
+:=
+by
+rcases
+n
+with
+_
+|
+n
+·
+simp
+[
+fac
+]
+sorry
+Induction is often used to prove identities involving finite sums and
+products.
+Mathlib defines the expressions
+Finset.sum
+s
+f
+where
+s
+:
+Finset
+α
+is a finite set of elements of the type
+α
+and
+f
+is a function defined on
+α
+.
+The codomain of
+f
+can be any type that supports a commutative,
+associative addition operation with a zero element.
+If you import
+Algebra.BigOperators.Basic
+and issue the command
+open
+BigOperators
+, you can use the more suggestive notation
+∑
+x
+∈
+s,
+f
+x
+. Of course, there is an analogous operation and
+notation for finite products.
+We will talk about the
+Finset
+type and the operations
+it supports in the next section, and again in a later chapter.
+For now, we will only make use
+of
+Finset.range
+n
+, which is the finite set of natural numbers
+less than
+n
+.
+variable
+{
+α
+:
+Type
+*
+}
+(
+s
+:
+Finset
+ℕ
+)
+(
+f
+:
+ℕ
+→
+ℕ
+)
+(
+n
+:
+ℕ
+)
+#check
+Finset.sum
+s
+f
+#check
+Finset.prod
+s
+f
+open
+BigOperators
+open
+Finset
+example
+:
+s.sum
+f
+=
+∑
+x
+∈
+s
+,
+f
+x
+:=
+rfl
+example
+:
+s.prod
+f
+=
+∏
+x
+∈
+s
+,
+f
+x
+:=
+rfl
+example
+:
+(
+range
+n
+)
+.
+sum
+f
+=
+∑
+x
+∈
+range
+n
+,
+f
+x
+:=
+rfl
+example
+:
+(
+range
+n
+)
+.
+prod
+f
+=
+∏
+x
+∈
+range
+n
+,
+f
+x
+:=
+rfl
+The facts
+Finset.sum_range_zero
+and
+Finset.sum_range_succ
+provide a recursive description of summation up to
+\(n\)
+,
+and similarly for products.
+example
+(
+f
+:
+ℕ
+→
+ℕ
+)
+:
+∑
+x
+∈
+range
+0
+,
+f
+x
+=
+0
+:=
+Finset.sum_range_zero
+f
+example
+(
+f
+:
+ℕ
+→
+ℕ
+)
+(
+n
+:
+ℕ
+)
+:
+∑
+x
+∈
+range
+n.succ
+,
+f
+x
+=
+∑
+x
+∈
+range
+n
+,
+f
+x
++
+f
+n
+:=
+Finset.sum_range_succ
+f
+n
+example
+(
+f
+:
+ℕ
+→
+ℕ
+)
+:
+∏
+x
+∈
+range
+0
+,
+f
+x
+=
+1
+:=
+Finset.prod_range_zero
+f
+example
+(
+f
+:
+ℕ
+→
+ℕ
+)
+(
+n
+:
+ℕ
+)
+:
+∏
+x
+∈
+range
+n.succ
+,
+f
+x
+=
+(
+∏
+x
+∈
+range
+n
+,
+f
+x
+)
+*
+f
+n
+:=
+Finset.prod_range_succ
+f
+n
+The first identity in each pair holds definitionally, which is to say,
+you can replace the proofs by
+rfl
+.
+The following expresses the factorial function that we defined as a product.
+example
+(
+n
+:
+ℕ
+)
+:
+fac
+n
+=
+∏
+i
+∈
+range
+n
+,
+(
+i
++
+1
+)
+:=
+by
+induction'
+n
+with
+n
+ih
+·
+simp
+[
+fac
+,
+prod_range_zero
+]
+simp
+[
+fac
+,
+ih
+,
+prod_range_succ
+,
+mul_comm
+]
+The fact that we include
+mul_comm
+as a simplification rule deserves
+comment.
+It should seem dangerous to simplify with the identity
+x
+*
+y
+=
+y
+*
+x
+,
+which would ordinarily loop indefinitely.
+Lean’s simplifier is smart enough to recognize that, and applies the rule
+only in the case where the resulting term has a smaller value in some
+fixed but arbitrary ordering of the terms.
+The following example shows that simplifying using the three rules
+mul_assoc
+,
+mul_comm
+, and
+mul_left_comm
+manages to identify products that are the same up to the
+placement of parentheses and ordering of variables.
+example
+(
+a
+b
+c
+d
+e
+f
+:
+ℕ
+)
+:
+a
+*
+(
+b
+*
+c
+*
+f
+*
+(
+d
+*
+e
+))
+=
+d
+*
+(
+a
+*
+f
+*
+e
+)
+*
+(
+c
+*
+b
+)
+:=
+by
+simp
+[
+mul_assoc
+,
+mul_comm
+,
+mul_left_comm
+]
+Roughly, the rules work by pushing parentheses to the right
+and then re-ordering the expressions on both sides until they
+both follow the same canonical order. Simplifying with these
+rules, and the corresponding rules for addition, is a handy trick.
+Returning to summation identities, we suggest stepping through the following proof
+that the sum of the natural numbers up to and including
+\(n\)
+is
+\(n (n + 1) / 2\)
+.
+The first step of the proof clears the denominator.
+This is generally useful when formalizing identities,
+because calculations with division generally have side conditions.
+(It is similarly useful to avoid using subtraction on the natural numbers when possible.)
+theorem
+sum_id
+(
+n
+:
+ℕ
+)
+:
+∑
+i
+∈
+range
+(
+n
++
+1
+),
+i
+=
+n
+*
+(
+n
++
+1
+)
+/
+2
+:=
+by
+symm
+;
+apply
+Nat.div_eq_of_eq_mul_right
+(
+by
+norm_num
+:
+0
+<
+2
+)
+induction'
+n
+with
+n
+ih
+·
+simp
+rw
+[
+Finset.sum_range_succ
+,
+mul_add
+2
+,
+←
+ih
+]
+ring
+We encourage you to prove the analogous identity for sums of squares,
+and other identities you can find on the web.
+theorem
+sum_sqr
+(
+n
+:
+ℕ
+)
+:
+∑
+i
+∈
+range
+(
+n
++
+1
+),
+i
+^
+2
+=
+n
+*
+(
+n
++
+1
+)
+*
+(
+2
+*
+n
++
+1
+)
+/
+6
+:=
+by
+sorry
+In Lean’s core library, addition and multiplication are themselves defined
+using recursive definitions,
+and their fundamental properties are established using induction.
+If you like thinking about foundational topics like that,
+you might enjoy working through proofs
+of the commutativity and associativity of multiplication and addition
+and the distributivity of multiplication over addition.
+You can do this on a copy of the natural numbers
+following the outline below.
+Notice that we can use the
+induction
+tactic with
+MyNat
+;
+Lean is smart enough to know to
+use the relevant induction principle (which is, of course,
+the same as that for
+Nat
+).
+We start you off with the commutativity of addition.
+A good rule of thumb is that because addition and multiplication
+are defined by recursion on the second argument,
+it is generally advantageous to do proofs by induction on a variable
+that occurs in that position.
+It is a bit tricky to decide which variable to use in the proof
+of associativity.
+It can be confusing to write things without the usual notation
+for zero, one, addition, and multiplication.
+We will learn how to define such notation later.
+Working in the namespace
+MyNat
+means that we can write
+zero
+and
+succ
+rather than
+MyNat.zero
+and
+MyNat.succ
+,
+and that these interpretations of the names take precedence over
+others.
+Outside the namespace, the full name of the
+add
+defined below,
+for example, is
+MyNat.add
+.
+If you find that you
+really
+enjoy this sort of thing, try defining
+truncated subtraction and exponentiation and proving some of their
+properties as well.
+Remember that truncated subtraction cuts off at zero.
+To define that, it is useful to define a predecessor function,
+pred
+,
+that subtracts one from any nonzero number and fixes zero.
+The function
+pred
+can be defined by a simple instance of recursion.
+inductive
+MyNat
+where
+|
+zero
+:
+MyNat
+|
+succ
+:
+MyNat
+→
+MyNat
+namespace
+MyNat
+def
+add
+:
+MyNat
+→
+MyNat
+→
+MyNat
+|
+x
+,
+zero
+=>
+x
+|
+x
+,
+succ
+y
+=>
+succ
+(
+add
+x
+y
+)
+def
+mul
+:
+MyNat
+→
+MyNat
+→
+MyNat
+|
+x
+,
+zero
+=>
+zero
+|
+x
+,
+succ
+y
+=>
+add
+(
+mul
+x
+y
+)
+x
+theorem
+zero_add
+(
+n
+:
+MyNat
+)
+:
+add
+zero
+n
+=
+n
+:=
+by
+induction'
+n
+with
+n
+ih
+·
+rfl
+rw
+[
+add
+,
+ih
+]
+theorem
+succ_add
+(
+m
+n
+:
+MyNat
+)
+:
+add
+(
+succ
+m
+)
+n
+=
+succ
+(
+add
+m
+n
+)
+:=
+by
+induction'
+n
+with
+n
+ih
+·
+rfl
+rw
+[
+add
+,
+ih
+]
+rfl
+theorem
+add_comm
+(
+m
+n
+:
+MyNat
+)
+:
+add
+m
+n
+=
+add
+n
+m
+:=
+by
+induction'
+n
+with
+n
+ih
+·
+rw
+[
+zero_add
+]
+rfl
+rw
+[
+add
+,
+succ_add
+,
+ih
+]
+theorem
+add_assoc
+(
+m
+n
+k
+:
+MyNat
+)
+:
+add
+(
+add
+m
+n
+)
+k
+=
+add
+m
+(
+add
+n
+k
+)
+:=
+by
+sorry
+theorem
+mul_add
+(
+m
+n
+k
+:
+MyNat
+)
+:
+mul
+m
+(
+add
+n
+k
+)
+=
+add
+(
+mul
+m
+n
+)
+(
+mul
+m
+k
+)
+:=
+by
+sorry
+theorem
+zero_mul
+(
+n
+:
+MyNat
+)
+:
+mul
+zero
+n
+=
+zero
+:=
+by
+sorry
+theorem
+succ_mul
+(
+m
+n
+:
+MyNat
+)
+:
+mul
+(
+succ
+m
+)
+n
+=
+add
+(
+mul
+m
+n
+)
+n
+:=
+by
+sorry
+theorem
+mul_comm
+(
+m
+n
+:
+MyNat
+)
+:
+mul
+m
+n
+=
+mul
+n
+m
+:=
+by
+sorry
+end
+MyNat
+5.3.
+Infinitely Many Primes
+
+Let us continue our exploration of induction and recursion with another
+mathematical standard: a proof that there are infinitely many primes.
+One way to formulate this is as the statement that
+for every natural number
+\(n\)
+, there is a prime number greater than
+\(n\)
+.
+To prove this, let
+\(p\)
+be any prime factor of
+\(n! + 1\)
+.
+If
+\(p\)
+is less than or equal to
+\(n\)
+, it divides
+\(n!\)
+.
+Since it also divides
+\(n! + 1\)
+, it divides 1, a contradiction.
+Hence
+\(p\)
+is greater than
+\(n\)
+.
+To formalize that proof, we need to show that any number greater than or equal
+to 2 has a prime factor.
+To do that, we will need to show that any natural number that is
+not equal to 0 or 1 is greater-than or equal to 2.
+And this brings us to a quirky feature of formalization:
+it is often trivial statements like this that are among the most
+annoying to formal
+Induction and Recursion - Theorem Proving in Lean 4
+Theorem Proving in Lean 4
+1.
+Introduction
+2.
+Dependent Type Theory
+3.
+Propositions and Proofs
+4.
+Quantifiers and Equality
+5.
+Tactics
+6.
+Interacting with Lean
+7.
+Inductive Types
+8.
+Induction and Recursion
+9.
+Structures and Records
+10.
+Type Classes
+11.
+The Conversion Tactic Mode
+12.
+Axioms and Computation
+Light (default)
+Rust
+Coal
+Navy
+Ayu
+Theorem Proving in Lean 4
+Induction and Recursion
+In the previous chapter, we saw that inductive definitions provide a
+powerful means of introducing new types in Lean. Moreover, the
+constructors and the recursors provide the only means of defining
+functions on these types. By the propositions-as-types correspondence,
+this means that induction is the fundamental method of proof.
+Lean provides natural ways of defining recursive functions, performing
+pattern matching, and writing inductive proofs. It allows you to
+define a function by specifying equations that it should satisfy, and
+it allows you to prove a theorem by specifying how to handle various
+cases that can arise. Behind the scenes, these descriptions are
+"compiled" down to primitive recursors, using a procedure that we
+refer to as the "equation compiler." The equation compiler is not part
+of the trusted code base; its output consists of terms that are
+checked independently by the kernel.
+Pattern Matching
+The interpretation of schematic patterns is the first step of the
+compilation process. We have seen that the
+casesOn
+recursor can
+be used to define functions and prove theorems by cases, according to
+the constructors involved in an inductively defined type. But
+complicated definitions may use several nested
+casesOn
+applications, and may be hard to read and understand. Pattern matching
+provides an approach that is more convenient, and familiar to users of
+functional programming languages.
+Consider the inductively defined type of natural numbers. Every
+natural number is either
+zero
+or
+succ x
+, and so you can define
+a function from the natural numbers to an arbitrary type by specifying
+a value in each of those cases:
+open Nat
+
+def sub1 : Nat → Nat
+  | zero   => zero
+  | succ x => x
+
+def isZero : Nat → Bool
+  | zero   => true
+  | succ x => false
+The equations used to define these functions hold definitionally:
+open Nat
+def sub1 : Nat → Nat
+| zero   => zero
+| succ x => x
+def isZero : Nat → Bool
+| zero   => true
+| succ x => false
+example : sub1 0 = 0 := rfl
+example (x : Nat) : sub1 (succ x) = x := rfl
+
+example : isZero 0 = true := rfl
+example (x : Nat) : isZero (succ x) = false := rfl
+
+example : sub1 7 = 6 := rfl
+example (x : Nat) : isZero (x + 3) = false := rfl
+Instead of
+zero
+and
+succ
+, we can use more familiar notation:
+def sub1 : Nat → Nat
+  | 0   => 0
+  | x+1 => x
+
+def isZero : Nat → Bool
+  | 0   => true
+  | x+1 => false
+Because addition and the zero notation have been assigned the
+[match_pattern]
+attribute, they can be used in pattern matching. Lean
+simply normalizes these expressions until the constructors
+zero
+and
+succ
+are exposed.
+Pattern matching works with any inductive type, such as products and option types:
+def swap : α × β → β × α
+  | (a, b) => (b, a)
+
+def foo : Nat × Nat → Nat
+  | (m, n) => m + n
+
+def bar : Option Nat → Nat
+  | some n => n + 1
+  | none   => 0
+Here we use it not only to define a function, but also to carry out a
+proof by cases:
+namespace Hidden
+def not : Bool → Bool
+  | true  => false
+  | false => true
+
+theorem not_not : ∀ (b : Bool), not (not b) = b
+  | true  => rfl  -- proof that not (not true) = true
+  | false => rfl  -- proof that not (not false) = false
+end Hidden
+Pattern matching can also be used to destruct inductively defined propositions:
+example (p q : Prop) : p ∧ q → q ∧ p
+  | And.intro h₁ h₂ => And.intro h₂ h₁
+
+example (p q : Prop) : p ∨ q → q ∨ p
+  | Or.inl hp => Or.inr hp
+  | Or.inr hq => Or.inl hq
+This provides a compact way of unpacking hypotheses that make use of logical connectives.
+In all these examples, pattern matching was used to carry out a single
+case distinction. More interestingly, patterns can involve nested
+constructors, as in the following examples.
+def sub2 : Nat → Nat
+  | 0   => 0
+  | 1   => 0
+  | x+2 => x
+The equation compiler first splits on cases as to whether the input is
+zero
+or of the form
+succ x
+.  It then does a case split on
+whether
+x
+is of the form
+zero
+or
+succ x
+.  It determines
+the necessary case splits from the patterns that are presented to it,
+and raises an error if the patterns fail to exhaust the cases. Once
+again, we can use arithmetic notation, as in the version below. In
+either case, the defining equations hold definitionally.
+def sub2 : Nat → Nat
+| 0   => 0
+| 1   => 0
+| x+2 => x
+example : sub2 0 = 0 := rfl
+example : sub2 1 = 0 := rfl
+example : sub2 (x+2) = x := rfl
+
+example : sub2 5 = 3 := rfl
+You can write
+#print sub2
+to see how the function was compiled to
+recursors. (Lean will tell you that
+sub2
+has been defined in terms
+of an internal auxiliary function,
+sub2.match_1
+, but you can print
+that out too.) Lean uses these auxiliary functions to compile
+match
+expressions.
+Actually, the definition above is expanded to
+def sub2 : Nat → Nat :=
+  fun x =>
+    match x with
+    | 0   => 0
+    | 1   => 0
+    | x+2 => x
+Here are some more examples of nested pattern matching:
+example (p q : α → Prop)
+        : (∃ x, p x ∨ q x) → (∃ x, p x) ∨ (∃ x, q x)
+  | Exists.intro x (Or.inl px) => Or.inl (Exists.intro x px)
+  | Exists.intro x (Or.inr qx) => Or.inr (Exists.intro x qx)
+
+def foo : Nat × Nat → Nat
+  | (0, n)     => 0
+  | (m+1, 0)   => 1
+  | (m+1, n+1) => 2
+The equation compiler can process multiple arguments sequentially. For
+example, it would be more natural to define the previous example as a
+function of two arguments:
+def foo : Nat → Nat → Nat
+  | 0,   n   => 0
+  | m+1, 0   => 1
+  | m+1, n+1 => 2
+Here is another example:
+def bar : List Nat → List Nat → Nat
+  | [],      []      => 0
+  | a :: as, []      => a
+  | [],      b :: bs => b
+  | a :: as, b :: bs => a + b
+Note that the patterns are separated by commas.
+In each of the following examples, splitting occurs on only the first
+argument, even though the others are included among the list of
+patterns.
+namespace Hidden
+def and : Bool → Bool → Bool
+  | true,  a => a
+  | false, _ => false
+
+def or : Bool → Bool → Bool
+  | true,  _ => true
+  | false, a => a
+
+def cond : Bool → α → α → α
+  | true,  x, y => x
+  | false, x, y => y
+end Hidden
+Notice also that, when the value of an argument is not needed in the
+definition, you can use an underscore instead. This underscore is
+known as a
+wildcard pattern
+, or an
+anonymous variable
+. In contrast
+to usage outside the equation compiler, here the underscore does
+not
+indicate an implicit argument. The use of underscores for wildcards is
+common in functional programming languages, and so Lean adopts that
+notation.
+Section Wildcards and Overlapping Patterns
+expands on the notion of a wildcard, and
+Section Inaccessible Patterns
+explains how
+you can use implicit arguments in patterns as well.
+As described in
+Chapter Inductive Types
+,
+inductive data types can depend on parameters. The following example defines
+the
+tail
+function using pattern matching. The argument
+α : Type u
+is a parameter and occurs before the colon to indicate it does not participate in the pattern matching.
+Lean also allows parameters to occur after
+:
+, but it cannot pattern match on them.
+def tail1 {α : Type u} : List α → List α
+  | []      => []
+  | a :: as => as
+
+def tail2 : {α : Type u} → List α → List α
+  | α, []      => []
+  | α, a :: as => as
+Despite the different placement of the parameter
+α
+in these two
+examples, in both cases it is treated in the same way, in that it does
+not participate in a case split.
+Lean can also handle more complex forms of pattern matching, in which
+arguments to dependent types pose additional constraints on the
+various cases. Such examples of
+dependent pattern matching
+are
+considered in the
+Section Dependent Pattern Matching
+.
+Wildcards and Overlapping Patterns
+Consider one of the examples from the last section:
+def foo : Nat → Nat → Nat
+  | 0,   n   => 0
+  | m+1, 0   => 1
+  | m+1, n+1 => 2
+An alternative presentation is:
+def foo : Nat → Nat → Nat
+  | 0, n => 0
+  | m, 0 => 1
+  | m, n => 2
+In the second presentation, the patterns overlap; for example, the
+pair of arguments
+0 0
+matches all three cases. But Lean handles
+the ambiguity by using the first applicable equation, so in this example
+the net result is the same. In particular, the following equations hold
+definitionally:
+def foo : Nat → Nat → Nat
+| 0, n => 0
+| m, 0 => 1
+| m, n => 2
+example : foo 0     0     = 0 := rfl
+example : foo 0     (n+1) = 0 := rfl
+example : foo (m+1) 0     = 1 := rfl
+example : foo (m+1) (n+1) = 2 := rfl
+Since the values of
+m
+and
+n
+are not needed, we can just as well use wildcard patterns instead.
+def foo : Nat → Nat → Nat
+  | 0, _ => 0
+  | _, 0 => 1
+  | _, _ => 2
+You can check that this definition of
+foo
+satisfies the same
+definitional identities as before.
+Some functional programming languages support
+incomplete
+patterns
+. In these languages, the interpreter produces an exception
+or returns an arbitrary value for incomplete cases. We can simulate
+the arbitrary value approach using the
+Inhabited
+type
+class. Roughly, an element of
+Inhabited α
+is a witness to the fact
+that there is an element of
+α
+; in the
+Chapter Type Classes
+we will see that Lean can be instructed that suitable
+base types are inhabited, and can automatically infer that other
+constructed types are inhabited. On this basis, the
+standard library provides a default element,
+default
+, of
+any inhabited type.
+We can also use the type
+Option α
+to simulate incomplete patterns.
+The idea is to return
+some a
+for the provided patterns, and use
+none
+for the incomplete cases. The following example demonstrates
+both approaches.
+def f1 : Nat → Nat → Nat
+  | 0, _  => 1
+  | _, 0  => 2
+  | _, _  => default  -- the "incomplete" case
+
+example : f1 0     0     = 1       := rfl
+example : f1 0     (a+1) = 1       := rfl
+example : f1 (a+1) 0     = 2       := rfl
+example : f1 (a+1) (b+1) = default := rfl
+
+def f2 : Nat → Nat → Option Nat
+  | 0, _  => some 1
+  | _, 0  => some 2
+  | _, _  => none     -- the "incomplete" case
+
+example : f2 0     0     = some 1 := rfl
+example : f2 0     (a+1) = some 1 := rfl
+example : f2 (a+1) 0     = some 2 := rfl
+example : f2 (a+1) (b+1) = none   := rfl
+The equation compiler is clever. If you leave out any of the cases in
+the following definition, the error message will let you know what has
+not been covered.
+def bar : Nat → List Nat → Bool → Nat
+  | 0,   _,      false => 0
+  | 0,   b :: _, _     => b
+  | 0,   [],     true  => 7
+  | a+1, [],     false => a
+  | a+1, [],     true  => a + 1
+  | a+1, b :: _, _     => a + b
+It will also use an "if ... then ... else" instead of a
+casesOn
+in appropriate situations.
+def foo : Char → Nat
+  | 'A' => 1
+  | 'B' => 2
+  | _   => 3
+
+#print foo.match_1
+Structural Recursion and Induction
+What makes the equation compiler powerful is that it also supports
+recursive definitions. In the next three sections, we will describe,
+respectively:
+structurally recursive definitions
+well-founded recursive definitions
+mutually recursive definitions
+Generally speaking, the equation compiler processes input of the following form:
+def foo (a : α) : (b : β) → γ
+  | [patterns₁] => t₁
+  ...
+  | [patternsₙ] => tₙ
+Here
+(a : α)
+is a sequence of parameters,
+(b : β)
+is the
+sequence of arguments on which pattern matching takes place, and
+γ
+is any type, which can depend on
+a
+and
+b
+. Each line should
+contain the same number of patterns, one for each element of
+β
+. As we
+have seen, a pattern is either a variable, a constructor applied to
+other patterns, or an expression that normalizes to something of that
+form (where the non-constructors are marked with the
+[match_pattern]
+attribute). The appearances of constructors prompt case splits, with
+the arguments to the constructors represented by the given
+variables. In
+Section Dependent Pattern Matching
+,
+we will see that it is sometimes necessary to include explicit terms in patterns that
+are needed to make an expression type check, though they do not play a
+role in pattern matching. These are called "inaccessible patterns" for
+that reason. But we will not need to use such inaccessible patterns
+before
+Section Dependent Pattern Matching
+.
+As we saw in the last section, the terms
+t₁, ..., tₙ
+can make use
+of any of the parameters
+a
+, as well as any of the variables that
+are introduced in the corresponding patterns. What makes recursion and
+induction possible is that they can also involve recursive calls to
+foo
+. In this section, we will deal with
+structural recursion
+, in
+which the arguments to
+foo
+occurring on the right-hand side of the
+=>
+are subterms of the patterns on the left-hand side. The idea is
+that they are structurally smaller, and hence appear in the inductive
+type at an earlier stage. Here are some examples of structural
+recursion from the last chapter, now defined using the equation
+compiler:
+open Nat
+def add : Nat → Nat → Nat
+  | m, zero   => m
+  | m, succ n => succ (add m n)
+
+theorem add_zero (m : Nat)   : add m zero = m := rfl
+theorem add_succ (m n : Nat) : add m (succ n) = succ (add m n) := rfl
+
+theorem zero_add : ∀ n, add zero n = n
+  | zero   => rfl
+  | succ n => congrArg succ (zero_add n)
+
+def mul : Nat → Nat → Nat
+  | n, zero   => zero
+  | n, succ m => add (mul n m) n
+The proof of
+zero_add
+makes it clear that proof by induction is
+really a form of recursion in Lean.
+The example above shows that the defining equations for
+add
+hold
+definitionally, and the same is true of
+mul
+. The equation compiler
+tries to ensure that this holds whenever possible, as is the case with
+straightforward structural induction. In other situations, however,
+reductions hold only
+propositionally
+, which is to say, they are
+equational theorems that must be applied explicitly. The equation
+compiler generates such theorems internally. They are not meant to be
+used directly by the user; rather, the
+simp
+tactic
+is configured to use them when necessary. Thus both of the following
+proofs of
+zero_add
+work:
+open Nat
+def add : Nat → Nat → Nat
+| m, zero   => m
+| m, succ n => succ (add m n)
+theorem zero_add : ∀ n, add zero n = n
+  | zero   => by simp [add]
+  | succ n => by simp [add, zero_add]
+As with definition by pattern matching, parameters to a structural
+recursion or induction may appear before the colon. Such parameters
+are simply added to the local context before the definition is
+processed. For example, the definition of addition may also be written
+as follows:
+open Nat
+def add (m : Nat) : Nat → Nat
+  | zero   => m
+  | succ n => succ (add m n)
+You can also write the example above using
+match
+.
+open Nat
+def add (m n : Nat) : Nat :=
+  match n with
+  | zero   => m
+  | succ n => succ (add m n)
+A more interesting example of structural recursion is given by the Fibonacci function
+fib
+.
+def fib : Nat → Nat
+  | 0   => 1
+  | 1   => 1
+  | n+2 => fib (n+1) + fib n
+
+example : fib 0 = 1 := rfl
+example : fib 1 = 1 := rfl
+example : fib (n + 2) = fib (n + 1) + fib n := rfl
+
+example : fib 7 = 21 := rfl
+Here, the value of the
+fib
+function at
+n + 2
+(which is
+definitionally equal to
+succ (succ n)
+) is defined in terms of the
+values at
+n + 1
+(which is definitionally equivalent to
+succ n
+)
+and the value at
+n
+. This is a notoriously inefficient way of
+computing the Fibonacci function, however, with an execution time that
+is exponential in
+n
+. Here is a better way:
+def fibFast (n : Nat) : Nat :=
+  (loop n).2
+where
+  loop : Nat → Nat × Nat
+    | 0   => (0, 1)
+    | n+1 => let p := loop n; (p.2, p.1 + p.2)
+
+#eval fibFast 100
+Here is the same definition using a
+let rec
+instead of a
+where
+.
+def fibFast (n : Nat) : Nat :=
+  let rec loop : Nat → Nat × Nat
+    | 0   => (0, 1)
+    | n+1 => let p := loop n; (p.2, p.1 + p.2)
+  (loop n).2
+In both cases, Lean generates the auxiliary function
+fibFast.loop
+.
+To handle structural recursion, the equation compiler uses
+course-of-values
+recursion, using constants
+below
+and
+brecOn
+that are automatically generated with each inductively defined
+type. You can get a sense of how it works by looking at the types of
+Nat.below
+and
+Nat.brecOn
+:
+variable (C : Nat → Type u)
+
+#check (@Nat.below C : Nat → Type u)
+
+#reduce @Nat.below C (3 : Nat)
+
+#check (@Nat.brecOn C : (n : Nat) → ((n : Nat) → @Nat.below C n → C n) → C n)
+The type
+@Nat.below C (3 : nat)
+is a data structure that stores elements of
+C 0
+,
+C 1
+, and
+C 2
+.
+The course-of-values recursion is implemented by
+Nat.brecOn
+. It enables us to define the value of a dependent
+function of type
+(n : Nat) → C n
+at a particular input
+n
+in terms of all the previous values of the function,
+presented as an element of
+@Nat.below C n
+.
+The use of course-of-values recursion is one of the techniques the equation compiler uses to justify to
+the Lean kernel that a function terminates. It does not affect the code generator which compiles recursive
+functions as other functional programming language compilers. Recall that
+#eval fib <n>
+is exponential on
+<n>
+.
+On the other hand,
+#reduce fib <n>
+is efficient because it uses the definition sent to the kernel that
+is based on the
+brecOn
+construction.
+def fib : Nat → Nat
+  | 0   => 1
+  | 1   => 1
+  | n+2 => fib (n+1) + fib n
+
+-- #eval fib 50 -- slow
+#reduce fib 50  -- fast
+
+#print fib
+Another good example of a recursive definition is the list
+append
+function.
+def append : List α → List α → List α
+  | [],    bs => bs
+  | a::as, bs => a :: append as bs
+
+example : append [1, 2, 3] [4, 5] = [1, 2, 3, 4, 5] := rfl
+Here is another: it adds elements of the first list to elements of the second list, until one of the two lists runs out.
+def listAdd [Add α] : List α → List α → List α
+  | [],      _       => []
+  | _,       []      => []
+  | a :: as, b :: bs => (a + b) :: listAdd as bs
+
+#eval listAdd [1, 2, 3] [4, 5, 6, 6, 9, 10]
+-- [5, 7, 9]
+You are encouraged to experiment with similar examples in the exercises below.
+Local recursive declarations
+You can define local recursive declarations using the
+let rec
+keyword.
+def replicate (n : Nat) (a : α) : List α :=
+  let rec loop : Nat → List α → List α
+    | 0,   as => as
+    | n+1, as => loop n (a::as)
+  loop n []
+
+#check @replicate.loop
+-- {α : Type} → α → Nat → List α → List α
+Lean creates an auxiliary declaration for each
+let rec
+. In the example above,
+it created the declaration
+replicate.loop
+for the
+let rec loop
+occurring at
+replicate
+.
+Note that, Lean "closes" the declaration by adding any local variable occurring in the
+let rec
+declaration as additional parameters. For example, the local variable
+a
+occurs
+at
+let rec loop
+.
+You can also use
+let rec
+in tactic mode and for creating proofs by induction.
+def replicate (n : Nat) (a : α) : List α :=
+let rec loop : Nat → List α → List α
+| 0,   as => as
+| n+1, as => loop n (a::as)
+loop n []
+theorem length_replicate (n : Nat) (a : α) : (replicate n a).length = n := by
+  let rec aux (n : Nat) (as : List α)
+              : (replicate.loop a n as).length = n + as.length := by
+    match n with
+    | 0   => simp [replicate.loop]
+    | n+1 => simp [replicate.loop, aux n, Nat.add_succ, Nat.succ_add]
+  exact aux n []
+You can also introduce auxiliary recursive declarations using
+where
+clause after your definition.
+Lean converts them into a
+let rec
+.
+def replicate (n : Nat) (a : α) : List α :=
+  loop n []
+where
+  loop : Nat → List α → List α
+    | 0,   as => as
+    | n+1, as => loop n (a::as)
+
+theorem length_replicate (n : Nat) (a : α) : (replicate n a).length = n := by
+  exact aux n []
+where
+  aux (n : Nat) (as : List α)
+      : (replicate.loop a n as).length = n + as.length := by
+    match n with
+    | 0   => simp [replicate.loop]
+    | n+1 => simp [replicate.loop, aux n, Nat.add_succ, Nat.succ_add]
+Well-Founded Recursion and Induction
+When structural recursion cannot be used, we can prove termination using well-founded recursion.
+We need a well-founded relation and a proof that each recursive application is decreasing with respect to
+this relation. Dependent type theory is powerful enough to encode and justify
+well-founded recursion. Let us start with the logical background that
+is needed to understand how it works.
+Lean's standard library defines two predicates,
+Acc r a
+and
+WellFounded r
+, where
+r
+is a binary relation on a type
+α
+,
+and
+a
+is an element of type
+α
+.
+variable (α : Sort u)
+variable (r : α → α → Prop)
+
+#check (Acc r : α → Prop)
+#check (WellFounded r : Prop)
+The first,
+Acc
+, is an inductively defined predicate. According to
+its definition,
+Acc r x
+is equivalent to
+∀ y, r y x → Acc r y
+. If you think of
+r y x
+as denoting a kind of order relation
+y ≺ x
+, then
+Acc r x
+says that
+x
+is accessible from below,
+in the sense that all its predecessors are accessible. In particular,
+if
+x
+has no predecessors, it is accessible. Given any type
+α
+,
+we should be able to assign a value to each accessible element of
+α
+, recursively, by assigning values to all its predecessors first.
+The statement that
+r
+is well-founded, denoted
+WellFounded r
+,
+is exactly the statement that every element of the type is
+accessible. By the above considerations, if
+r
+is a well-founded
+relation on a type
+α
+, we should have a principle of well-founded
+recursion on
+α
+, with respect to the relation
+r
+. And, indeed,
+we do: the standard library defines
+WellFounded.fix
+, which serves
+exactly that purpose.
+noncomputable def f {α : Sort u}
+      (r : α → α → Prop)
+      (h : WellFounded r)
+      (C : α → Sort v)
+      (F : (x : α) → ((y : α) → r y x → C y) → C x)
+      : (x : α) → C x := WellFounded.fix h F
+There is a long cast of characters here, but the first block we have
+already seen: the type,
+α
+, the relation,
+r
+, and the
+assumption,
+h
+, that
+r
+is well-founded. The variable
+C
+represents the motive of the recursive definition: for each element
+x : α
+, we would like to construct an element of
+C x
+. The
+function
+F
+provides the inductive recipe for doing that: it tells
+us how to construct an element
+C x
+, given elements of
+C y
+for
+each predecessor
+y
+of
+x
+.
+Note that
+WellFounded.fix
+works equally well as an induction
+principle. It says that if
+≺
+is well-founded and you want to prove
+∀ x, C x
+, it suffices to show that for an arbitrary
+x
+, if we
+have
+∀ y ≺ x, C y
+, then we have
+C x
+.
+In the example above we use the modifier
+noncomputable
+because the code
+generator currently does not support
+WellFounded.fix
+. The function
+WellFounded.fix
+is another tool Lean uses to justify that a function
+terminates.
+Lean knows that the usual order
+<
+on the natural numbers is well
+founded. It also knows a number of ways of constructing new well
+founded orders from others, for example, using lexicographic order.
+Here is essentially the definition of division on the natural numbers that is found in the standard library.
+open Nat
+
+theorem div_lemma {x y : Nat} : 0 < y ∧ y ≤ x → x - y < x :=
+  fun h => sub_lt (Nat.lt_of_lt_of_le h.left h.right) h.left
+
+def div.F (x : Nat) (f : (x₁ : Nat) → x₁ < x → Nat → Nat) (y : Nat) : Nat :=
+  if h : 0 < y ∧ y ≤ x then
+    f (x - y) (div_lemma h) y + 1
+  else
+    zero
+
+noncomputable def div := WellFounded.fix (measure id).wf div.F
+
+#reduce div 8 2 -- 4
+The definition is somewhat inscrutable. Here the recursion is on
+x
+, and
+div.F x f : Nat → Nat
+returns the "divide by
+y
+"
+function for that fixed
+x
+. You have to remember that the second
+argument to
+div.F
+, the recipe for the recursion, is a function
+that is supposed to return the divide by
+y
+function for all values
+x₁
+smaller than
+x
+.
+The elaborator is designed to make definitions like this more
+convenient. It accepts the following:
+def div (x y : Nat) : Nat :=
+  if h : 0 < y ∧ y ≤ x then
+    have : x - y < x := Nat.sub_lt (Nat.lt_of_lt_of_le h.1 h.2) h.1
+    div (x - y) y + 1
+  else
+    0
+When Lean encounters a recursive definition, it first
+tries structural recursion, and only when that fails, does it fall
+back on well-founded recursion. Lean uses the tactic
+decreasing_tactic
+to show that the recursive applications are smaller. The auxiliary
+proposition
+x - y < x
+in the example above should be viewed as a hint
+for this tactic.
+The defining equation for
+div
+does
+not
+hold definitionally, but
+we can unfold
+div
+using the
+unfold
+tactic. We use
+conv
+to select which
+div
+application we want to unfold.
+def div (x y : Nat) : Nat :=
+if h : 0 < y ∧ y ≤ x then
+have : x - y < x := Nat.sub_lt (Nat.lt_of_lt_of_le h.1 h.2) h.1
+div (x - y) y + 1
+else
+0
+example (x y : Nat) : div x y = if 0 < y ∧ y ≤ x then div (x - y) y + 1 else 0 := by
+  conv => lhs; unfold div -- unfold occurrence in the left-hand-side of the equation
+
+example (x y : Nat) (h : 0 < y ∧ y ≤ x) : div x y = div (x - y) y + 1 := by
+  conv => lhs; unfold div
+  simp [h]
+The following example is similar: it converts any natural number to a
+binary expression, represented as a list of 0's and 1's. We have to
+provide evidence that the recursive call is
+decreasing, which we do here with a
+sorry
+. The
+sorry
+does not
+prevent the interpreter from evaluating the function successfully.
+def natToBin : Nat → List Nat
+  | 0     => [0]
+  | 1     => [1]
+  | n + 2 =>
+    have : (n + 2) / 2 < n + 2 := sorry
+    natToBin ((n + 2) / 2) ++ [n % 2]
+
+#eval natToBin 1234567
+As a final example, we observe that Ackermann's function can be
+defined directly, because it is justified by the well-foundedness of
+the lexicographic order on the natural numbers. The
+termination_by
+clause
+instructs Lean to use a lexicographic order. This clause is actually mapping
+the function arguments to elements of type
+Nat × Nat
+. Then, Lean uses typeclass
+resolution to synthesize an element of type
+WellFoundedRelation (Nat × Nat)
+.
+def ack : Nat → Nat → Nat
+  | 0,   y   => y+1
+  | x+1, 0   => ack x 1
+  | x+1, y+1 => ack x (ack (x+1) y)
+termination_by x y => (x, y)
+Note that a lexicographic order is used in the example above because the instance
+WellFoundedRelation (α × β)
+uses a lexicographic order. Lean also defines the instance
+instance (priority := low) [SizeOf α] : WellFoundedRelation α :=
+  sizeOfWFRel
+In the following example, we prove termination by showing that
+as.size - i
+is decreasing
+in the recursive application.
+def takeWhile (p : α → Bool) (as : Array α) : Array α :=
+  go 0 #[]
+where
+  go (i : Nat) (r : Array α) : Array α :=
+    if h : i < as.size then
+      let a := as.get ⟨i, h⟩
+      if p a then
+        go (i+1) (r.push a)
+      else
+        r
+    else
+      r
+  termination_by as.size - i
+Note that, auxiliary function
+go
+is recursive in this example, but
+takeWhile
+is not.
+By default, Lean uses the tactic
+decreasing_tactic
+to prove recursive applications are decreasing. The modifier
+decreasing_by
+allows us to provide our own tactic. Here is an example.
+theorem div_lemma {x y : Nat} : 0 < y ∧ y ≤ x → x - y < x :=
+  fun ⟨ypos, ylex⟩ => Nat.sub_lt (Nat.lt_of_lt_of_le ypos ylex) ypos
+
+def div (x y : Nat) : Nat :=
+  if h : 0 < y ∧ y ≤ x then
+    div (x - y) y + 1
+  else
+    0
+decreasing_by apply div_lemma; assumption
+Note that
+decreasing_by
+is not replacement for
+termination_by
+, they complement each other.
+termination_by
+is used to specify a well-founded relation, and
+decreasing_by
+for providing our own tactic for showing recursive applications are decreasing. In the following example, we use both of them.
+def ack : Nat → Nat → Nat
+  | 0,   y   => y+1
+  | x+1, 0   => ack x 1
+  | x+1, y+1 => ack x (ack (x+1) y)
+termination_by x y => (x, y)
+decreasing_by
+  all_goals simp_wf -- unfolds well-founded recursion auxiliary definitions
+  · apply Prod.Lex.left; simp_arith
+  · apply Prod.Lex.right; simp_arith
+  · apply Prod.Lex.left; simp_arith
+We can use
+decreasing_by sorry
+to instruct Lean to "trust" us that the function terminates.
+def natToBin : Nat → List Nat
+  | 0     => [0]
+  | 1     => [1]
+  | n + 2 => natToBin ((n + 2) / 2) ++ [n % 2]
+decreasing_by sorry
+
+#eval natToBin

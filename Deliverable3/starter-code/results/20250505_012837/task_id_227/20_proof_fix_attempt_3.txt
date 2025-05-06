@@ -1,0 +1,18 @@
+```lean
+simp [minOfThree]
+split
+· by_cases h1 : a ≤ b
+  · by_cases h2 : a ≤ c
+    · simp [h1, h2]
+    · simp [h1, h2]; exact And.intro (le_of_not_le h2) le_rfl
+  · by_cases h3 : b ≤ c
+    · simp [h1, h3]; exact And.intro (le_of_not_le h1) le_rfl
+    · simp [h1, h3]; exact And.intro (le_of_not_le h1) (le_of_not_le h3)
+· by_cases h1 : a ≤ b
+  · by_cases h2 : a ≤ c
+    · simp [h1, h2]
+    · simp [h1, h2]
+  · by_cases h3 : b ≤ c
+    · simp [h1, h3]
+    · simp [h1, h3]
+```

@@ -1,0 +1,4 @@
+constructor
+· exact Array.size_map (fun x => x * x * x) a
+· intros i hi
+  exact Array.get_map (fun x => x * x * x) a i hi

@@ -1,0 +1,14 @@
+by_cases h : a ≤ b
+rw [if_pos h]
+split
+· split
+  · simp
+  · exact h
+· left; rfl
+rw [if_neg h]
+split
+· split
+  · apply le_of_not_le
+    exact h
+  · simp
+· right; rfl

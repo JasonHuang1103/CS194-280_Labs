@@ -1,0 +1,75 @@
+Below is an explanation of the problem and one way to fix it.
+
+─────────────────────────────  
+Understanding the error
+
+The error message tells us two things:
+
+1. In one branch (the “isTrue” branch for the if–then–else), Lean shows an unsolved goal:
+  case isTrue  
+  a, b : ℤ  
+  h : a ≤ b  
+  ⊢ (a ≤ a ∧ a ≤ b) ∧ (a = a ∨ a = b)
+
+2. Later, Lean complains with “unexpected token '·'; expected command” at line 23. This suggests that one of the bullet markers was in a position that Lean did not expect.
+
+In our proof we are doing the following:
+ • We first “unfold” the definitions of myMin and myMin_spec.
+ • Then we use “split” to break the conjunction (since myMin_spec is a conjunction of two statements).
+ • In one branch we call “simp” and then “split_ifs” so that the if–then–else inside myMin is analyzed into two cases.
+ • In each case we give a proof using “exact …” with a pair constructed with “⟨ … , …⟩”.
+ • We then have a “simp” and another “split_ifs” with further bullet markers to prove the other part of the conjunction.
+
+The errors arise because of two issues:
+
+• Mis-nested bullet markers:  
+ The use of bullet markers (“·”) must follow the structure that Lean expects. In our proof these bullet markers are not correctly nested relative to the “split” and “split_ifs” commands. In other words, after starting a proof branch for one of the split-ifs cases, we “close” that branch but then use a bullet marker at the top level when Lean was not expecting one.
+
+• The actual proofs in each branch are not quite right:  
+ For instance, in the “isTrue” branch (when h : a ≤ b) our goal is to prove  
+  (a ≤ a ∧ a ≤ b) ∧ (a = a ∨ a = b)  
+ Since result is defined to be if a ≤ b then a else b, in this branch result = a. Thus we need to prove:
+  • a ≤ a (which is trivial by reflexivity) and a ≤ b (which is exactly h), and  
+  • a = a (or a = b, but a = a is the natural choice).  
+ However, the proof uses “le_trans h (le_of_eq h).symm”, which is not a proper way to use the hypotheses and is not actually proving the required inequality. (A similar issue occurs in the other branch.)
+
+─────────────────────────────  
+How to fix the proof
+
+There are two directions for a fix:
+
+1. Restructure the proof so that the cases for the if–then–else are handled clearly. For example, instead of “unfold”ing and then using “split” and “split_ifs”, you can use a “by cases” on the statement (a ≤ b). This way you guarantee that in one branch result = a and in the other branch result = b, and you can use the obvious facts (like le_refl and h) much more directly.
+
+2. If you wish to continue using “unfold” and “split_ifs” with bullet markers, be very careful with the indentation. Each “·” must be nested within its parent block. For example, you’d want to have something like:
+
+  theorem myMin_spec_satisfied (a b : Int) : myMin_spec a b (myMin a b) := by
+    unfold myMin myMin_spec
+    split  -- splits the conjunction into two goals
+    · -- First goal: prove (result ≤ a ∧ result ≤ b)
+      split_ifs
+      · -- when a ≤ b, result = a. Then
+        exact ⟨le_refl a, h⟩
+      · -- when ¬ a ≤ b, result = b. Then
+        -- Here you need to show b ≤ a. In ℤ we know the order is total,
+        -- so you can conclude b ≤ a if a ≤ b is false.
+        exact ⟨‹proof that b ≤ a›, le_refl b⟩
+    · -- Second goal: prove (result = a ∨ result = b)
+      split_ifs
+      · left; rfl
+      · right; rfl
+
+Note that in the above sketch (the “‹proof that b ≤ a›” comment) you might have to appeal to a theorem stating that ℤ is totally ordered (so ¬(a ≤ b) implies b ≤ a), such as “LinearOrder.total” or a similar lemma available in Mathlib.
+
+Thus, the root direction is to fix the bullet/nesting structure and to use the correct proofs for the inequalities (for instance, in the a ≤ b branch, simply using “h” rather than “le_trans h (le_of_eq h).symm”).
+
+─────────────────────────────  
+Summary
+
+The error is not because of a wrong idea for myMin_spec but because the tactic block is not structured correctly. The misuse of bullets (i.e. the “·” tokens that are unexpectedly placed) and the incorrect application of the inequalities (using something like “le_trans h (le_of_eq h).symm” instead of using h or the reflexivity directly) cause Lean to complain about unsolved goals and unexpected tokens.
+
+A good way forward is:
+ • Reorganize the proof so that you handle the two cases (a ≤ b and ¬ a ≤ b) in a clearly nested way;
+ • Check that each “·” bullet is properly indented relative to its parent tactic;
+ • And simplify the proofs by directly using le_refl, h, and (by totality) the fact that ¬ (a ≤ b) implies b ≤ a.
+
+This direction should resolve both the unsolved goal and the unexpected token errors.

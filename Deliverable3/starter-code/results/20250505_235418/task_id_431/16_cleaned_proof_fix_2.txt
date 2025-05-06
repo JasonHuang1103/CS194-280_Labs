@@ -1,0 +1,9 @@
+constructor
+{ intro h
+  obtain ⟨x, hx, hy⟩ := Array.exists_mem_iff_any.mp ((Bool.decide_eq_true_iff (Exists $ λ x => b.any $ λ y => decide (x = y))).mpr h)
+  obtain ⟨y, hy', rfl⟩ := Array.exists_mem_iff_any.mp ((Bool.decide_eq_true_iff _).mp hy)
+  exact ⟨a.indexOf x, b.indexOf y, Array.indexOf_lt_length _ _, Array.indexOf_lt_length _ _, rfl⟩ }
+{ rintro ⟨i, j, hi, hj, h_eq⟩
+  apply (Bool.decide_eq_true_iff _).mpr
+  apply Array.exists_mem_iff_any.mpr
+  exact ⟨a[i]!, Array.indexOf_mem _ hi, (Bool.decide_eq_true_iff _).mpr (Array.exists_mem_iff_any.mpr ⟨b[j]!, Array.indexOf_mem _ hj, h_eq.symm⟩)⟩ }

@@ -1,0 +1,4 @@
+{
+  "code": "n % 10",
+  "proof": "exact \u27e8\u27e8Nat.zero_le (n % 10), Nat.mod_lt n (by decide)\u27e9, rfl\u27e9"
+}

@@ -1,0 +1,12 @@
+```lean
+by_cases h : a ≤ b
+· apply And.intro
+  · exact ⟨le_refl a, h⟩
+  · left
+    rfl
+· apply And.intro
+  · have h' : b ≤ a := Int.le_of_lt (Int.lt_of_not_ge h)
+    exact ⟨h', le_refl b⟩
+  · right
+    rfl
+```

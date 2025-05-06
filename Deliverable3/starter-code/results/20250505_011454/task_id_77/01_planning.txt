@@ -1,0 +1,64 @@
+Below is a detailed plan that breaks the problem into two parts: writing the function (and its specification) and then proving that the function meets the specification.
+
+─────────────────────────────  
+1. Implementation Plan
+
+• The function should take an integer n, compute the remainder when divided by 11, and return true if and only if the remainder is zero.  
+  – Lean’s built‐in (%) operator gives the remainder.  
+  – To test if this remainder is zero, one can write (n % 11 == 0) where “==” is the boolean equality check.  
+  – Therefore, the intended definition is  
+    def isDivisibleBy11 (n : Int) : Bool := n % 11 == 0
+
+─────────────────────────────  
+2. Specification
+
+• The given specification states that for any integer n and a boolean result, the predicate  
+  n % 11 = 0 ↔ result  
+  must hold.  
+• In our case we want to show that  
+  n % 11 = 0 ↔ (n % 11 == 0)  
+  so that the specification “isDivisibleBy11_spec” holds on the implementation.
+
+─────────────────────────────  
+3. Proof Plan
+
+The theorem to prove is:  
+  theorem isDivisibleBy11_spec_satisfied (n : Int) : isDivisibleBy11_spec n (isDivisibleBy11 n)  
+After unfolding definitions, this becomes proving  
+  n % 11 = 0 ↔ (n % 11 == 0).
+
+Key steps in the proof:
+
+• Step 3.1: Unfold the definitions of isDivisibleBy11 and isDivisibleBy11_spec to expose the equivalence we need to prove.  
+  After unfolding, the goal becomes: (n % 11 = 0) ↔ (n % 11 == 0)
+
+• Step 3.2: Use the fact that for integers, the boolean equality (==) is defined to decide the equality between two integers.  
+  Lean (and Mathlib) provides a lemma (or the necessary decidability structure) that shows that for integers a and b,  
+    a = b ↔ (a == b)  
+  One way to proceed is by applying such a lemma (for example, a lemma like Int.beq_eq may exist or you can prove the equivalence by case analysis on decide (a = b)).  
+  If no ready-made lemma is available, the proof may unfold by splitting into the two implications:
+   • If n % 11 = 0, then by the definition of “==” (or by computation of decide), n % 11 == 0 returns true.
+   • Conversely, if n % 11 == 0 returns true, then by the correctness of the decision procedure we also have n % 11 = 0.
+  
+• Step 3.3: Complete the proof by either invoking a known lemma or by performing a case analysis on the decidability of the equality.
+
+─────────────────────────────  
+4. Summary of the Plan
+
+A. Write the function:
+  def isDivisibleBy11 (n : Int) : Bool := n % 11 == 0
+
+B. Write the specification as given:
+  def isDivisibleBy11_spec (n : Int) (result : Bool) : Prop := n % 11 = 0 ↔ result
+
+C. For the proof theorem, begin by unfolding the definitions. Then prove that:
+  n % 11 = 0 ↔ (n % 11 == 0)
+by relying on the connection between the proposition (n % 11 = 0) and its decision (n % 11 == 0). Use either an existing lemma (e.g. Int.beq_eq) or perform a case analysis using Lean’s decidability machinery. 
+
+─────────────────────────────  
+5. Additional Considerations
+
+• Make sure that the proper modules (Mathlib, Aesop, etc.) are imported so that the decidability of "=" on Int is available.  
+• The proof may be as short as “by simp” if the right simp rules are in place, or it might require an explicit or rewrite tactic using the associated lemma.
+
+This plan outlines both how to write the function and how to prove that the function meets the specification. You can now proceed to code the Lean 4 implementation and fill in the proof using the outline above.

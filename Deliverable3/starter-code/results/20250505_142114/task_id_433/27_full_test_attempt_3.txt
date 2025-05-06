@@ -1,0 +1,10 @@
+Lean Error: lean_playground/TempTest.lean:22:2: error: expected '{' or indented tactic sequence
+lean_playground/TempTest.lean:21:74: error: unsolved goals
+n : ℤ
+a : Array ℤ
+⊢ (∀ m ∈ a.toList, n > m) ↔ ∀ i < a.size, n > a[i]!
+lean_playground/TempTest.lean:18:40: error: unsolved goals
+n : ℤ
+a : Array ℤ
+h : (∀ m ∈ a.toList, n > m) ↔ ∀ i < a.size, n > a[i]!
+⊢ (∀ i < a.size, n > a[i]!) ↔ (a.toList.all fun m => decide (n > m)) = true

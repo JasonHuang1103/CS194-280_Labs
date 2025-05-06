@@ -1,0 +1,6 @@
+```lean
+simp only
+split_ifs
+{ exact Iff.rfl }
+{ simp }
+```

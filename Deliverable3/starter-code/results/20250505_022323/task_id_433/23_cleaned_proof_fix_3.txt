@@ -1,0 +1,8 @@
+simp [isGreater, isGreater_spec],
+split,
+{ intros h i hi,
+  apply h,
+  assumption },
+{ intros h x hx,
+  rcases List.mem_toList.1 hx with ⟨j, rfl⟩,
+  exact h j (by simp [Array.getElem_eq_data_get, hx]) }

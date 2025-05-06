@@ -1,0 +1,9 @@
+The error occurs because Lean doesn't have a built-in method field "min" for Int. In other words, you cannot write a.min (b.min c) because the min method isn't defined for ℤ. One common fix is to define the minimum using if-then-else expressions. Here's a corrected version of the implementation:
+
+-------------------------------------------------
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  let minAB := if a <= b then a else b
+  if minAB <= c then minAB else c
+-------------------------------------------------
+
+This version computes the minimum of a and b, then compares it with c, thereby returning the minimum among the three integers.

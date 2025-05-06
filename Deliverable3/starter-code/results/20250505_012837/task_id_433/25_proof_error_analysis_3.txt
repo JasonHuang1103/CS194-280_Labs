@@ -1,0 +1,20 @@
+The root issue is a parsing ambiguity caused by missing parentheses. In your definition
+
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    List.all (fun x => decide (n > x)) a.toList
+
+Lean parses the expression as
+
+  ((List.all (fun x => decide (n > x)) a).toList)
+
+due to the way function application and the dot (.) operator bind. Here, Lean thinks you are calling .toList on the result of (List.all (fun x => decide (n > x)) a), but that result is already a Bool. That is why the error message complains that “function expected” and that a.toList (or rather, the .toList) is applied incorrectly.
+
+What you intended to do was to apply List.all to the predicate and the list obtained by a.toList. To achieve that, you need to explicitly add parentheses so that a.toList is recognized as the second argument to List.all. For example, write:
+
+  List.all (fun x => decide (n > x)) (a.toList)
+
+This tells Lean that a.toList is the argument for the List.all function rather than trying to call .toList on the result of List.all.
+
+Fixing this parentheses issue will likely remove the first several errors. (The remaining errors in the theorem proof are because the proof is incomplete and contains placeholders like “sorry”, but they are separate from the main parsing error in the implementation.)
+
+In summary, the error comes from Lean’s interpretation of the expression due to the missing set of parentheses, and the solution is to parenthesize the second argument to List.all explicitly.

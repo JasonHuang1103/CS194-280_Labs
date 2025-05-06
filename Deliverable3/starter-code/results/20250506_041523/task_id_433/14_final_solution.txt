@@ -1,0 +1,4 @@
+{
+  "code": "a.toList.all (fun x => n > x)",
+  "proof": "intro; \napply Iff.intro;\n{ intro h;\n  intro i H;\n  exact h i H },\n{ intro h i H;\n  apply h i H }"
+}

@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:19:42: error: unsolved goals
+a : Array ℤ
+⊢ (Array.map (fun x => x * x * x) a).size = a.size ∧
+    ∀ i < a.size, (Array.map (fun x => x * x * x) a)[i]! = a[i]! * a[i]! * a[i]!
+lean_playground/TempTest.lean:22:10: error: 'cubeElements_spec_satisfied' has already been declared

@@ -1,0 +1,72 @@
+Below is a step‐by‐step explanation of the error and what’s going wrong.
+
+─────────────────────────────  
+Step 1. Identify Which Tactic Is Failing and Why
+
+The first error reported is on the line
+
+  exact Array.size_map a (fun x => x * x * x)
+
+This tactic is supposed to use the lemma Array.size_map, which (roughly) states that for any array a and any function f the following holds:
+
+  (a.map f).size = a.size
+
+However, Lean complains with an “application type mismatch.” The error message states that the given function (fun x => x * x * x) has a type that does not match the expected type. In short, Lean is not sure about the type of the anonymous function, and it appears to be “reading” it as if it were something other than a function from the elements of a (which are Integers) to some output type.
+
+─────────────────────────────  
+Step 2. Consider the Proof State at That Point
+
+After we do
+
+  unfold cubeElements cubeElements_spec
+
+the goal becomes a conjunction: we must prove
+
+  (a.map (fun x => x * x * x)).size = a.size  
+and  
+  ∀ i, i < a.size → (a.map (fun x => x * x * x))[i]! = a[i]! * a[i]! * a[i]!
+
+At the moment of the first subgoal, the goal is exactly the statement of Array.size_map when the function f is chosen to be (fun x => x * x * x). Thus we want to “apply” that lemma. But because Lean cannot infer the correct type for the function (note that a is an Array Int) it fails. (Moreover, the second part of the proof has a similar problem: the lemma Array.getElem_map expects an index in the mapped array’s bound (i < (a.map f).size) while we only have hi : i < a.size. Even though (a.map f).size equals a.size by the lemma Array.size_map, Lean does not automatically use that equality.)
+
+─────────────────────────────  
+Step 3. Check if the Proof Approach Matches the Specification
+
+The idea of the proof is perfectly natural: you want to show that mapping over an array does not change its size, and that accessing an element of the mapped array produces the mapped result (which in our case is the cube of the original element). In other words, the proof “matches the specification.” What does not work is that you are directly applying the lemmas without first reconciling the (expected) types. For example, Array.getElem_map expects the index hypothesis to be of the form i < (a.map f).size rather than i < a.size.
+
+─────────────────────────────  
+Step 4. Identify Any Type Mismatches or Incorrect Assumptions
+
+There are two issues:
+1. For the first subgoal, the call
+
+  Array.size_map a (fun x => x * x * x)
+
+causes a type error because Lean cannot tell that the anonymous function should be of type Int → Int. (Adding an explicit type annotation like (fun (x : Int) => x * x * x) would help Lean.) In the error message you see that the function’s type “(x : ?m.2222) → ?m.2240 x” is not being unified with the expected type.
+
+2. In the second part of the proof, you pass hi, which tells you that i < a.size, to Array.getElem_map. However, Array.getElem_map expects a proof that i < (a.map (fun x => x * x * x)).size. Although Array.size_map shows that a.size and (a.map f).size are equal, Lean does not “automatically” use that equality to convert hi.
+
+─────────────────────────────  
+Step 5. Consider Alternative Proof Strategies
+
+There are at least two ways to correct the proof:
+• Add explicit type annotations so that Lean sees that the function argument is of type Int → Int.
+• Rewrite or “transport” the inequality i < a.size into one stating i < (a.map f).size by first using the equality from Array.size_map. For instance, you could first rewrite the goal using that lemma before applying Array.getElem_map.
+• Alternatively, use a tactic like rw or conv to replace (a.map _).size with a.size when needed.
+
+A possible fix for the first part might be writing:
+  exact Array.size_map a (fun (x : Int) => x * x * x)
+and for the second part, one might explicitly rewrite using the size equality:
+  intro i hi
+  rw [Array.size_map a (fun (x : Int) => x * x * x)] at hi
+  exact Array.getElem_map a (fun (x : Int) => x * x * x) i hi
+
+─────────────────────────────  
+Conclusion: Root Cause and Fix Direction
+
+The root cause of the error is that Lean’s type inference does not automatically know that the anonymous function (fun x => x * x * x) should be viewed as Int → Int. Moreover, the natural equality (a.map f).size = a.size provided by Array.size_map is not “applied” automatically to transform the hypothesis hi : i < a.size into the needed i < (a.map f).size for Array.getElem_map.
+
+The remedy is to either add explicit type annotations so that the mapping lemmas are applied with the correct type or to rewrite using Array.size_map so that the index inequality hypothesis matches exactly what the lemma expects.
+
+By making these changes, Lean will no longer report a type mismatch, and the proof should go through.
+
+Happy proving!

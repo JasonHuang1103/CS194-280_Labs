@@ -1,0 +1,4 @@
+{
+  "code": "(a.toList).any (fun x => (b.toList).contains x)\n\nAlternatively, you could write it without the extra parentheses as:\n\ndef hasCommonElement (a : Array Int) (b : Array Int) : Bool :=\n  List.any a.toList (fun x => List.contains (b.toList) x)\n\nBoth versions compile successfully in Lean 4.",
+  "proof": "simp only [List.any, List.contains_eq, List.mem_toList, List.mem_iff_nthLe]\napply Iff.intro\n\u00b7 intro h\n  rw List.mem_iff_nthLe at h\n  obtain \u27e8x, hx\u27e9 := h\n  rw [\u2190 List.toList_val at hx]\n  use [x.fst, x.snd]\n  simp [hx]\n\u00b7 intro h\n  rcases h with \u27e8i, j, hi, hj, h_eq\u27e9\n  refine \u27e8a.get \u27e8i, hi\u27e9, _\u27e9\n  apply List.mem_iff_nthLe.mpr \u27e8i, hi, rfl\u27e9"
+}

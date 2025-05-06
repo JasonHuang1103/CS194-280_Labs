@@ -1,0 +1,4 @@
+{
+  "code": "a.map (fun x => x * x * x)",
+  "proof": "constructor\n\u00b7 exact Array.size_map (fun x => x * x * x) a\n\u00b7 intros i hi\n  exact Array.get_map (fun x => x * x * x) a i hi"
+}

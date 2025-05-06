@@ -1,0 +1,24 @@
+Lean Error: lean_playground/TempTest.lean:23:27: error: application type mismatch
+  Array.size_map ?m.1315 fun x => x * x * x
+argument
+  fun x => x * x * x
+has type
+  (x : ?m.2222) → ?m.2240 x : Type (max ?u.1319 ?u.1320)
+but is expected to have type
+  Array ?m.417 : Type ?u.416
+lean_playground/TempTest.lean:24:65: error: application type mismatch
+  Array.getElem_map ?m.17252 ?m.18287 i hi
+argument
+  hi
+has type
+  i < a.size : Prop
+but is expected to have type
+  i < (Array.map ?m.17252 ?m.18287).size : Prop
+lean_playground/TempTest.lean:24:42: error: application type mismatch
+  Array.getElem_map ?m.17252 fun x => x * x * x
+argument
+  fun x => x * x * x
+has type
+  (x : ?m.18159) → ?m.18177 x : Type (max ?u.17256 ?u.17257)
+but is expected to have type
+  Array ?m.16354 : Type ?u.16353

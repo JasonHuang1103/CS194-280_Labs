@@ -1,0 +1,351 @@
+RAG components successfully imported.
+Starting test of 5 tasks: task_id_227, task_id_404, task_id_431, task_id_433, task_id_447
+
+==================================================
+Processing task task_id_227...
+Reading problem description and code template from tasks/task_id_227...
+Problem description length: 608 characters
+Reading unit tests...
+Unit tests length: 339 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_025132
+Processing task: task_id_227 (Task index: 0)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'minOfThree'...
+Response saved to results/20250506_025132/task_id_227/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_025132/task_id_227/02_proof_rag_examples.txt
+RAG components successfully imported.
+Starting test of 5 tasks: task_id_227, task_id_404, task_id_431, task_id_433, task_id_447
+
+==================================================
+Processing task task_id_227...
+Reading problem description and code template from tasks/task_id_227...
+Problem description length: 608 characters
+Reading unit tests...
+Unit tests length: 339 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_025202
+Processing task: task_id_227 (Task index: 0)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'minOfThree'...
+Response saved to results/20250506_025202/task_id_227/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_025202/task_id_227/02_proof_rag_examples.txt
+Response saved to results/20250506_025202/task_id_227/03_planning.txt
+Starting iteration 1 of workflow loop
+Response saved to results/20250506_025202/task_id_227/04_raw_code_1.txt
+Response saved to results/20250506_025202/task_id_227/05_cleaned_code_1.txt
+Response saved to results/20250506_025202/task_id_227/06_code_test_1.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_227/07_raw_proof_1.txt
+Response saved to results/20250506_025202/task_id_227/08_cleaned_proof_1.txt
+Response saved to results/20250506_025202/task_id_227/09_full_test_1.txt
+Response saved to results/20250506_025202/task_id_227/10_proof_error_rag_examples_1.txt
+Response saved to results/20250506_025202/task_id_227/11_proof_error_analysis_1.txt
+Starting iteration 2 of workflow loop
+Response saved to results/20250506_025202/task_id_227/12_revised_plan_2.txt
+Response saved to results/20250506_025202/task_id_227/13_raw_code_2.txt
+Response saved to results/20250506_025202/task_id_227/14_cleaned_code_2.txt
+Response saved to results/20250506_025202/task_id_227/15_code_test_2.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_227/16_raw_proof_2.txt
+Response saved to results/20250506_025202/task_id_227/17_cleaned_proof_2.txt
+Response saved to results/20250506_025202/task_id_227/18_full_test_2.txt
+Response saved to results/20250506_025202/task_id_227/19_proof_error_rag_examples_2.txt
+Response saved to results/20250506_025202/task_id_227/20_proof_error_analysis_2.txt
+Starting iteration 3 of workflow loop
+Response saved to results/20250506_025202/task_id_227/21_revised_plan_3.txt
+Response saved to results/20250506_025202/task_id_227/22_raw_code_3.txt
+Response saved to results/20250506_025202/task_id_227/23_cleaned_code_3.txt
+Response saved to results/20250506_025202/task_id_227/24_code_test_3.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_227/25_raw_proof_3.txt
+Response saved to results/20250506_025202/task_id_227/26_cleaned_proof_3.txt
+Response saved to results/20250506_025202/task_id_227/27_full_test_3.txt
+Response saved to results/20250506_025202/task_id_227/28_proof_error_rag_examples_3.txt
+Response saved to results/20250506_025202/task_id_227/29_proof_error_analysis_3.txt
+Response saved to results/20250506_025202/task_id_227/30_final_solution.txt
+Solution generated in 437.37 seconds
+Generated code length: 70 characters
+Generated proof length: 535 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:22:46: error: unsolved goals
+case pos
+a b c : ℤ
+h₁ : a ≤ b
+⊢ ((if a ≤ b then if a ≤ c then a else c else if b ≤ c then b...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_404...
+Reading problem description and code template from tasks/task_id_404...
+Problem description length: 483 characters
+Reading unit tests...
+Unit tests length: 228 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_025202
+Processing task: task_id_404 (Task index: 1)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'myMin'...
+Response saved to results/20250506_025202/task_id_404/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_025202/task_id_404/02_proof_rag_examples.txt
+Response saved to results/20250506_025202/task_id_404/03_planning.txt
+Starting iteration 1 of workflow loop
+Response saved to results/20250506_025202/task_id_404/04_raw_code_1.txt
+Response saved to results/20250506_025202/task_id_404/05_cleaned_code_1.txt
+Response saved to results/20250506_025202/task_id_404/06_code_test_1.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_404/07_raw_proof_1.txt
+Response saved to results/20250506_025202/task_id_404/08_cleaned_proof_1.txt
+Response saved to results/20250506_025202/task_id_404/09_full_test_1.txt
+Response saved to results/20250506_025202/task_id_404/10_proof_error_rag_examples_1.txt
+Response saved to results/20250506_025202/task_id_404/11_proof_error_analysis_1.txt
+Starting iteration 2 of workflow loop
+Response saved to results/20250506_025202/task_id_404/12_revised_plan_2.txt
+Response saved to results/20250506_025202/task_id_404/13_raw_code_2.txt
+Response saved to results/20250506_025202/task_id_404/14_cleaned_code_2.txt
+Response saved to results/20250506_025202/task_id_404/15_code_test_2.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_404/16_raw_proof_2.txt
+Response saved to results/20250506_025202/task_id_404/17_cleaned_proof_2.txt
+Response saved to results/20250506_025202/task_id_404/18_full_test_2.txt
+Response saved to results/20250506_025202/task_id_404/19_proof_error_rag_examples_2.txt
+Response saved to results/20250506_025202/task_id_404/20_proof_error_analysis_2.txt
+Starting iteration 3 of workflow loop
+Response saved to results/20250506_025202/task_id_404/21_revised_plan_3.txt
+Response saved to results/20250506_025202/task_id_404/22_raw_code_3.txt
+Response saved to results/20250506_025202/task_id_404/23_cleaned_code_3.txt
+Response saved to results/20250506_025202/task_id_404/24_code_test_3.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_404/25_raw_proof_3.txt
+Response saved to results/20250506_025202/task_id_404/26_cleaned_proof_3.txt
+Response saved to results/20250506_025202/task_id_404/27_full_test_3.txt
+Response saved to results/20250506_025202/task_id_404/28_proof_error_rag_examples_3.txt
+Response saved to results/20250506_025202/task_id_404/29_proof_error_analysis_3.txt
+Response saved to results/20250506_025202/task_id_404/30_final_solution.txt
+Solution generated in 255.25 seconds
+Generated code length: 22 characters
+Generated proof length: 197 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:19:32: error: unsolved goals
+case pos
+a b : ℤ
+h : a ≤ b
+⊢ ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_431...
+Reading problem description and code template from tasks/task_id_431...
+Problem description length: 597 characters
+Reading unit tests...
+Unit tests length: 465 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_025202
+Processing task: task_id_431 (Task index: 2)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'hasCommonElement'...
+Response saved to results/20250506_025202/task_id_431/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_025202/task_id_431/02_proof_rag_examples.txt
+Response saved to results/20250506_025202/task_id_431/03_planning.txt
+Starting iteration 1 of workflow loop
+Response saved to results/20250506_025202/task_id_431/04_raw_code_1.txt
+Response saved to results/20250506_025202/task_id_431/05_cleaned_code_1.txt
+Response saved to results/20250506_025202/task_id_431/06_code_test_1.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_431/07_raw_proof_1.txt
+Response saved to results/20250506_025202/task_id_431/08_cleaned_proof_1.txt
+Response saved to results/20250506_025202/task_id_431/09_full_test_1.txt
+Response saved to results/20250506_025202/task_id_431/10_proof_error_rag_examples_1.txt
+Response saved to results/20250506_025202/task_id_431/11_proof_error_analysis_1.txt
+Starting iteration 2 of workflow loop
+Response saved to results/20250506_025202/task_id_431/12_revised_plan_2.txt
+Response saved to results/20250506_025202/task_id_431/13_raw_code_2.txt
+Response saved to results/20250506_025202/task_id_431/14_cleaned_code_2.txt
+Response saved to results/20250506_025202/task_id_431/15_code_test_2.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_431/16_raw_proof_2.txt
+Response saved to results/20250506_025202/task_id_431/17_cleaned_proof_2.txt
+Response saved to results/20250506_025202/task_id_431/18_full_test_2.txt
+Response saved to results/20250506_025202/task_id_431/19_proof_error_rag_examples_2.txt
+Response saved to results/20250506_025202/task_id_431/20_proof_error_analysis_2.txt
+Starting iteration 3 of workflow loop
+Response saved to results/20250506_025202/task_id_431/21_revised_plan_3.txt
+Response saved to results/20250506_025202/task_id_431/22_raw_code_3.txt
+Response saved to results/20250506_025202/task_id_431/23_cleaned_code_3.txt
+Response saved to results/20250506_025202/task_id_431/24_code_test_3.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_431/25_raw_proof_3.txt
+Response saved to results/20250506_025202/task_id_431/26_cleaned_proof_3.txt
+Response saved to results/20250506_025202/task_id_431/27_full_test_3.txt
+Response saved to results/20250506_025202/task_id_431/28_proof_error_rag_examples_3.txt
+Response saved to results/20250506_025202/task_id_431/29_proof_error_analysis_3.txt
+Response saved to results/20250506_025202/task_id_431/30_final_solution.txt
+Solution generated in 371.25 seconds
+Generated code length: 39 characters
+Generated proof length: 458 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:18:54: error: unsolved goals
+case mp
+a b : Array ℤ
+⊢ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) → (a.any fun x => ...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_433...
+Reading problem description and code template from tasks/task_id_433...
+Problem description length: 646 characters
+Reading unit tests...
+Unit tests length: 367 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_025202
+Processing task: task_id_433 (Task index: 3)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'isGreater'...
+Response saved to results/20250506_025202/task_id_433/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_025202/task_id_433/02_proof_rag_examples.txt
+Response saved to results/20250506_025202/task_id_433/03_planning.txt
+Starting iteration 1 of workflow loop
+Response saved to results/20250506_025202/task_id_433/04_raw_code_1.txt
+Response saved to results/20250506_025202/task_id_433/05_cleaned_code_1.txt
+Response saved to results/20250506_025202/task_id_433/06_code_test_1.txt
+Response saved to results/20250506_025202/task_id_433/07_error_rag_examples_1.txt
+Response saved to results/20250506_025202/task_id_433/08_error_analysis_1.txt
+Starting iteration 2 of workflow loop
+Response saved to results/20250506_025202/task_id_433/09_revised_plan_2.txt
+Response saved to results/20250506_025202/task_id_433/10_raw_code_2.txt
+Response saved to results/20250506_025202/task_id_433/11_cleaned_code_2.txt
+Response saved to results/20250506_025202/task_id_433/12_code_test_2.txt
+Response saved to results/20250506_025202/task_id_433/13_error_rag_examples_2.txt
+Response saved to results/20250506_025202/task_id_433/14_error_analysis_2.txt
+Starting iteration 3 of workflow loop
+Response saved to results/20250506_025202/task_id_433/15_revised_plan_3.txt
+Response saved to results/20250506_025202/task_id_433/16_raw_code_3.txt
+Response saved to results/20250506_025202/task_id_433/17_cleaned_code_3.txt
+Response saved to results/20250506_025202/task_id_433/18_code_test_3.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_433/19_raw_proof_3.txt
+Response saved to results/20250506_025202/task_id_433/20_cleaned_proof_3.txt
+Response saved to results/20250506_025202/task_id_433/21_full_test_3.txt
+Response saved to results/20250506_025202/task_id_433/22_proof_error_rag_examples_3.txt
+Response saved to results/20250506_025202/task_id_433/23_proof_error_analysis_3.txt
+Response saved to results/20250506_025202/task_id_433/24_final_solution.txt
+Solution generated in 332.89 seconds
+Generated code length: 51 characters
+Generated proof length: 582 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:21:8: error: unknown constant 'List.all?'
+lean_playground/TempTest.lean:21:33: error: unknown constant 'List.foldr_eq_fo...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_447...
+Reading problem description and code template from tasks/task_id_447...
+Problem description length: 691 characters
+Reading unit tests...
+Unit tests length: 234 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250506_025202
+Processing task: task_id_447 (Task index: 4)
+Using MiniLM embedding model
+Retrieving relevant examples for function 'cubeElements'...
+Response saved to results/20250506_025202/task_id_447/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250506_025202/task_id_447/02_proof_rag_examples.txt
+Response saved to results/20250506_025202/task_id_447/03_planning.txt
+Starting iteration 1 of workflow loop
+Response saved to results/20250506_025202/task_id_447/04_raw_code_1.txt
+Response saved to results/20250506_025202/task_id_447/05_cleaned_code_1.txt
+Response saved to results/20250506_025202/task_id_447/06_code_test_1.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_447/07_raw_proof_1.txt
+Response saved to results/20250506_025202/task_id_447/08_cleaned_proof_1.txt
+Response saved to results/20250506_025202/task_id_447/09_full_test_1.txt
+Response saved to results/20250506_025202/task_id_447/10_proof_error_rag_examples_1.txt
+Response saved to results/20250506_025202/task_id_447/11_proof_error_analysis_1.txt
+Starting iteration 2 of workflow loop
+Response saved to results/20250506_025202/task_id_447/12_revised_plan_2.txt
+Response saved to results/20250506_025202/task_id_447/13_raw_code_2.txt
+Response saved to results/20250506_025202/task_id_447/14_cleaned_code_2.txt
+Response saved to results/20250506_025202/task_id_447/15_code_test_2.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_447/16_raw_proof_2.txt
+Response saved to results/20250506_025202/task_id_447/17_cleaned_proof_2.txt
+Response saved to results/20250506_025202/task_id_447/18_full_test_2.txt
+Response saved to results/20250506_025202/task_id_447/19_proof_error_rag_examples_2.txt
+Response saved to results/20250506_025202/task_id_447/20_proof_error_analysis_2.txt
+Starting iteration 3 of workflow loop
+Response saved to results/20250506_025202/task_id_447/21_revised_plan_3.txt
+Response saved to results/20250506_025202/task_id_447/22_raw_code_3.txt
+Response saved to results/20250506_025202/task_id_447/23_cleaned_code_3.txt
+Response saved to results/20250506_025202/task_id_447/24_code_test_3.txt
+Code implementation successful, moving to proof generation
+Response saved to results/20250506_025202/task_id_447/25_raw_proof_3.txt
+Response saved to results/20250506_025202/task_id_447/26_cleaned_proof_3.txt
+Response saved to results/20250506_025202/task_id_447/27_full_test_3.txt
+Response saved to results/20250506_025202/task_id_447/28_proof_error_rag_examples_3.txt
+Response saved to results/20250506_025202/task_id_447/29_proof_error_analysis_3.txt
+Response saved to results/20250506_025202/task_id_447/30_final_solution.txt
+Solution generated in 255.11 seconds
+Generated code length: 26 characters
+Generated proof length: 85 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:22:2: error: tactic 'split' failed, consider using `set_option trace.split.failure true`
+a : Array ℤ
+⊢ (Array.map (fun x...
+✅ Implementation passes unit tests
+❌ Proof has errors
+Testing Summary:
+Task task_id_227:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 437.37133288383484 seconds
+---
+Task task_id_404:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 255.24628710746765 seconds
+---
+Task task_id_431:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 371.2468419075012 seconds
+---
+Task task_id_433:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 332.88849997520447 seconds
+---
+Task task_id_447:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 255.10921382904053 seconds
+---

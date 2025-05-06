@@ -1,0 +1,2 @@
+Lean code executed successfully.
+lean_playground/TempTest.lean:21:8: warning: declaration uses 'sorry'

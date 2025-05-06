@@ -1,0 +1,11 @@
+apply And.intro
+· apply And.intro
+  · exact le_trans (min_le_left a b) (min_le_left (a ⊓ b) c)
+  · exact le_trans (min_le_right a b) (min_le_left (a ⊓ b) c)
+· exact le_trans (le_min (min_le_left a b) (min_le_right a b)) (min_le_right (a ⊓ b) c)
+· have : min (min a b) c = min a b ∨ min (min a b) c = c := min_eq_left_or_eq_right (a ⊓ b) c
+  cases this with
+  | inl heq => exact Or.inl (heq.symm ▸ min_eq_left_of_le (min_le_left a b))
+  | inr heq => cases min_eq_left_or_eq_right a b with
+    | inl heq' => exact Or.inl (heq'.symm ▸ heq.symm)
+    | inr heq' => exact Or.inr (Or.inl (heq'.symm ▸ heq.symm))

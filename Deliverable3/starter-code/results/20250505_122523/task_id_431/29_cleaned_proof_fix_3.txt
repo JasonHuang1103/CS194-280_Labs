@@ -1,0 +1,12 @@
+simp only [List.any, List.contains_eq, List.mem_toList, List.mem_iff_nthLe]
+apply Iff.intro
+· intro h
+  rw List.mem_iff_nthLe at h
+  obtain ⟨x, hx⟩ := h
+  rw [← List.toList_val at hx]
+  use [x.fst, x.snd]
+  simp [hx]
+· intro h
+  rcases h with ⟨i, j, hi, hj, h_eq⟩
+  refine ⟨a.get ⟨i, hi⟩, _⟩
+  apply List.mem_iff_nthLe.mpr ⟨i, hi, rfl⟩

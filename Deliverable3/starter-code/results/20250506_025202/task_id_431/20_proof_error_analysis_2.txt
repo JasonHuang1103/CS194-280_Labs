@@ -1,0 +1,91 @@
+We’ll explain step‐by‐step what is going wrong. In our “proof by tactic” the error message complains of “unsolved goals” (in the “mp” and “mpr” cases) as well as an “unexpected token ‘·’” error. In our case the bug comes from both a mis‐use of the bullet notation (and/or its indentation) and from “mis‐aligning” the two sides of the equivalence when we use Array.any_iff. Let’s explain in detail.
+
+──────────────────────────────
+1. Which tactic is failing and why
+
+After “unfold …” the proof does
+  apply Iff.intro
+which creates two subgoals:
+ – First: prove that (∃ i j, …) → a.any (fun x ⇒ b.any (fun y ⇒ decide (x = y))) = true 
+ – Second: prove that a.any (fun x ⇒ b.any (fun y ⇒ decide (x = y))) = true → ∃ i j, …
+
+Then the proof uses “bullet” markers (the “·” symbol) to start the two parts. Two things go wrong here: 
+ a) The bullets “·” are (in Lean 4) sensitive to indentation. In our file the bullet marker “·” appears on a line where Lean does not expect a tactic–it sees an unexpected token. (Often this happens because one mixes “by …” proofs with bullet statements that are not indented enough.)
+ b) Although the proof script “looks like” it is handling the two directions, Lean reports unsolved goals; that is, the tactics we supply for the “mp” and “mpr” directions are not enough to discharge the corresponding goals.
+
+──────────────────────────────
+2. The proof state at that point
+
+After “apply Iff.intro” the proof state shows two goals:
+ Goal (mp direction): 
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) → (a.any (λ x, b.any (λ y, decide (x = y))) = true)
+ Goal (mpr direction):
+  (a.any (λ x, b.any (λ y, decide (x = y))) = true) → (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!)
+
+In each case the next line “intro …” is meant to begin the proof. However, because the bullets (“·” lines) are not correctly recognized (see step 1a), Lean does not “see” that you are about to solve the goals. In addition the tactics that follow do not quite “match” the goal expected when we use the Array.any_iff conversion lemmas.
+
+──────────────────────────────
+3. Checking whether the proof approach matches the specification
+
+The implementation returns a Bool by testing
+  a.any (λ x, b.any (λ y, x = y))
+while the specification asserts that
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result.
+Thus we’re trying to prove an equivalence between a Boolean (the output of Array.any) and an existential statement. That equivalence is “mediated” by the lemma Array.any_iff that tells us for any array and predicate p,
+  a.any p = true ↔ ∃ i, i < a.size ∧ p (a[i]!).
+So our general idea is sound: 
+ • For the “mp” direction we must take a witness (i, j) for the existentials and show that by applying Array.any_iff (first for b and then for a) we get that the overall “any” returns true.
+ • For the “mpr” direction we must “unfold” a.any using Array.any_iff, obtain a witness i with the property that b.any (λ y, a[i]! = y) = true, and then apply Array.any_iff again to get a witness j.
+
+The overall approach “matches” the specification. However, the details of the use “⟨i, hi, …⟩” have a slight confusion: In the first branch you start by “intro ⟨i, j, hi, hj, h_eq⟩” so that you have witnesses for both arrays. Then you “build” a proof that b.any returns true for the element a[i]! by applying Array.any_iff.mpr on b with the witness j. Finally you “build” a proof that a.any returns true by applying Array.any_iff.mpr on a with the witness i. In principle this is the right idea; instead, as formulated the tactic code does not “close” the goals because of bullet and indentation problems.
+ 
+──────────────────────────────
+4. Type mismatches or incorrect assumptions
+
+The error “unsolved goals” is a symptom that Lean did not see the inner tactics properly, but there is another subtlety. We are comparing a Bool (the result of a.any) with a Prop (an existential statement) even though the spec has the form “(∃ …) ↔ result”. In Lean one might need to convert between Bool and Prop (for example, using “decide” or by “unfolding” the definition of Array.any) carefully. Notice that in the error message you see “(a.any … decide (x = y))”. This conversion depends on the predicate being decidable. Although in our case equality on Int is decidable, one must check that the Array.any_iff lemma is applied to the same predicate in both cases. (In the first bullet we use “fun y => a[i]! = y”; in the original definition the inner lambda was “fun y => x = y”.) Make sure that these match exactly (or that a conversion happens automatically).
+ 
+──────────────────────────────
+5. Alternative proof strategies
+
+To fix the situation one can try one or more of the following:
+ • Replace the “·” bullets by the “-” bullet notation (or ensure that the bullets are indented correctly) so that Lean accepts them.
+ • Write the proof using “constructor” and then “intros”.
+ • Alternatively, give an explicit proof term (or use “calc”) to avoid the bullet notation altogether.
+ • Be explicit about the conversion of Bool to Prop using the appropriate lemmas so that Array.any_iff is applied without ambiguity.
+ • Finally, it might help to “unfold” the definitions earlier and use “rw Array.any_iff” to simplify the goals rather than applying the mpr and mp directions manually.
+ 
+──────────────────────────────
+Detailed Root Cause and Direction for Fixing
+
+The root cause of the error is twofold:
+ (1) The “bullet” notation using “·” is not recognized because either it is not correctly indented or mixed with other tactic styles. Lean 4 is very sensitive to indentation when using bullets, so you must ensure that every bullet starts at the same indentation level and that they follow a “by” or tactic block.
+ (2) Although the overall plan using Array.any_iff is sound, there is a slight “mis-alignment” in that the inner application uses the witness i from the outer array even though the existence proof for b.any must use its witness j. In other words, you must “chain” the two applications of Array.any_iff so that the existence for a.any (i with property “b.any …”) is clearly expressed by first using the inner existence for b.any.
+
+A suggested way to fix it is to rewrite the proof with careful indentation and clear use of the conversion lemmas. For example, one might write:
+
+-----------------------------------------------------------
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔
+     a.any (fun x => b.any (fun y => decide (x = y))) = true :=
+by
+  -- First, prove the "→" direction:
+  constructor
+  · intro ⟨i, j, hi, hj, h_eq⟩
+    have inner : b.any (fun y => (a[i]! = y)) = true :=
+      Array.any_iff.mpr ⟨j, hj, h_eq⟩
+    exact Array.any_iff.mpr ⟨i, hi, inner⟩
+  -- Now, prove the "←" direction:
+  · intro h
+    obtain ⟨i, hi, h_inner⟩ := Array.any_iff.mp h
+    obtain ⟨j, hj, h_eq⟩ := Array.any_iff.mp h_inner
+    exact ⟨i, j, hi, hj, h_eq⟩
+-----------------------------------------------------------
+
+Notice that here we use “constructor” and then two bullet blocks indented equally (using “·”) so that Lean interprets them as separate cases. Also, it is very important that the predicate passed to Array.any_iff in each step is exactly the one that appears in our definitions.
+
+──────────────────────────────
+Conclusion
+
+The error happens because Lean does “not see” our tactic steps inside the bullet markers due to indentation/syntax (the “unexpected token ‘·’” message) and because the use of Array.any_iff in the two directions was “chained” in a way that left unsolved goals. (Also, one must be careful when relating a Bool (the result of .any) with an existential proposition.) The recommended direction is to fix the bullet notation—either by switching to “-” or by ensuring proper indentation—and then check that each application of Array.any_iff uses the corresponding array and predicate without any unintended mismatch.
+
+By addressing the bullet syntax and double–checking the conversion lemmas between Bool and Prop, the proof should type–check successfully.

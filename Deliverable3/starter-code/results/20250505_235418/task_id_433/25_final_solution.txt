@@ -1,0 +1,4 @@
+{
+  "code": "(a.toList).all (fun x => n > x)",
+  "proof": "intro result_eq\n  apply Iff.symm\n  rw [\u2190result_eq]\n  induction a using Array.inductionOn with\n  | empty => simp\n  | push a arr ih =>\n    simp only [Array.toList_push, List.all_cons, and_iff_right_iff_imp]\n    intro h\n    intro i hi\n    cases Nat.lt_or_eq_of_le (Nat.le_of_lt_succ hi) with\n    | inl hlt => exact ih.mp h i hlt\n    | inr heq => exact (by simp [heq, h])"
+}

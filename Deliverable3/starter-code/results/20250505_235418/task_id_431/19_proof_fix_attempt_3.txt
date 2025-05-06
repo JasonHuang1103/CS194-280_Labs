@@ -1,0 +1,24 @@
+```
+constructor
+· intro h
+  obtain ⟨i, j, hi, hj, hij⟩ := h
+  apply Array.any_eq_true (λ x => b.any (λ y => decide (x = y))) i
+  { apply Array.any_eq_true (λ y => decide (a[i]! = y)) j
+    { rw [← eq_true]
+      exact hij }
+    { exact hj } } 
+  { exact hi }
+· intro h
+  rw [Array.any_eq_true_iff] at h
+  obtain ⟨x, hx, hx_any⟩ := h
+  rw [Array.any_eq_true_iff] at hx_any
+  obtain ⟨y, hy, hy_eq⟩ := hx_any
+  use a.indexOf x, b.indexOf y
+  split
+  { apply Array.indexOf_lt_size_of_mem
+    exact hx }
+  split
+  { apply Array.indexOf_lt_size_of_mem
+    exact hy }
+  exact hy_eq
+```

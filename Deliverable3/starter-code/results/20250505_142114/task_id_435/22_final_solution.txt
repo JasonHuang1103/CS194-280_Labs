@@ -1,0 +1,4 @@
+{
+  "code": "n % 10",
+  "proof": "split\n\u00b7 apply And.intro\n  \u00b7 apply Nat.mod_lt n 10; decide\n  \u00b7 rfl"
+}

@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:9:0: error: unknown identifier 'This'
+lean_playground/TempTest.lean:9:5: error: unknown identifier 'change'
+lean_playground/TempTest.lean:9:26: error: expected token
+lean_playground/TempTest.lean:9:92: error: unexpected token '.'; expected ':'
+lean_playground/TempTest.lean:19:8: warning: declaration uses 'sorry'

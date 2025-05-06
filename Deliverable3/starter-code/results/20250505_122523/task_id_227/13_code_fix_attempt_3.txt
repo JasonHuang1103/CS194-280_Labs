@@ -1,0 +1,17 @@
+The issue is that Lean’s builtin if–then–else expects its condition to be a Bool, but for integers the ≤ operator returns a Prop even though a decidable instance exists. (In Lean 4 the if–then–else syntax is defined only for Bool.) To fix this you can “decide” the inequality so that you get a Boolean condition. For example, change
+
+  if (minAB <= c) then minAB else c
+
+to
+
+  if decide (minAB <= c) then minAB else c
+
+and similarly for the first branch. Here’s the fixed version of the function implementation only:
+
+---------------------------------------------------------
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  let minAB := if decide (a <= b) then a else b
+  if decide (minAB <= c) then minAB else c
+---------------------------------------------------------
+
+This modification converts the proposition (minAB ≤ c) into a Bool using decide, which resolves the error.

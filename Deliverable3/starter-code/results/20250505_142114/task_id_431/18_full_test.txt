@@ -1,0 +1,6 @@
+Lean Error: lean_playground/TempTest.lean:9:0: error: expected token
+lean_playground/TempTest.lean:24:27: error: unknown constant 'Array.contains_eq_true'
+lean_playground/TempTest.lean:21:54: error: unsolved goals
+a b : Array ℤ
+⊢ (∃ i < a.size, ∃ x < b.size, a[i]! = b[x]!) ↔ ∃ i, ∃ (h : i < a.size), a[i] ∈ b
+lean_playground/TempTest.lean:25:0: error: unexpected identifier; expected command

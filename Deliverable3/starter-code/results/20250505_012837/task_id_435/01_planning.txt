@@ -1,0 +1,57 @@
+Below is a detailed plan to approach both the implementation and the proof.
+
+─────────────────────────────  
+1. Implementation Plan
+
+• The function goal is to return the last digit of any non-negative integer n.  
+• To get the last digit, you simply compute (n % 10) because the remainder when dividing n by 10 is exactly the last digit in its decimal representation.  
+• Therefore, the implementation in Lean is straightforward: define lastDigit n as n % 10.
+
+─────────────────────────────  
+2. Specification and Proof Strategy
+
+• The specification (lastDigit_spec) requires two properties:
+  ▸ (0 ≤ result ∧ result < 10): Ensures that the result is a digit from 0 to 9.
+  ▸ n % 10 = result: Ensures that the returned result corresponds to the remainder of n modulo 10.
+  
+• Since our implementation defines lastDigit n as n % 10, the equality n % 10 = result holds by definition.
+
+• The main task in the proof is then to show 0 ≤ n % 10 ∧ n % 10 < 10.
+
+─────────────────────────────  
+3. Proof Steps
+
+(a) unfold definitions:
+  ▸ Expand definitions of lastDigit and lastDigit_spec.
+
+(b) Prove (0 ≤ n % 10):
+  ▸ This follows from the property of the modulo operation on natural numbers, as the remainder must always be non-negative in Lean’s Nat type.
+
+(c) Prove (n % 10 < 10):
+  ▸ Lean's standard library includes the lemma (Nat.mod_lt n k) proving that n % k < k, provided that k > 0.  
+  ▸ Here, k is 10, and we can use (Nat.mod_lt n 10) because 10 > 0 is trivially true (and Lean will accept dec_trivial or a simple numeric argument to show that).
+
+(d) Conclude:
+  ▸ Combine both parts into a conjunction and finish the proof.
+
+─────────────────────────────  
+4. Putting It All Together
+
+(a) In the code, inside lastDigit, replace {{code}} with:
+     n % 10
+
+(b) In lastDigit_spec_satisfied, inside the proof block, after unfolding the definitions, you can apply (Nat.mod_lt n 10) (using a tactic like exact or apply Nat.mod_lt with dec_trivial for verifying 10 > 0).
+
+─────────────────────────────  
+Summary of Key Steps:
+
+1. Implementation:
+   - Write the function to return n % 10.
+
+2. Proof:
+   - Unfold the definitions for both lastDigit and lastDigit_spec.
+   - Prove the non-negativity part, which is immediate.
+   - Prove the upper bound using the lemma Nat.mod_lt, ensuring that n % 10 is less than 10.
+   - Conclude the proof by combining both components with ∧.
+
+This plan gives a clear road map to implement the function and complete the corresponding theorem proof in Lean 4.

@@ -1,0 +1,5 @@
+simp
+apply And.intro
+· simp
+· intros i hi
+  simp [Array.getElem_eq_data_get, Array.get!]

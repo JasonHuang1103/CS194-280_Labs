@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:22:2: error: tactic 'split' failed, consider using `set_option trace.split.failure true`
+n : ℕ
+⊢ (0 ≤ n % 10 ∧ n % 10 < 10) ∧ n % 10 = n % 10
+lean_playground/TempTest.lean:23:0: error: unexpected identifier; expected command

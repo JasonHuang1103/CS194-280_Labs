@@ -1,0 +1,12 @@
+theorem isDivisibleBy11_spec_satisfied (n : Int) :
+  isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  split_ifs
+  case _ h₁ =>
+    constructor
+    . intro _; exact h₁
+    . intro _; rfl
+  case _ h₂ =>
+    constructor
+    . intro h; exact h₂ h
+    . intro h; contradiction

@@ -1,0 +1,9 @@
+constructor
+  · intro h
+    cases h with
+    | inl h1 => exact Or.inl ⟨h1, by linarith⟩
+    | inr h2 => exact Or.inr ⟨h2, by linarith⟩
+  · intro h
+    cases h with
+    | inl h1 => exact h1.left
+    | inr h2 => exact h2.right

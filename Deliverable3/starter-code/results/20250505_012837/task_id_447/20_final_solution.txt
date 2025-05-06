@@ -1,0 +1,4 @@
+{
+  "code": "a.map (fun x => x * x * x)",
+  "proof": "apply And.intro\n\u00b7 simp\n\u00b7 intros i hi\n  simp [Array.get!, Array.map]"
+}

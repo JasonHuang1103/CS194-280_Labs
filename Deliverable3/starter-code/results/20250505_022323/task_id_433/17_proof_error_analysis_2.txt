@@ -1,0 +1,34 @@
+Below is an explanation of the root issue and some ideas on how to proceed. In your proof you are attempting to “rewrite” with lemmas that do not exist (or are misnamed) in Lean 4’s mathlib. In particular, the error
+
+  unknown constant 'Array.size_eq_length'
+
+indicates that Lean can’t find a lemma called Array.size_eq_length. (Later errors cascade from that.) Here’s a more detailed breakdown:
+
+1. Unfolding and rewriting:
+  Your proof begins with
+   unfold isGreater isGreater_spec
+   rw [Array.size_eq_length, List.toArray_toList, List.ofFn],
+   simp_rw [List.get_ofFn],
+  which means you expect that
+
+   a.size = a.toList.length,
+   a.toArray (a.toList) = a      and so on.
+
+  However, at least the first rewrite uses Array.size_eq_length, a name that does not exist in your Lean 4 environment. (It may be that a similar result is available under a different name, for example a lemma stating that a.size equals the length of a.toList.) Lean therefore complains that it does not know such a constant.
+
+2. Unexpected token errors:
+  Also note that after your “rw …” you put a trailing comma. In tactic mode commands must be separated by newlines or semicolons instead of trailing commas in the list (and the list itself does not expect an extra comma after the closing bracket). This also causes the “unexpected token ','; expected command” error. (It is not the central issue here, but it must be corrected too.)
+
+3. Type mismatches and unsolved goals:
+  Another message shows that there is an unsolved goal about the equivalence
+   (∀ i < a.size, n > a[i]!) ↔ (a.toList.all fun x => decide (n > x)) = true.
+  That is likely caused by the rewriting steps not “canceling out” the constructions properly. Since the names of the conversion lemmas or rewrite rules are wrong, Lean ends up with a goal that does not match the intended specification.
+
+Summary and Next Steps:
+ • The fundamental problem is that the proof tries to use rewriting lemmas that either have the wrong names or do not exist in Lean 4 mathlib. For example, Array.size_eq_length should likely be replaced with the correct lemma name (or proved separately) that relates an array’s size with the length of its list representation.
+ • Similarly, check that the other rewrite targets you use (List.toArray_toList, List.ofFn, and List.get_ofFn) are either available or have the correct names.
+ • Finally, remove any extra commas or fix the tactic syntax so that each tactic is on its own line or separated appropriately.
+
+Thus, a good direction for fixing your proof is to consult the current Lean 4 documentation to determine the correct names of the conversion lemmas for arrays and lists. For instance, you might find a lemma like Array.toList_length or similar that can replace Array.size_eq_length. Adjust the tactics accordingly and re-run the proof.
+
+By replacing (or proving) the missing lemmas and fixing the tactic syntax, the compiler should then be able to verify that the specification is met.

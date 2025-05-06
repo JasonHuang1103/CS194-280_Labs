@@ -1,0 +1,27 @@
+unfold isGreater isGreater_spec
+  rw [← Array.foldl_eq_foldr_rev]
+  apply Array.foldr_induction_on (λ b a => (((∀ i : Fin a.size, n > a[i]) ↔ b)) → (∀ i : Fin a.size, n > a[i]) ↔ b) (a := a) (init := true)
+  · intro h
+    simp [h, forall_true_left]
+  · intro a_1 i IH h
+    simp only [Array.foldr_cons] at h
+    simp only [h]
+    split
+    · intro H
+      constructor
+      · intro j
+        cases j with
+        | mk _ idx =>
+          simp only [Array.get, Array.getAux]
+          by_cases h' : idx.val = a.size-1
+          · apply lt_of_succ_lt
+            rw [h']
+            exact H.left
+          · apply IH.mpr H.right ⟨j, by simpa using lt_of_le_of_lt (Nat.succ_le_of_lt $ j.isLt) h'.1⟩
+      · constructor_all
+        exact H.left
+        exact IH.mpr H.right
+    · intro ⟨Hl, Hr⟩
+      constructor
+      · exact Hl ⟨a.size - 1, by simp⟩
+      · exact IH.mpr Hr

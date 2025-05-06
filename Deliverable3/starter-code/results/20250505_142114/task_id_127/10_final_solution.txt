@@ -1,0 +1,4 @@
+{
+  "code": "a * b",
+  "proof": "simp"
+}

@@ -1,0 +1,4 @@
+{
+  "code": "List.all (fun x => decide (n > x)) a.toList\n\nThis change ensures that List.all is correctly applied to the list a.toList with the given predicate.",
+  "proof": "intro h\n  split\n  \u00b7 intro h1 i h2\n    have h3 : a.toList.get? i = some (a[i]!) := List.get?_eq_get a.toList i h2\n    rw [\u2190 List.All_iff_forall_mem] at h1\n    specialize h1 a[i]!\n    rw [Array.getElem_eq_get] at h2 \n    have : decide (n > a[i]!) = true := h1 (List.mem_of_get_eq_some h3)\n    exact of_decide_eq_true this\n  \u00b7 intro h1\n    rw [\u2190 List.All_iff_forall_mem]\n    intros x hx\n    obtain \u27e8i, hi, rfl\u27e9 := List.exists_of_mem_get? hx\n    specialize h1 i hi\n    exact decide_eq_true h1"
+}

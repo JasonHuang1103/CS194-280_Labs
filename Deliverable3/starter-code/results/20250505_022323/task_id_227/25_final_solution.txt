@@ -1,0 +1,4 @@
+{
+  "code": "min (min a b) c",
+  "proof": "split\n{ \n  apply And.intro\n  { \n    apply le_trans (Int.le_min (min a b) c)\n    exact Int.le_min_left a b\n  }\n  {\n    apply And.intro\n    { \n      apply le_trans (Int.le_min (min a b) c)\n      exact Int.le_min_right a b\n    }\n    { \n      exact Int.le_min_right (min a b) c\n    }\n  }\n}\n{\n  cases min_choice a b with\n  | inl h => \n    cases min_choice (min a b) c with\n    | inl hc => exact Or.inl hc\n    | inr hc => exact Or.inr (Or.inr hc)\n  | inr h =>\n    cases min_choice (min a b) c with\n    | inl hc => exact Or.inr (Or.inl hc)\n    | inr hc => exact Or.inr (Or.inr hc)\n}"
+}

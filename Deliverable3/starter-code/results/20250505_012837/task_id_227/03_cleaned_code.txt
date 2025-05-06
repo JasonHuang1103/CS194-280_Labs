@@ -1,0 +1,1 @@
+Int.min a (Int.min b c)

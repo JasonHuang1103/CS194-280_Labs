@@ -1,0 +1,66 @@
+We’re not “getting” a complaint from Lean about a wrong theorem statement––rather, Lean tells us that “unsolved goals remain” and that there is an “unexpected token ‘·’” on line 22. (Line numbers won’t match exactly in your editor, but the idea is that after you run constructor you give two “bullet‐proofs”. One of them does not “close up correctly.”) In our case the error really comes down to two issues that interact:
+
+1. The overall proof is using an “iff” introduction by calling constructor and then trying to prove the two directions by “intro” and “rcases” (in the first branch) and then by “cases” (in the second branch). In the second part the goal is to show that
+  hasOppositeSign_spec a b (hasOppositeSign a b)
+—that is, that 
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ ((a > 0 && b < 0) || (a < 0 && b > 0)) = true.
+In that second direction you want to show that "if the Boolean value computed by your code is true then the corresponding disjunction of propositions holds." Instead of “deciding” the individual comparisons, you are trying to use “cases h” on the Boolean premise. (Remember that the “hasOppositeSign” implementation uses Boolean combinations that are computed by “&&” and “||”.)
+
+2. The error message “unexpected token ‘·’” means that one of the bullet markers (the centered “dot” you see) is not coming at a place where Lean expects a new command. (Sometimes this happens if the indentation is off, or if you leave a sub-proof without “closing” it correctly.) Quite likely the second branch (the “→” for the mpr direction) gets “stuck” because the tactic chain does not solve the goal and then the bullet marker appears later in a context where a command is expected.
+
+Let’s break it down step‐by‐step:
+
+──────────────────────────── Step 1. Which tactic is failing and why
+
+After “constructor” you get two subgoals (one for each implication in the “↔”). In the second subgoal you begin with “intro h” and then “cases h”. The “cases” tactic splits the disjunction on h, but the “exact” commands that follow do not actually complete the goal. (That is, your expressions  
+  decide (a < 0) && decide (b > 0) = true  
+and  
+  decide (a > 0) && decide (b < 0) = true  
+are not “closing” the goals because they do not serve as proofs of the required proposition of the second implication.) In short, the proof tactic “cases h” is leaving unsolved subgoals because the proof for the direction “if the boolean value is true then the disjunction holds” is not justified.
+
+──────────────────────────── Step 2. What is the proof state at that point?
+
+When you enter the second branch (after the bullet “· intro h”), the goal is essentially
+
+  (hasOppositeSign a b = true) → ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+
+Because you have “intro h”, you assume the Boolean expression is true. Now “cases h” is used to analyze the disjunction produced by the code for hasOppositeSign, but that code is defined by Boolean operators such as “&&” and “||.” (Remember that hasOppositeSign a b is defined by  
+  (a > 0 && b < 0) || (a < 0 && b > 0).) You are comparing two “Bool” values with “= true.” In order to close the goal you must “connect” the Boolean computation to the intended Prop (i.e. the disjunction of two inequalities). The proof state is therefore not “solved” by merely doing a case split on the assumed Boolean value.
+
+──────────────────────────── Step 3. Does the proof approach match the specification?
+
+The specification says that
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ (hasOppositeSign a b)
+where hasOppositeSign a b is a Bool. Thus you must show both:
+  • If the disjunction holds then your computed Boolean is true.
+  • If your computed Boolean is true then the disjunction holds.
+Your first bullet (the “mp” direction) is handled by “rcases” (there you switch the order of the pair when you have the “or”). Unfortunately in your “mpr” branch the approach is to split the assumption with “cases” and then “exact” the equalities such as “decide (a < 0) && decide (b > 0) = true”. However, a direct “exact” does not complete the subgoal: Lean still sees an unsolved Boolean equation that is not proved. In other words, the approach uses proof terms of the wrong “shape” (you are mixing up Prop and Bool) and the tactic chain is not “closing” the second subgoal.
+
+──────────────────────────── Step 4. Are there type mismatches or incorrect assumptions?
+
+Yes, the spec mixes up an “iff” between a Prop (the disjunction of inequalities) and a Bool (the result of hasOppositeSign). In Lean it is possible to “decide” a proposition by writing “decide … = true” if the Bool reflects the truth value of the proposition. However, in your “mpr” branch you simply write:
+  exact (decide (a < 0) && decide (b > 0) = true)
+which is not enough: Lean expects a proof of the disjunction (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) but you provide a Boolean equality. (Likely the construct “decide” is meant to be computed in “Eval” mode so that you get True or False; if you want to tie this to a Prop you could use “dec_trivial” or use a conversion lemma stating that “b = true” if and only if “b” holds as a Prop.)
+
+Also, the bullet marker “·” on the second branch is not aligned with the first branch’s proof. This is why Lean complains “unexpected token ‘·’”; it’s a side‐effect of the tactic block not being “closed” when the first unsolved goal appears.
+
+──────────────────────────── Step 5. Consider alternative proof strategies
+
+A good approach might be to first rewrite the Boolean equality into its “if and only if” form by an application of, say, a lemma that tells you that “(decide p) = true ↔ p” holds (when p is decidable). In Mathlib there is a standard fact that “if p is a decidable Prop then decidable.to_bool_eq_true : to_bool p = true ↔ p” holds. (Sometimes this is packaged as “decide_iff” or by using “dec_trivial” in the appropriate context.) Then, instead of “cases h” you might “rw” using that lemma, and then use case analysis on the Boolean operators “&&” and “||” by rewriting them in their logical form.
+
+An alternative is to use “decide” on both sides of the equivalence and then clean up with “rfl,” since the computation in the Bool world should match the specification (when the comparison and logical operators are computed).
+
+──────────────────────────── Conclusion and Suggested Direction
+
+The root cause is two‑fold:
+ (1) In the second part of your proof (the “mpr” direction) you try to “case‐split” on the Bool assumption and then “exact” a Boolean equality. This does not give you a proof of the intended Prop (the disjunction of inequalities) because you are mixing up the computation domain (Bool) with the logical domain (Prop).
+ (2) The bullet marker “·” appears in a place where Lean expected a complete tactic command because the previous tactic block did not “close” (that is, you have an unsolved subgoal that leaves the proof block incomplete).
+
+To fix the proof you should:
+ • Ensure that when you need to pass from “hasOppositeSign a b = true” to the corresponding proposition, you use a lemma that converts Boolean equality to a Prop (for example, a lemma stating that “(to_bool p = true) ↔ p” holds for a decidable proposition p).
+ • Check the indentation and bullet markers so that each subgoal is correctly marked and closed.
+ • Instead of manually “cases” on the Bool value, you might “rw” with the conversion lemma and then use Boolean reasoning (or even “dec_trivial”) to finish the goal.
+
+By cleaning up the bullet structure and writing conversion lemmas between Bool equalities and the corresponding propositions, you will be able to close both subgoals and have Lean accept your proof.
+
+This is where I would direct your efforts: review how decidable predicates are “reflected” into Prop (look up “decidable” and “decidable.by_cases” lemmas in Mathlib) and fix the tactic block so that both directions of the equivalence are completed.

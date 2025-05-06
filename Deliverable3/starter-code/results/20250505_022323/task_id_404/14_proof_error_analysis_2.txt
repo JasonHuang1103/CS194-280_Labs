@@ -1,0 +1,36 @@
+The problem is not with your definition of myMin or your spec but with the way you structure the proof script. In particular, the tactic steps that “rewrite” the if‑expression (using rw [if_pos h] and rw [if_neg h]) are not split into properly isolated cases. That is, after you invoke by_cases h : a ≤ b, Lean expects you to provide separate proofs (or case blocks) for the two cases (when h holds and when it doesn’t). In your script the two branches are given consecutively instead of “nesting” the tactics for the true case and the false case into separate blocks. As a result, Lean sees unsolved goals (and even an “unexpected identifier” error) because after finishing the first branch with rw [if_pos h] and its bullet proofs, you then issue another rewrite (rw [if_neg h]) on the same goal.
+
+To explain in more detail:
+
+• When you call “by_cases h : a ≤ b”, Lean splits the proof into two subgoals:
+  – one assuming h : a ≤ b, with the goal
+   ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧ ((if a ≤ b then a else b) = a ∨ (if a ≤ b then a else b) = b)
+  – the other assuming ¬ a ≤ b, with a similar goal.
+  
+• In each branch you must “fix” your goal by rewriting the if‑expression accordingly. In the case h holds you need to call “rw [if_pos h]” and then finish that branch; in the other case you need “rw [if_neg h]”. Instead, your script calls “rw [if_pos h]” and then immediately “rw [if_neg h]” in the same branch. This leaves goals that are not solved, and Lean produces an error.
+
+A direction for fixing it is to refactor the proof so that you handle each case in its own block. For instance, you can write something like:
+
+----------------------------------------------------------------
+theorem myMin_spec_satisfied (a : Int) (b : Int) :
+  myMin_spec a b (myMin a b) := by
+  by_cases h : a ≤ b
+  · -- case: a ≤ b
+    rw [if_pos h]
+    split
+    · split
+      · simp
+      · exact h
+    · left; rfl
+  · -- case: ¬(a ≤ b)
+    rw [if_neg h]
+    split
+    · split
+      · sorry  -- complete the proof here properly
+      · simp
+    · right; rfl
+----------------------------------------------------------------
+
+You could also consider using the tactic split_ifs to manage the rewriting automatically. The key idea is to “scope” your rewrites and steps so that rewriting with if_pos h happens in the true branch and rewriting with if_neg h happens in the false branch, instead of intermingling them.
+
+Thus, the root cause is that your by_cases splitting is not structured into two separate bullet blocks, causing Lean to try to rewrite the same goal with both [if_pos] and [if_neg] rewrite rules and leaving unsolved goals. Adjusting the indentation and bullet structure will allow Lean to see the two cases as independent, resolving the error.

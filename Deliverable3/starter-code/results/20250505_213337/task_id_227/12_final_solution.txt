@@ -1,0 +1,4 @@
+{
+  "code": "if a <= b \u2227 a <= c then a\nelse if b <= c then b\nelse c",
+  "proof": "split_ifs with h\u2081 h\u2082 h\u2083\n\u00b7 -- Case a <= b \u2227 a <= c\n  exact \u27e8\u27e8h\u2081.1, h\u2081.2, le_refl _\u27e9, Or.inl rfl\u27e9\n\u00b7 -- Case \u00ac(a <= b \u2227 a <= c) and b <= c\n  have : a > b := not_and_or.1 h\u2081 |>.resolve_left h\u2083\n  exact \u27e8\u27e8this.le, le_refl _, h.h\u2081\u27e9, Or.inr <| Or.inl rfl\u27e9\n\u00b7 -- Case \u00ac(a <= b \u2227 a <= c) and \u00ac(b <= c)\n  have : a > c := not_and_or.1 h\u2081 |>.resolve_right h\u2083\n  exact \u27e8\u27e8this.le, h_1, le_refl _\u27e9, Or.inr <| Or.inr rfl\u27e9"
+}

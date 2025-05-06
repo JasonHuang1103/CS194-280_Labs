@@ -1,0 +1,13 @@
+apply Iff.intro
+· intro h
+  obtain ⟨i, hi, hik⟩ := Array.any_iff.mp h
+  obtain ⟨j, hj, hjk⟩ := Array.any_iff.mp hik
+  exact ⟨i, j, hi, hj, hjk⟩
+· rintro ⟨i, j, hi, hj, heq⟩
+  apply Array.any_iff.mpr
+  use i
+  split
+  · exact hi
+  · apply Array.any_iff.mpr
+    use j
+    exact ⟨hj, heq⟩

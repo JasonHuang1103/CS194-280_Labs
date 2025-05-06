@@ -1,0 +1,5 @@
+cases' lt_or_ge a b with h h
+· simp [h]
+  exact ⟨le_of_lt h, le_refl _, Or.inl rfl⟩
+· simp [h]
+  exact ⟨le_refl _, h, Or.inr rfl⟩

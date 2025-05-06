@@ -1,0 +1,14 @@
+split_ifs with h
+case pos =>
+  constructor
+  constructor
+  exact le_refl a
+  exact h
+  exact Or.inl rfl
+case neg =>
+  have h' : b ≤ a := not_le.mp h
+  constructor
+  constructor
+  exact h'
+  exact le_refl b
+  exact Or.inr rfl

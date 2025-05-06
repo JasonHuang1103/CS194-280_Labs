@@ -1,0 +1,10 @@
+```lean
+simp [isGreater, isGreater_spec],
+split,
+{ intros h i hi,
+  exact h i (by rwa Array.getElem_eq_data_get ⟨i, hi⟩) },
+{ intros h x hx,
+  cases' List.mem_toList.1 hx with j hj,
+  rw [← hj.2, Array.getElem_eq_data_get ⟨j, by rwa ← hj.1⟩],
+  exact h _ hj.1 }
+```

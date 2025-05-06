@@ -1,0 +1,50 @@
+Lean Error: lean_playground/TempTest.lean:8:41: error: function expected at
+  c
+term has type
+  ℤ
+lean_playground/TempTest.lean:10:67: error: unexpected token 'using'; expected command
+lean_playground/TempTest.lean:22:46: error: unsolved goals
+case pos
+a b c : ℤ
+h1 : decide (a ≤ b) = true
+⊢ ((let minAB := if decide (a ≤ b) = true then a else b;
+        if decide (minAB ≤ c) = true then minAB else sorry) ≤
+        a ∧
+      (let minAB := if decide (a ≤ b) = true then a else b;
+          if decide (minAB ≤ c) = true then minAB else sorry) ≤
+          b ∧
+        (let minAB := if decide (a ≤ b) = true then a else b;
+          if decide (minAB ≤ c) = true then minAB else sorry) ≤
+          c) ∧
+    ((let minAB := if decide (a ≤ b) = true then a else b;
+        if decide (minAB ≤ c) = true then minAB else sorry) =
+        a ∨
+      (let minAB := if decide (a ≤ b) = true then a else b;
+          if decide (minAB ≤ c) = true then minAB else sorry) =
+          b ∨
+        (let minAB := if decide (a ≤ b) = true then a else b;
+          if decide (minAB ≤ c) = true then minAB else sorry) =
+          c)
+
+case neg
+a b c : ℤ
+h1 : ¬decide (a ≤ b) = true
+⊢ ((let minAB := if decide (a ≤ b) = true then a else b;
+        if decide (minAB ≤ c) = true then minAB else sorry) ≤
+        a ∧
+      (let minAB := if decide (a ≤ b) = true then a else b;
+          if decide (minAB ≤ c) = true then minAB else sorry) ≤
+          b ∧
+        (let minAB := if decide (a ≤ b) = true then a else b;
+          if decide (minAB ≤ c) = true then minAB else sorry) ≤
+          c) ∧
+    ((let minAB := if decide (a ≤ b) = true then a else b;
+        if decide (minAB ≤ c) = true then minAB else sorry) =
+        a ∨
+      (let minAB := if decide (a ≤ b) = true then a else b;
+          if decide (minAB ≤ c) = true then minAB else sorry) =
+          b ∨
+        (let minAB := if decide (a ≤ b) = true then a else b;
+          if decide (minAB ≤ c) = true then minAB else sorry) =
+          c)
+lean_playground/TempTest.lean:26:0: error: unexpected identifier; expected command

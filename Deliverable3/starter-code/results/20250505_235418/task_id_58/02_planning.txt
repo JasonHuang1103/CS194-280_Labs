@@ -1,0 +1,81 @@
+Below is my detailed reasoning process along with the resulting plan.
+
+──────────────────────────────
+Step 1. Understand the Function Specification
+
+• The function, named hasOppositeSign, takes two integers, a and b.
+• It must return true if one integer is strictly positive while the other is strictly negative.
+• Note that if either integer is zero (or both), the function should yield false since zero’s sign is neither positive nor negative.
+
+──────────────────────────────
+Step 2. Break Down into Subproblems
+
+• We need to check two conditions:
+  – Condition 1: a < 0 and b > 0.
+  – Condition 2: a > 0 and b < 0.
+• The overall result is given by the logical “or” (disjunction) of these two conditions.
+• We can translate this into Lean's Boolean operations using the “&&” for “and” and “||” for “or.”
+
+──────────────────────────────
+Step 3. Consider Inputs, Edge Cases, and Expected Behavior
+
+• The inputs are two integers (of type Int), so we use the built-in comparison operators.
+• Edge case: If a or b is zero, then neither (a < 0 && b > 0) nor (a > 0 && b < 0) holds, and so the function correctly returns false.
+• There is no need for further testing of boundaries because the simple comparisons capture all required scenarios.
+
+──────────────────────────────
+Step 4. Plan the Proof Strategy
+
+• We must prove that the value returned by hasOppositeSign satisfies the specification expressed in hasOppositeSign_spec.
+• In the specification, the left-hand side of the ↔ is exactly the same as the condition we used inside hasOppositeSign.
+• Once we “unfold” or expand both definitions, the statement
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)
+ is directly identical to what is computed by our function.
+• In Lean, after unfolding definitions, this equivalence is a direct “reflexivity” (i.e., by rfl) so the proof is trivial.
+
+──────────────────────────────
+Step 5. Note Similar Patterns
+
+• Often in Lean, when definitions match up exactly, the proof can be finished with “rfl” (reflexivity).
+• The structure of the function resembles many other examples where simple Boolean formulas are implemented.
+• The proof strategy by “unfolding” the definitions is a common pattern.
+
+──────────────────────────────
+Final Detailed Plan
+
+• Implementation:
+ – Define hasOppositeSign such that it returns: (a < 0 && b > 0) || (a > 0 && b < 0).
+
+• Proof:
+ – Unfold the definitions of hasOppositeSign and hasOppositeSign_spec.
+ – Notice that the condition (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) appears on both sides of the equivalence.
+ – Conclude with “rfl” to complete the proof.
+
+──────────────────────────────
+Below is the complete Lean 4 code following the plan:
+
+---------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasOppositeSign (a : Int) (b : Int) : Bool :=
+  -- << CODE START >>
+  (a < 0 && b > 0) || (a > 0 && b < 0)
+  -- << CODE END >>
+
+-- Theorem: The result is true if a and b have opposite signs
+def hasOppositeSign_spec (a : Int) (b : Int) (result: Bool) : Prop :=
+  -- << SPEC START >>
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result
+  -- << SPEC END >>
+
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  -- << PROOF START >>
+  unfold hasOppositeSign hasOppositeSign_spec
+  rfl
+  -- << PROOF END >>
+---------------------------------------------
+
+This plan implements the required function and proves that its output agrees with the given specification.

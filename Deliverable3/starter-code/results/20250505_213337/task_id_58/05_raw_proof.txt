@@ -1,0 +1,15 @@
+```lean
+simp [decide_eq_true_eq]
+rcases lt_trichotomy a 0 with (ha | rfl | ha)
+· rcases lt_trichotomy b 0 with (hb | rfl | hb)
+  · simp [ha, hb]
+  · simp [hb]
+  · simp [ha, hb]
+· rcases eq_or_lt_of_le (Int.le_of_eq rfl) with rfl | hb
+  · simp
+  · simp [hb]
+· rcases lt_trichotomy b 0 with (hb | rfl | hb)
+  · simp [ha, hb]
+  · simp [hb]
+  · simp [ha, hb]
+```

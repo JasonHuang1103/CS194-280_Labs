@@ -1,0 +1,4 @@
+{
+  "code": "n % 10",
+  "proof": "theorem lastDigit_spec_satisfied (n : Nat) :\n  lastDigit_spec n (lastDigit n) := by\n  unfold lastDigit lastDigit_spec\n  constructor\n  . constructor\n    . apply Nat.zero_le\n    . apply Nat.mod_lt\n      exact Nat.zero_lt_succ 9\n  . rfl"
+}

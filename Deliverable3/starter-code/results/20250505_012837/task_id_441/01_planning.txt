@@ -1,0 +1,46 @@
+Below is a detailed plan outlining the approach for both the implementation of the function and the corresponding proof.
+
+──────────────────────────────
+Step 1. Implement the Function
+
+• Understand the formula: The surface area (A) of a cube with edge length size is given by A = 6 * size².
+• Write the function: In Lean 4, define the function cubeSurfaceArea that accepts an integer size and returns 6 * size * size.
+• Notice that you can directly use multiplication on integers, so the implementation is straightforward.
+
+──────────────────────────────
+Step 2. Define the Specification
+
+• The specification is a property that for a given size and result, result = 6 * size * size.
+• This property is captured in the definition cubeSurfaceArea_spec.
+• This definition can be used later in the theorem to connect the function implementation with the expected result.
+
+──────────────────────────────
+Step 3. Prove the Theorem
+
+• The theorem cubeSurfaceArea_spec_satisfied should show that for any cube edge size, the computed surface area meets the specification.
+• In the proof:
+  - Unfold both the definitions of cubeSurfaceArea and cubeSurfaceArea_spec.
+  - After unfolding, you will reveal the equality that needs to be proven, namely that (6 * size * size) = (6 * size * size).
+  - Lean's simplifier (or just a reflexivity argument) will then notice that both sides are definitionally equal.
+• Use either the tactic rfl (reflexivity), simp, or any similar tactic to close the proof.
+
+──────────────────────────────
+Step 4. Write Out the Final Code
+
+• Integrate the function, specification, and theorem into the template.
+• Your final Lean code will have:
+  - The implementation of cubeSurfaceArea.
+  - The definition of the cubeSurfaceArea_spec.
+  - And the theorem with the proof that unfolds the definitions and uses reflexivity or similar to finish the argument.
+
+──────────────────────────────
+Summary of Key Steps
+
+1. Use the formula A = 6 * size * size in the function definition.
+2. Define a specification property ensuring the computed value agrees with the formula.
+3. In the proof:
+   - Unfold definitions to expose the underlying arithmetic expression.
+   - Use reflexivity (or a simplification tactic) to show the equality.
+4. Ensure the proof remains valid by not assuming any extraneous properties beyond the given arithmetic operations.
+
+Following this plan, you can now implement the function and proof in Lean 4 confidently.

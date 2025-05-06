@@ -1,0 +1,20 @@
+```
+let l := a.toList 
+induction l with
+| nil => simp 
+| cons hd tl ih =>
+  simp only [List.foldl, List.foldr] at *
+  split
+  · intro h i hi
+    cases i
+    · exact h 0 (by simp)
+    · apply ih
+      intros j hj
+      apply h
+      exact succ_lt_succ hj
+  · intro h
+    apply ih
+    intro j hj
+    apply h
+    exact succ_lt_succ hj
+```

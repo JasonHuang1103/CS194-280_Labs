@@ -1,0 +1,18 @@
+Lean Error: lean_playground/TempTest.lean:23:52: error: unsolved goals
+case pos
+a b : ℤ
+h✝ : a < 0
+⊢ a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 ↔ decide (b > 0) = true
+
+case pos
+a b : ℤ
+h✝¹ : ¬a < 0
+h✝ : a > 0
+⊢ a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 ↔ decide (b < 0) = true
+
+case neg
+a b : ℤ
+h✝¹ : ¬a < 0
+h✝ : ¬a > 0
+⊢ a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 ↔ False
+lean_playground/TempTest.lean:27:0: error: unexpected identifier; expected command

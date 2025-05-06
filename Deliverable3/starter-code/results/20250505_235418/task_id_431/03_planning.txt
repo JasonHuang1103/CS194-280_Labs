@@ -1,0 +1,96 @@
+Below is a step‐by‐step explanation of our planning process, followed by the detailed plan for both the implementation and the proof.
+
+──────────────────────────────
+1. Understand the Function Specification
+
+• The function is called hasCommonElement and takes two arrays of integers (a and b).
+• It should return true if there exists at least one element that appears in both arrays.
+• If no common element exists—or if one (or both) of the arrays is empty—the function should return false.
+
+──────────────────────────────
+2. Break Down the Problem
+
+• We need to check for each element in the first array (a) whether it is contained in the second array (b).
+• Lean’s Array methods offer “any” which takes a predicate and returns true if at least one element satisfies that predicate.
+• Therefore, we can express our function as: for every x in a, check if b contains an x (i.e., b.any on the predicate “= x”). We can then “any” over a itself.
+• This nested use of “any” means that if any element of a is found in b, the overall function returns true.
+
+──────────────────────────────
+3. Consider Input Types, Edge Cases, and Behavior
+
+• Input types: Both a and b are provided as Array Int.
+• Edge Cases:
+  - If a is empty, then there is no element to check and the function naturally returns false.
+  - If b is empty, then even if a is nonempty, no element of a can be found in b, again giving false.
+• Expected Behavior: The function must return exactly true if there is some index i in a and index j in b such that a[i]! = b[j]!, and false otherwise.
+
+──────────────────────────────
+4. Choose the Proof Technique
+
+• Our specification (hasCommonElement_spec) requires proving an “if and only if” statement:
+  
+    (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+• For the implementation, “result” is the Boolean returned by hasCommonElement.
+• We plan to use the built-in properties of Array.any. In particular, Lean provides a specification (or one can reason manually similarly) that states:
+  
+    a.any p = true  ↔ ∃ i, i < a.size ∧ p(a[i]!)
+    
+  and the same for b.any.
+  
+• Therefore, the proof will proceed in two directions:
+  - (→) From ∃ i j … to hasCommonElement returning true.
+  - (←) From hasCommonElement returning true to ∃ i j ….
+• Proof tactics will include:
+  - Unfolding the definitions of hasCommonElement and hasCommonElement_spec.
+  - Using the equivalence given by the specification for Array.any.
+  - Reasoning via “cases” or “constructor” to handle the two directions of the ↔ (if and only if) statement.
+
+──────────────────────────────
+5. Note Similar Patterns from Examples
+
+• The examples illustrate the use of “constructor” and “intro” to handle bi-implications.
+• They also show that one can use “use” (to supply a witness) when proving existential statements.
+• We see that working with nested existential quantifiers can be managed by first obtaining a witness from a.any and then applying similar reasoning for b.any.
+
+──────────────────────────────
+Detailed Plan
+
+A. Implementation Steps
+
+1. Define hasCommonElement as a function that uses Array.any twice:
+  
+    • First, iterate through each element x of array a.
+    • For each x, check if b.any (λ y => x = y) is true.
+    • Return the overall result of a.any.
+  
+2. The resulting Lean code will look like:
+
+       def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+         a.any (λ x => b.any (λ y => x = y))
+  
+B. Proof Steps
+
+1. Unfold the definitions of hasCommonElement and hasCommonElement_spec.
+2. Prove the forward direction (→):
+  
+    • Assume there exist indices i and j such that i < a.size, j < b.size, and a[i]! = b[j]! holds.
+    • By the specification of Array.any, we can conclude that for the element a[i]! the predicate (λ y => a[i]! = y) is true at index j in array b.
+    • Hence, the inner b.any returns true for that particular element.
+    • Consequently, a.any applied with that predicate must return true.
+  
+3. Prove the backward direction (←):
+  
+    • Assume that a.any (λ x => b.any (λ y => x = y)) returns true.
+    • By the specification of Array.any, there exists some index i such that i < a.size and b.any (λ y => a[i]! = y) returns true.
+    • Again, by the specification of Array.any for b, from b.any (λ y => a[i]! = y) being true, we get that there exists some index j such that j < b.size and a[i]! = b[j]! holds.
+    • This directly gives the desired existence of indices i and j, closing the bi-implication.
+  
+4. Structure the proof using tactics such as “constructor”, “intro”, “cases”, “use”, and so on as needed.
+
+──────────────────────────────
+Conclusion
+
+We will implement the function using a nested use of Array.any. After that, we prove that the Boolean result is equivalent to the existence statement using the properties of Array.any and logical reasoning. This plan carefully handles the case where one or both arrays are empty—by correctly using Array.any, the function naturally returns false when no elements satisfy the predicate.
+
+The final Lean template will include the implementation and a structured proof using the outlined steps. This completes our planning for both the implementation of hasCommonElement and its specification proof.

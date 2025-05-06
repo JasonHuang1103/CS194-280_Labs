@@ -1,0 +1,57 @@
+The error isn’t due to some exotic bug in Lean but rather to a mismatch between what our code is “saying” and what the proof is trying to show. In our setup we mix boolean computations with propositions, but we never properly “bridge” the two. Let’s review the situation carefully.
+
+──────────────────────────── 
+1. The Definitions
+
+We define
+
+ hasOppositeSign (a : Int) (b : Int) : Bool :=
+  if a < 0 then b > 0
+  else if a > 0 then b < 0
+  else false
+
+and
+
+ hasOppositeSign_spec (a : Int) (b : Int) (result: Bool) : Prop :=
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+
+Notice that in hasOppositeSign we are writing a conditional that “returns” a Bool. However, inside that conditional we write things like “b > 0” or “b < 0” which are propositions (of type Prop). Lean can automatically “decide” these comparisons (since the order on Int is decidable) and so it turns them into booleans via “decide”. What actually happens is that Lean is using the decidability instance to convert the proposition b > 0 into a Bool (namely decide (b > 0)), but then the spec has an equivalence between a ∨-form proposition and a Bool. In other words, the specification says that
+
+ (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+
+but after unfolding definitions the goal becomes something like
+
+ (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ decide (b > 0) = true
+
+in the branch where a < 0 holds. (Similarly for the a > 0 branch.)
+
+──────────────────────────── 
+2. What the Error Message Tells Us
+
+The error message shows unsolved goals such as
+
+ ⊢ a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 ↔ decide (b > 0) = true
+
+in one branch and a similar statement in the other branch. In the first case the proof simply did “simp [ha,hb]” hoping that it would “match” the two sides. However, the two sides are of different “flavors”: one side is a plain proposition formed by comparing integers and using ∧, ∨, etc., while the other side comes from the Boolean world (the “if … then …” in the definition, after having “decided” b > 0). Lean wants an explicit conversion (or rewriting) between these, but our proof does not supply one.
+
+In the other branch the tactic “by_cases” introduces a case split on a < 0 (and then on a > 0) and the subsequent subgoals again have mismatches – and in addition the bullet “·” appears at an unexpected place (often meaning that the tactic script’s indentation or structure isn’t exactly what Lean expects once goals have this more complicated form).
+
+──────────────────────────── 
+3. The Root Cause
+
+In summary, our “specification” is written as an equivalence between a proposition and a Bool (or its “decided” form), and the proof does not make explicit the necessary conversions (using, for example, the function decide or by working with Prop versions of our condition). That lack of explicit conversion (plus perhaps some bullet indentation issues caused by having complicated unsolved goals) is the root cause of the unsolved goals and the “unexpected token ‘·’ ” error that Lean reports.
+
+──────────────────────────── 
+4. How to Fix It
+
+There are two general paths to fix this situation:
+
+• Change the specification (or the implementation) so that you are always working in the same “world”. For example, you might
+ – define hasOppositeSign to return a Prop instead of a Bool (i.e. defining it “intensionally” as a statement about a and b), or
+ – restate the spec so that it compares Booleans with Booleans. (For instance, you could compare (hasOppositeSign a b) with (decide ( (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) )).)
+
+• If you wish to keep your definition as is (returning a Bool) and the spec as is, then in your proof you must explicitly use the decidability conversion. That is, you’d want to rewrite the goal so that the “if … then …” branches are replaced with their decisions (like showing that b > 0 if and only if decide (b > 0) = true). In Lean the function decide gives you that connection, but you have to use it explicitly.
+
+In short, the proof error arises because we are trying to prove an equivalence between a proposition and a “decided” boolean value without showing the necessary connections. A good direction is to either stick to propositions everywhere (which is often simpler for proofs) or make your conversion between Prop and Bool explicit using decide. Then the unsolved goals should disappear and the bullet structure will no longer “confuse” Lean.
+
+I hope this detailed explanation helps you understand both the error and how to fix it!

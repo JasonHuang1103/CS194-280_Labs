@@ -1,0 +1,4 @@
+{
+  "code": "a.map (fun x => x * x * x)",
+  "proof": "simp [Array.size_map, Array.getElem_map]\nintro i hi\nsimp"
+}

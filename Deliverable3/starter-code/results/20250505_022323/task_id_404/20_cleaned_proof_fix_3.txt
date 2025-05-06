@@ -1,0 +1,16 @@
+by_cases h : a ≤ b
+case pos =>
+  rw [if_pos h]
+  split
+  · split
+    · exact le_refl a
+    · exact h
+  · left; rfl
+case neg =>
+  rw [if_neg h]
+  split
+  · split
+    · have : b < a := lt_of_not_ge h
+      exact le_of_lt this
+    · exact le_refl b
+  · right; rfl

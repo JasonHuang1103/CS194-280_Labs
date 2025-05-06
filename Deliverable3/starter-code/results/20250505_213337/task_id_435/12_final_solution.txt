@@ -1,0 +1,4 @@
+{
+  "code": "n % 10",
+  "proof": "simp\nconstructor\n\u00b7 constructor\n  \u00b7 apply Nat.zero_le\n  \u00b7 exact Nat.mod_lt n 10 (Nat.zero_lt_succ 9)\n\u00b7 rfl"
+}

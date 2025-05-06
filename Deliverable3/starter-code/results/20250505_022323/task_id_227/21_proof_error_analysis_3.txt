@@ -1,0 +1,79 @@
+The upshot is that Lean complains not because the mathematical idea is wrong but because the tactic proof is “incomplete” and its block structure is malformed. In other words, you have left unsolved (or “dangling”) subgoals for the two conjuncts of the specification, and the way you’ve opened and closed curly‐brace blocks in your tactic script confuses Lean’s parser. Let’s break down some of the issues and how you might go about fixing them.
+
+──────────────────────────────
+1. Unsolved Subgoals
+
+The specification for minOfThree_spec is given as a conjunction:
+  (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c).
+
+When you do
+
+  apply And.intro { … } { … }
+
+Lean expects that the first block completely proves the “inequalities” part and the second block completely proves the “being one of the inputs” part. However, the error message
+
+  ⊢ a ⊓ b ⊓ c ≤ a ∧ a ⊓ b ⊓ c ≤ b ∧ a ⊓ b ⊓ c ≤ c
+
+indicates that after you’ve applied parts of your “apply le_trans …” chains, some of the three inequalities are still left unsolved. (Similarly for the second part of the specification.)
+
+What happens is that your nested tactic blocks using “apply And.intro” never manage to discharge all of the goals; some remain “open” and Lean complains that they are unsolved.
+
+──────────────────────────────
+2. Block Structure and the Unexpected “{”
+
+The error
+
+  error: unexpected token '{'; expected command
+
+usually means that Lean got “confused” by the way blocks are opened and closed. In this proof you are using multiple nested curly-brace blocks (each representing a sub-proof) after an “apply,” so the parser is not certain where each sub-proof begins or ends. Since Lean’s “by” tactic mode is very sensitive to indentation and proper block closure, this unclear structuring causes the parser to “see” an extra { where it expects a tactic command.
+
+──────────────────────────────
+3. How to Fix It
+
+Here are a couple of directions that might help resolve the error:
+
+a. Split the Conjunctions More Explicitly.  
+ Use the tactic split (or And.intro in a begin…end block) to break the goal into the two parts and work on each one separately. For example, you might write:
+
+  begin
+    unfold minOfThree minOfThree_spec,
+    split,  -- now the goal splits into two parts
+    { 
+      -- prove (min (min a b) c) ≤ a ∧ (min (min a b) c) ≤ b ∧ (min (min a b) c) ≤ c
+      split,
+      { -- first inequality
+        apply le_trans (Int.le_min (min a b) c),
+        exact Int.le_min_left a b,
+      },
+      { 
+        split,
+        { 
+          apply le_trans (Int.le_min (min a b) c),
+          exact Int.le_min_right a b,
+        },
+        { 
+          exact Int.le_min_right (min a b) c,
+        }
+      }
+    },
+    {
+      -- prove (min (min a b) c) = a ∨ (min (min a b) c) = b ∨ (min (min a b) c) = c
+      -- ... here you would use cases on min_choice appropriately.
+      sorry  -- replace with the actual case analysis
+    }
+  end
+
+This approach structure makes it explicit to Lean what you’re proving.
+
+b. Use the New Tactic Language Constructs Properly.  
+ Rather than “nesting” many curly braces directly, consider using indentation and “begin … end” blocks for clarity.
+
+c. Fully Solve Each Subgoal.  
+ Make sure that every branch (i.e. every “cases” branch and every application of le_trans) actually ends with a tactic like exact … or by “refine” so that no subgoal remains unsolved. The error message suggests that in at least one branch the goals like “a ⊓ b ⊓ c ≤ a” were not finished.
+
+──────────────────────────────
+Summary
+
+The root cause is that your proof’s structure leaves some subgoals for the conjunction unsolved, and the curly-brace blocks you wrote cause the Lean parser to get confused (resulting in the “unexpected token '{'” error). The remedy is to refactor the proof so that each conjunct (and each case in your case analysis) is handled in its own, clearly delimited block (for instance, using begin/end blocks and/or the split tactic). This way Lean knows exactly which goal is being addressed and every goal is eventually discharged.
+
+With that reorganization, Lean should be able to process your proof without the unsolved-goals or unexpected-token errors.

@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:18:54: error: unsolved goals
+size : ℤ
+⊢ 6 * size * size = 6 * size * size
+lean_playground/TempTest.lean:21:10: error: 'cubeSurfaceArea_spec_satisfied' has already been declared

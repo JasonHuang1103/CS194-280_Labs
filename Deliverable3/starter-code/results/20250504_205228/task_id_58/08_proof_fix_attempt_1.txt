@@ -1,0 +1,20 @@
+Here's how you can fix the proof:
+
+```lean
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  unfold hasOppositeSign hasOppositeSign_spec
+  apply Iff.intro
+  · intro h
+    simp only [decide_eq_true_iff, *]
+  · intro h
+    simp only [decide_eq_true, *] at h
+    assumption
+```
+
+### Explanation of Changes
+1. **`unfold`**: We still use `unfold` to expand the definitions, but note that `unfold` only works on fully-named parts of the expression. If you have something like an `Iff`, using `unfold` directly on the names won't work if the goal needs more simplification to reach the form you desire.
+
+2. **Simplification and `decide` handling**: The use of `decide` adds a layer where you need to handle `decide_eq_true_iff` and `decide_eq_true` to simplify propositions involving `decide`. This plays a crucial role in connecting the logical propositions to the Boolean evaluations that arise from `decide`.
+
+With these changes, the proof accurately expands and then matches both sides of the equivalence, ensuring that the boolean result of `hasOppositeSign` is handled correctly.

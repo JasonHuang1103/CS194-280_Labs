@@ -1,0 +1,20 @@
+```
+induction a using Array.inductionOn with
+| nil =>
+  simp at *
+| cons hd tl ih =>
+  unfold isGreater isGreater_spec
+  simp only [Array.foldl, List.mem] at *
+  split
+  · intro h i hi
+    cases i
+    · apply h
+      simp
+    · apply ih
+      exact fun j hj => h (j + 1) (Nat.succ_lt_succ hj)
+  · intro h
+    apply ih
+    intro j hj
+    apply h
+    exact Nat.succ_lt_succ hj
+```

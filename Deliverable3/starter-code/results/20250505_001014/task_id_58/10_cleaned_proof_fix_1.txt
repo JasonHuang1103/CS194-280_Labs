@@ -1,0 +1,13 @@
+split
+  · intro h
+    cases h with
+    | inl ⟨ha, hb⟩ => simp [ha, decide_eq_true_iff.2 hb]
+    | inr ⟨ha, hb⟩ => simp [ha, decide_eq_true_iff.2 hb]
+  · intro h
+    by_cases ha : a < 0
+    · simp [ha] at h
+      left; constructor; assumption
+    by_cases ha' : a > 0
+    · simp [ha, ha'] at h
+      right; constructor; assumption
+    simp [ha, ha'] at h

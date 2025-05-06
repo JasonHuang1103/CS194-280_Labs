@@ -1,0 +1,86 @@
+Below is one detailed analysis of the error. (Your proof “fails” because the two sides of the ↔ use different “domains” and you “swapped” the two cases.) In our example the specification is
+
+  hasOppositeSign_spec a b result :=
+   ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result
+
+while the implementation has
+
+  hasOppositeSign a b :=
+   (a > 0 && b < 0) || (a < 0 && b > 0)
+
+Thus the “if and only if” is meant to state that the boolean result is true exactly when the pair (a, b) has opposite “sign” (in the appropriate order). However, in your proof you “unfold” both definitions and then split the ⇔ into two implications. In the first branch you do
+
+  rcases h with (⟨ha, hb⟩ | ⟨hc, hd⟩)
+  · exact (a > 0) && (b < 0)
+  · exact (a < 0) && (b > 0)
+
+Notice what is happening:
+
+1. In the unfolding the left‐side of the “iff” is a disjunction of two propositions:
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0).
+2. In the implementation (right–side after unfolding) you get a boolean expression:
+  (a > 0 && b < 0) || (a < 0 && b > 0).
+
+The intended meaning is that the Boolean “result” is true exactly when one of the two cases holds. (That is why you wrote an “iff” between a proposition and a Bool.) But there are at least two problems in the proof:
+  
+• First, in the branch initiated by “rcases h with (⟨ha, hb⟩ | ⟨hc, hd⟩)” the pattern
+  ⟨ha, hb⟩
+destructs a proof of (a < 0 ∧ b > 0). In this branch the condition in the definition that should be “true” is the one corresponding to “(a < 0 && b > 0)” – but you wrote “(a > 0) && (b < 0)” in the “exact”. In the other branch the roles are reversed. (They are swapped relative to what you want.)
+  
+• Second, there is a type mismatch: the left–side of the “iff” is a Prop (a logical statement about a and b) while the right–side is a Bool (built using the Boolean operators “&&” and “||”). In Lean 4 there is no automatic conversion from Bool to Prop. (Even if you had the right Boolean value, writing “exact (a > 0) && (b < 0)” means that you are trying to present a Bool as a proof of a Prop.) In short, the “exact” tactic is being given the wrong “term,” one that has the wrong type—in addition to being the wrong branch.
+
+Let’s break the analysis into clear steps:
+
+──────────────────────────────
+Step 1. Identify the failing tactic and why:
+──────────────────────────────
+When you use “exact (a > 0) && (b < 0)” (and the similar line in the other branch) Lean is expecting a proof of the goal. However, the goal (after “unfold”) is something like
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) → ((a > 0 && b < 0) || (a < 0 && b > 0))
+or its converse. In that implication branch the conclusion is a Bool expression. But your “exact” term is a Boolean expression constructed with “&&” (and similarly for “||”). Not only is the Boolean built from (a > 0) and (b < 0) the wrong branch (it’s swapped), it is also not a proof of a proposition because mixing booleans with prop is not automatic.
+
+──────────────────────────────
+Step 2. Consider the proof state at that point:
+──────────────────────────────
+After “unfold” and “constructor” the current goal splits into proving two implications. For one implication the goal will be something like:
+
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) → ( (a > 0 && b < 0) || (a < 0 && b > 0) )
+
+In the first branch, you have assumed (a < 0 ∧ b > 0) (or the other disjunct) and then you have to show that the boolean (result) evaluates to true. But as a proof term you need to connect the propositional data (like “a < 0”) with the Boolean test “a < 0” (which is not the same because “<” when applied to Int produces a Prop, while “>” inside a Boolean operator must be used together with “decide” or a coercion). In short, there’s an incompatibility between using logical connectives “∧” and “∨” (for Propositions) and using “&&” and “||” (for Bool).
+
+──────────────────────────────
+Step 3. Check if the proof approach matches the specification:
+──────────────────────────────
+The specification uses an “iff” between a compound propositional statement and a Boolean. Proving an “iff” requires you to prove each implication. In your proof you try to “destruct” the hypothesis coming from the left side but then you “return” a boolean expression using “&&”. Even if you swapped the branches correctly (so that you return (a < 0 && b > 0) when you have a proof of a < 0 ∧ b > 0, etc.) you would still have a mismatch—the Boolean expression is not “of the right type” as a proof.
+
+──────────────────────────────
+Step 4. Identify any type mismatches or incorrect assumptions:
+──────────────────────────────
+• The proof incorrectly uses Boolean “&&” where a proof of a proposition (or a term of type Prop) is needed.
+• The two branches are swapped: the branch for a proof of (a < 0 ∧ b > 0) should yield the Boolean (a < 0 && b > 0) rather than (a > 0 && b < 0).
+• There is no “bridge” lemma that converts a Boolean expression (which is decidable) into an equality to true or a truth value in Prop. (For instance, one might expect to use a lemma like “Bool.eq_true_intro” or “decidable” conversion.)
+
+──────────────────────────────
+Step 5. Consider alternative proof strategies:
+──────────────────────────────
+One way to repair the proof is to change the statement of the specification so that the “if and only if” is not between a Prop and a Bool but, say, between two booleans. (For example, you could require that hasOppositeSign_spec returns a Bool by “deciding” the condition.) Alternatively, you may want to “lift” the boolean result to a Prop using a conversion lemma (often one uses the fact that “b = true” is a proposition that holds exactly when the Boolean b is true).
+
+Another strategy is to prove a “reflection theorem” that says:
+  ((a > 0 && b < 0) || (a < 0 && b > 0)) = true ↔ ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+and then use that lemma to conclude the specification. In that proof the “exact” lines would be replaced by proofs that the boolean expressions are indeed equal to true when the corresponding proposition holds. This may require using auxiliary lemmas about “decide” or “if then else” constructions.
+
+──────────────────────────────
+Conclusion and Direction for Fixing:
+──────────────────────────────
+The root cause is twofold:
+ 1. In each branch of your “rcases” you have “swapped” the boolean conditions.  
+  – For a case with (a < 0 ∧ b > 0), you must show that (a < 0 && b > 0) is true.
+  – For the other case, show that (a > 0 && b < 0) is true.
+ 2. More importantly, there is a mismatch between using boolean operations (&&, ||) and proving propositions. In Lean 4 these live in different universes. You need to either (a) change your specification to talk about booleans only (for example, say that hasOppositeSign_spec a b (hasOppositeSign a b) is defined as ((a > 0 && b < 0) || (a < 0 && b > 0)) = true) or (b) introduce an explicit conversion (a reflection lemma) that bridges the boolean computation with the propositional statement.
+
+A good direction to fix the proof would be to decide exactly what you want:
+ • If you mean the boolean function to “decide” the property, then work with equality to true.
+ • If you mean to prove an “iff” relating a Prop to a Bool, then either change the Bool to a Prop (by using “if … then …” or “decide”) or prove a reflection theorem that connects them.
+
+By correcting the swapped branches and either adjusting the statement (or adding the needed conversion lemmas), your proof can be repaired.
+
+Hopefully this breakdown clarifies the missteps in your proof.

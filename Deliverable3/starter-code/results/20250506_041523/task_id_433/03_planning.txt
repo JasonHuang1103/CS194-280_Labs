@@ -1,0 +1,123 @@
+Below is one complete way to think about and solve the problem. We “digest” the problem in several steps before giving the implementation and proof.
+
+──────────────────────────────
+Step 1. Understanding the Function
+
+We must write a function, isGreater (n : Int) (a : Array Int) : Bool, that returns true exactly when n is strictly greater than every element in the array a. In other words, we want
+
+  ∀ i, i < a.size → n > a[i]!
+
+to hold. (Notice that, when the array is empty the condition holds vacuously and the function should return true.)
+
+──────────────────────────────
+Step 2. Breaking Down the Problem
+
+There are two “subproblems” here:
+1. Implementation: write a function that “checks” that n is strictly bigger than every element in a.
+2. Proof: show that the Boolean result is equivalent to the proposition “∀ i, i < a.size → n > a[i]!”.
+
+A common pattern in functional programming (and Lean libraries) is to use an “all‐predicate” function. In Lean 4 Mathlib an Array has a method (or one can convert the array to a list) that checks whether every element satisfies a given predicate. One possibility is to define
+
+  a.toList.all (fun x => n > x)
+
+since (a.toList.all p) returns true exactly when every element in a.toList satisfies p. (One can also write an explicit fold.)
+
+──────────────────────────────
+Step 3. Considering Input Types and Edge Cases
+
+• The type of n is Int and the array is Array Int.
+• Edge case: If a is empty then there is no counterexample — hence, the specification “n is greater than every element” holds (a property known as “vacuous truth”). Thus, isGreater should return true.
+• We must also be careful when “unfolding” the specification: the theorem states
+  (∀ i, i < a.size → n > a[i]!) ↔ result
+and we must prove that our implementation indeed computes a Boolean that “encodes” the truth of that proposition.
+
+──────────────────────────────
+Step 4. Appropriate Proof Techniques
+
+A very clean proof strategy is to “bridge the gap” between the array of integers and a list that we know how to manipulate. In fact, one standard lemma in Mathlib is that an array’s list conversion equals the map over a suitable range; namely, there is a lemma
+
+  a.toList = (List.range a.size).map (λ i, a[i]!)
+
+Then we can use:
+• List.all_map: This shows that checking “all” on a mapped list is equivalent to checking a related “all” property on the original list.
+• List.all_range_iff: This lemma says that
+  (List.range a.size).all (λ i, n > a[i]!) ↔ (∀ i, i < a.size → n > a[i]!)
+
+Altogether, these let us establish that
+  a.toList.all (λ x, n > x)
+is equivalent to the desired specification.
+
+──────────────────────────────
+Step 5. Similar Patterns from Examples
+
+Many of the examples in Lean documentation use recursive definitions and conversion lemmas (for example, converting between list and array functions). In our case, converting the array to a list is a simple way to leverage existing lemmas such as List.all_map and List.all_range_iff in the proof. This pattern is similar to using auxiliary “let” or “where” clauses to structure a proof.
+
+──────────────────────────────
+Detailed Plan for Implementation and Proof
+
+1. Implementation:
+   • Define isGreater by converting the array to a list and applying List.all.
+   • In code:
+     
+     def isGreater (n : Int) (a : Array Int) : Bool :=
+       a.toList.all (fun x => n > x)
+
+2. Specification:
+   • We already have
+       
+       def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+         (∀ i, i < a.size → n > a[i]!) ↔ result
+
+3. Proof:
+   • Unfold the definition of isGreater.
+   • Use the lemma stating that
+       
+         a.toList = (List.range a.size).map (fun i => a[i]!)
+     
+   • Then use List.all_map to change the “all” predicate on a.toList to one on (List.range a.size).
+   • Finally, apply List.all_range_iff which asserts that
+       
+         (List.range a.size).all (λ i => n > a[i]!) ↔ ∀ i, i < a.size → n > a[i]!
+     
+   • Conclude with reflexivity to finish the proof.
+   
+The final Lean 4 code is given below.
+
+──────────────────────────────
+Final Lean 4 Code:
+
+import Mathlib
+import Aesop
+
+-- Implementation
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  -- We convert the array to a list and use the built-in .all predicate.
+  a.toList.all (fun x => n > x)
+
+-- Theorem: If the result is true, then n is greater than all elements in the array; 
+-- if the result is false, then there exists at least one element in the array that is
+-- greater than or equal to n.
+def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+  (∀ i, i < a.size → n > a[i]!) ↔ result
+
+theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :
+  isGreater_spec n a (isGreater n a) :=
+by
+  -- Unfold the definitions of isGreater and our specification.
+  unfold isGreater isGreater_spec
+  -- The key observation is that the list conversion of the array can be written as:
+  -- a.toList = (List.range a.size).map (λ i, a[i]!)
+  have h₁ : a.toList = (List.range a.size).map (fun i => a[i]!) :=
+    Array.toList_eq_range_map a
+  rw [h₁]
+  -- Next, use the fact that checking .all on a mapped list is equivalent to checking
+  -- the condition on the original index range.
+  rw [List.all_map]
+  rw [List.all_range_iff]
+  -- Now the goal becomes reflexively true.
+  rfl
+
+──────────────────────────────
+Conclusion
+
+By first converting the array into a list and then applying standard facts about lists (via List.all_map and List.all_range_iff) we both implement isGreater and prove that it satisfies the specification. This step‐by‐step plan shows how we break down the problem, handle edge cases, and apply appropriate rewriting lemmas in our theorem proof.

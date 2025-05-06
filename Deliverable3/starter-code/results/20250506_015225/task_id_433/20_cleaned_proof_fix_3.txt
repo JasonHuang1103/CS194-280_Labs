@@ -1,0 +1,18 @@
+congr
+induction a using Array.revRecOn with
+| nil =>
+  simp
+| cons a as ih =>
+  simp [Array.foldl, List.foldl]
+  split
+  · intro h
+    apply And.intro
+    · exact h as.size (by simp)
+    · apply ih
+      intro i hi
+      exact h i (Nat.lt_trans hi (Nat.lt_succ_self _))
+  · intro h
+    intro i hi
+    cases Nat.eq_or_lt_of_le hi with
+    | inl heq => subst heq; exact h.1
+    | inr hlt => exact ih.mp h.2 i hlt

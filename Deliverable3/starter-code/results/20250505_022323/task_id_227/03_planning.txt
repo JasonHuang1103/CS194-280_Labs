@@ -1,0 +1,70 @@
+Below is a detailed plan outlining how to implement the function and prove its specification.
+
+────────────────────────────────────────
+Step 1. IMPLEMENTATION
+
+• The goal is to return a value that is the smallest of a, b, and c.  
+• It is natural to use the built‐in minimum function (Int.min) twice:  
+  – First, compute m = Int.min a b, which is the minimum of a and b.  
+  – Then, return Int.min m c, which gives the minimum of a, b, and c.
+• Hence, the definition will be:  
+  minOfThree a b c = Int.min (Int.min a b) c
+
+────────────────────────────────────────
+Step 2. SPECIFICATION
+
+We need to ensure that for the returned result:
+ 1. result ≤ a, result ≤ b, and result ≤ c  
+ 2. result equals one of a, b, or c
+
+The spec is written as:
+ (minOfThree_spec a b c result) ≡ [(result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c)]  
+You need to show that both the “bound” property and the “choice” property (result equals one of the inputs) hold.
+
+────────────────────────────────────────
+Step 3. PROOF PLAN
+
+You must prove that (minOfThree a b c) meets the minOfThree_spec.
+
+A. Unfold the definitions:
+ – Unfold minOfThree and minOfThree_spec so that the proof deals with the explicit use of Int.min.
+
+B. Prove that the result is not larger than any of the inputs:
+ 1. Use the standard lemmas for Int.min, which typically include:
+  • Int.min_le_left : For any two integers, Int.min x y ≤ x.
+  • Int.min_le_right : Similarly, Int.min x y ≤ y.
+ 2. First, apply these lemmas to show:
+  – Let m = Int.min a b, then m ≤ a and m ≤ b.
+  – Since result = Int.min m c, you then have:
+   • result ≤ m and so result ≤ a and result ≤ b,
+   • and also result ≤ c.
+ 3. Combine the inequalities to meet the first conjunct of the specification.
+
+C. Prove that the result is exactly one of the inputs:
+ 1. Observe that Int.min a b returns either a or b. Let’s call that value m.
+ 2. Then, Int.min m c returns either m or c.  
+ 3. Do a case analysis:
+  • Case 1: If m ≤ c, then result = m. And since m was either a or b, the result equals a or b.
+  • Case 2: If c < m, then result = c, meeting the requirement.
+ 4. Either way, result equals one of a, b, or c.
+
+D. Use tactics like 'cases' (or 'by_cases') to split on the ordering assumptions (i.e. comparing m and c) and conclude the proof.
+
+────────────────────────────────────────
+Step 4. WRITE THE CODE
+
+Based on the plan, your Lean 4 file should:
+ 1. Define minOfThree by computing Int.min (Int.min a b) c.
+ 2. Define the specification predicate minOfThree_spec.
+ 3. Prove that minOfThree_spec is satisfied by using the lemmas about Int.min and doing a case distinction on whether Int.min a b ≤ c or not.
+
+────────────────────────────────────────
+Step 5. FINAL REMARKS
+
+• Make sure to import the Mathlib library so that you have access to the necessary lemmas about Int.min.  
+• Use tactical proofs (such as the 'by' block) and structured proof steps that Lean understands.
+• The overall approach uses standard properties of the minimum function; no complicated arithmetic is required.
+
+By following the above plan, you will have both a correct implementation of the function minOfThree and a complete proof that it meets the required specification.
+
+This plan fully addresses the problem requirements and guides you to a Lean 4 solution that is both correct and well-structured.

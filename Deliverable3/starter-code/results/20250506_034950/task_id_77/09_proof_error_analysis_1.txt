@@ -1,0 +1,86 @@
+Below is a step‐by‐step analysis of the error:
+
+──────────────────────────────
+1. Identifying the Failing Tactic
+
+• The failing tactic is rfl. Recall that rfl succeeds only when both sides of the equality are definitionally (i.e. “by computation”) identical.
+
+• After unfolding, Lean’s goal is
+
+  n % 11 = 0 ↔ (n % 11 == 0) = true
+
+ The rfl tactic fails because the left-hand side (n % 11 = 0) is a proposition comparing an integer to zero, while the right-hand side ((n % 11 == 0) = true) compares a Boolean (result of n % 11 == 0) to true. They are not definitionally identical.
+
+──────────────────────────────
+2. The Proof State at the Point of Failure
+
+• After the unfold tactic, your goal is exactly
+
+  (n % 11 = 0) ↔ ((n % 11 == 0) = true).
+
+• Here “n % 11 = 0” is of type Prop, and “(n % 11 == 0) = true” is another Prop stating that the Boolean equality expression equals true.
+
+• Despite the fact that these statements are logically equivalent (by how boolean equality is intended to be used), Lean’s conversion mechanism does not see them as definitionally identical. That is why rfl fails.
+
+──────────────────────────────
+3. Matching the Proof Approach to the Specification
+
+• Your implementation defines isDivisibleBy11 as a Boolean function that checks whether n % 11 equals 0 in the Boolean sense (using ==). 
+
+• The specification (isDivisibleBy11_spec) asserts that “n % 11 = 0 ↔ result.” When you instantiate result with (n % 11 == 0), the goal becomes showing that
+
+  n % 11 = 0 ↔ (n % 11 == 0)
+
+ which, after expanding the Boolean equality (the fact that for booleans b, “b = true” is what we normally use to “coerce” a Bool into a proposition), becomes
+
+  n % 11 = 0 ↔ ((n % 11 == 0) = true).
+
+• So the overall approach is to relate a mathematical equation with a boolean equation. However, the definition of (==) does not reduce to the mathematical (=) unless a conversion (or lemma) is applied.
+
+──────────────────────────────
+4. Type Mismatches or Incorrect Assumptions
+
+• Even though both sides are logically “about” the equality of n % 11 with 0, their types come from different worlds:
+  – The left-hand side is a standard integer equality (a proposition).
+  – The right-hand side is about the equality between a Boolean (n % 11 == 0) and true.
+
+• Lean’s definitional equality (which rfl uses) does not “know” that these two forms represent the same notion. There is a hidden coercion or a conversion lemma missing that would allow Lean to see them as the same.
+
+──────────────────────────────
+5. Alternative Proof Strategies
+
+• One strategy is to rewrite the goal using an appropriate lemma that converts between the proposition “n % 11 = 0” and “(n % 11 == 0) = true”. If Mathlib provides such a lemma, then you can apply it so that both sides become identical.
+
+• Alternatively (and equally valid), you could modify the specification itself so that it directly compares Boolean values. For example, you might define
+
+  def isDivisibleBy11_spec (n : Int) (result : Bool) : Prop :=
+   (n % 11 == 0) = result
+
+ and then the unfolded goal would become
+
+  (n % 11 == 0) = (n % 11 == 0)
+
+ to which rfl would immediately apply.
+
+• A more involved approach might involve pattern matching or using the “decide” or “bool.decide_iff_true” lemmas, if available, to bridge the fact that a Boolean expression is true exactly when its underlying proposition holds.
+
+──────────────────────────────
+Conclusion and Root Cause Analysis
+
+The error stems from using rfl on an equality whose two sides are not definitionally equal. The left-hand side expresses an arithmetic equality (n % 11 = 0), and the right-hand side expresses the condition that the Boolean (n % 11 == 0) is true, i.e., (n % 11 == 0) = true. Lean does not automatically convert Boolean equalities into their propositional counterparts; they live in distinctly different computational domains. 
+
+To fix this issue, you should either:
+ • Adjust the specification to use (n % 11 == 0) directly rather than n % 11 = 0; or 
+ • Introduce and apply a conversion lemma (or use tactics like rw with the appropriate lemma) to bridge the gap between the Boolean equality and the arithmetic equality before applying rfl.
+
+For example, one way might be to change your spec as follows:
+
+ def isDivisibleBy11_spec (n : Int) (result : Bool) : Prop :=
+  (n % 11 == 0) = result
+
+so that after unfolding, the goal is definitionally trivial.
+
+──────────────────────────────
+Final Summary
+
+The root cause is a mismatch between the Boolean equality used in your implementation and the arithmetic equality in your specification. Lean’s rfl cannot see these as identical without an explicit conversion. The remedy is to either use a conversion lemma to align the two forms or adjust the specification to match the implementation directly.

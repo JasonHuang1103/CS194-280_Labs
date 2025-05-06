@@ -1,0 +1,55 @@
+Below is a high‐level plan that explains both the implementation and the proof strategy.
+
+──────────────────────────────────────────────
+Step 1. Implementation
+
+• Use Lean’s built‑in integer minimum function. In Lean, given two integers x and y, one can use (x.min y) (or an if–then–else) to return the smaller of the two.  
+• Thus, to return the minimum among three integers a, b, and c, we can define:
+  minOfThree a b c = a.min (b.min c)  
+This works because:
+  – b.min c is by definition ≤ b and ≤ c, and equals one of these two.
+  – Then a.min (b.min c) is ≤ a and ≤ (b.min c), which means it is ≤ b and ≤ c.
+  – The final answer is either a or (b.min c) where (b.min c) equals b or c.
+
+──────────────────────────────────────────────
+Step 2. Writing the Spec
+
+The specification is given by minOfThree_spec stating two requirements:
+  1. The result is less than or equal to each of a, b, c.
+  2. The result is exactly one of a, b, or c.
+
+──────────────────────────────────────────────
+Step 3. Plan for the Proof
+
+To prove that minOfThree_spec_satisfied holds, we proceed as follows:
+
+1. Unfold the definitions of minOfThree and minOfThree_spec. This brings out the definition “minOfThree a b c = a.min (b.min c)”.
+2. Prove that (a.min (b.min c)) ≤ a by invoking a standard lemma such as Int.min_le_left.
+3. Prove that (a.min (b.min c)) is ≤ (b.min c) by using Int.min_le_right.  
+   Then, using properties of min applied to b and c, show that (b.min c) ≤ b and (b.min c) ≤ c.
+4. For the “one of” part, proceed by cases:
+  a. Case 1: Assume a is less than or equal to (b.min c). Then a.min (b.min c) equals a. From that it follows: result = a.
+  b. Case 2: Otherwise, a > (b.min c), so a.min (b.min c) equals (b.min c). Now, by definition of min on two numbers we know:
+   – Either b ≤ c, so b.min c = b, or  
+   – c ≤ b, so b.min c = c.
+  In either subcase, result equals either b or c.
+5. Conclude that in all cases the result is one of a, b, or c, and it is less than or equal to all the inputs.
+
+──────────────────────────────────────────────
+Step 4. Coding the Proof
+
+You might write the proof in Lean using tactical proofs (by cases or by straightforward application of known lemmas). The key Lean tactics you will likely use include:
+  – unfold
+  – apply or exact
+  – by_cases (or cases on conditions like a ≤ (b.min c) and b ≤ c)
+  – and_then use lemmas like Int.min_le_left and Int.min_le_right.
+
+──────────────────────────────────────────────
+Step 5. Summary
+
+• Define minOfThree using the built‑in min operation.  
+• In the theorem proof, use the properties of the min operation to show the result is less than or equal to each input and equals one of them.  
+• The case analysis (first on a vs. b.min c, then, if needed, on b vs. c) completes the second part of the spec.
+
+──────────────────────────────────────────────
+By following these steps you can structure both the function’s code and its correctness proof. This plan should help in writing a Lean 4 module that meets the assignment’s requirements.

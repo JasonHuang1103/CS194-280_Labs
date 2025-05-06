@@ -1,0 +1,65 @@
+Below is an analysis of what’s going wrong. I’ll walk you through the reasoning step-by-step.
+
+──────────────────────────────
+Step 1. Identify which tactic is failing and why
+
+The error message occurs during the branch‐handling after you call split_ifs. In each “case” the proof uses a refine tactic with identifiers such as h, h₁, h₂, etc. In one branch you write
+
+  refine ⟨⟨le_of_not_le h, …⟩, …⟩
+
+but Lean complains that the goal “unsolved goals … ⊢ (a ≤ a ∧ a ≤ b ∧ a ≤ c) ∧ (a = a ∨ a = b ∨ a = c)” cannot be completed. This happens because the tactic use of “le_of_not_le” is not valid here (and in fact no theorem named le_of_not_le exists that gives you c ≤ a from ¬ (a ≤ c)). Furthermore, the names h, h₁, h₂, etc. you refer to are coming from the splitting of the nested if–then–else statements, and those names do not match the ones produced by Lean. In short, the failing tactic is the “refine” command in the splitted branches which uses hypotheses that either do not have the intended meaning or even exist.
+
+──────────────────────────────
+Step 2. Consider the proof state at that point
+
+After you do
+
+  unfold minOfThree minOfThree_spec
+  split_ifs
+
+Lean generates one subgoal for each branch of the nested ifs. For example, in the branch where the conditions “a ≤ b” and “a ≤ c” hold, the context includes hypotheses (often automatically named h and h_1) that record these facts. However, your proof uses names like h₁ and h₂, and in another branch it tries to use “le_of_not_le h” on a hypothesis that is (or should be) the negation of a condition (like ¬ (a ≤ c)). The goal in each branch is to produce a proof of
+
+  (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c)
+
+with “result” being instantiated with a, b, or c. What you write in each branch must carefully use the saved condition hypotheses to build the chain of inequalities. In some branches you even need to transform a “not (a ≤ c)” into a useful statement such as “c < a” (and then conclude “c ≤ a” by the definition of ≤ for integers). None of that is done here.
+
+──────────────────────────────
+Step 3. Check if the proof approach matches the specification
+
+Your specification is that minOfThree_spec a b c result means two things:
+  (1) result is ≤ a, b, and c,
+  (2) result equals one of a, b, or c.
+
+The implementation of minOfThree is as expected (a nested if). When you “unfold” both definitions you get a goal whose overall shape is exactly a proof of a disjunction of equalities and a conjunction of three inequality proofs. One standard way to prove such a goal is to perform a case analysis on the if–then–else conditions, as you tried with split_ifs. However, your approach assumes that split_ifs introduces specific hypothesis names (like h₁, h₂, …) whose meanings exactly match what you think: e.g. h₁ for “a ≤ b” or “a ≤ c”, etc. In addition, you appear to use a lemma “le_of_not_le” to turn a negation into a desired inequality. Both of these assumptions are off.
+
+──────────────────────────────
+Step 4. Identify any type mismatches or incorrect assumptions
+
+There are at least two issues:
+ • The names of the hypotheses produced by split_ifs do not necessarily match the ones (h, h₁, h₂, h₃, …) that you refer to. This leads to “unsolved goals” because Lean cannot find the proofs you intend.
+ • The use of “le_of_not_le” is problematic. When you have ¬ (a ≤ c), for instance, you can deduce that c < a (by the totality of the order on integers). But then you should use an appropriate theorem (or simply use the fact that “c < a” implies “c ≤ a”). There is no theorem called le_of_not_le that does this transformation automatically.
+ • The order of the cases and the way you reference the resulting hypotheses is inconsistent with the structure of the nested if’s. In some cases you try to prove “a ≤ a” by le_refl, but in other branches you assume conditions that are turned around (e.g. proving c ≤ a from ¬ a ≤ c).
+ 
+──────────────────────────────
+Step 5. Consider alternative proof strategies
+
+Here are some directions for a better proof:
+ • Instead of relying on split_ifs to automatically introduce names, you might consider doing a case analysis manually (using “by_cases” or “cases” on the condition a ≤ b, etc.) so that you have full control over the hypothesis names.
+ • Write out explicitly what the conditions are in each branch. For example, in the branch where “a ≤ b” and “¬ (a ≤ c)” hold, note that by totality (for linear orders) you know c < a and then conclude c ≤ a (using an appropriate lemma, such as “Int.lt_iff_le_not_le” and “Int.le_of_lt” if available).
+ • Use tactics like “simp” to help simplify the expression after unfolding. Sometimes one may “dsimp” or “rw” to bring the goal into a more manageable form.
+ • Alternatively, rewrite minOfThree using pattern matching (instead of nested if’s) so that the structure of the proof by cases is more transparent.
+ 
+──────────────────────────────
+Conclusion: Root Cause and Directions for Fixing It
+
+The root cause of the error is that after unfolding and splitting the if–then–else, the proof attempts to use tactic steps (with refine) that reference condition hypotheses by assumed names (like h, h₁, h₂, …) and an incorrect lemma “le_of_not_le.” As a result, in each subgoal the intended inequality proof is left incomplete (unsolved goals) because either the hypothesis names do not exist in that context or the reasoning (e.g. turning ¬ (a ≤ c) into c ≤ a) is not justified by the available lemmas.
+
+To fix this, you should:
+ 1. Decide on a clear structure for the proof by doing a case analysis by hand or by using split_ifs and then use the names that Lean gives you (or annotate them explicitly).
+ 2. Replace “le_of_not_le” with a correct argument. For example, use the fact that in the integers (or any linear order) not (x ≤ y) implies y < x, and then conclude y ≤ x.
+ 3. Check that each case properly derives both parts of the specification: that the chosen result is less than or equal to each input and that it equals one of the inputs.
+
+By restructuring the proof along these lines and carefully handling the inequalities, you should be able to completely discharge all the goals.
+
+──────────────────────────────
+This concludes our detailed analysis. The immediate next step would be to work on the case analysis, naming the conditions explicitly, and using the appropriate inequalities (and lemmas for converting strict to weak inequalities) to meet the specification.

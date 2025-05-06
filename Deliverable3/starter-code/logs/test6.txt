@@ -1,0 +1,225 @@
+[2025-05-05 01:00:37,099] [INFO] [real_accelerator.py:239:get_accelerator] Setting ds_accelerator to mps (auto detect)
+[2025-05-05 01:03:14,303] [INFO] [real_accelerator.py:239:get_accelerator] Setting ds_accelerator to mps (auto detect)
+[2025-05-05 01:05:23,723] [INFO] [real_accelerator.py:239:get_accelerator] Setting ds_accelerator to mps (auto detect)
+Starting test of 2 tasks: task_id_0, task_id_58
+
+==================================================
+Processing task task_id_0...
+Reading problem description and code template from tasks/task_id_0...
+Problem description length: 310 characters
+Reading unit tests...
+Unit tests length: 69 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_010757
+Processing task: task_id_0 (Task index: 0)
+[2025-05-05 01:08:05,853] [INFO] [real_accelerator.py:239:get_accelerator] Setting ds_accelerator to mps (auto detect)
+Starting test of 2 tasks: task_id_0, task_id_58
+
+==================================================
+Processing task task_id_0...
+Reading problem description and code template from tasks/task_id_0...
+Problem description length: 310 characters
+Reading unit tests...
+Unit tests length: 69 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_011046
+Processing task: task_id_0 (Task index: 0)
+Response saved to results/20250505_011046/task_id_0/01_planning.txt
+Response saved to results/20250505_011046/task_id_0/02_raw_code.txt
+Response saved to results/20250505_011046/task_id_0/03_cleaned_code.txt
+Response saved to results/20250505_011046/task_id_0/04_code_test.txt
+Response saved to results/20250505_011046/task_id_0/05_raw_proof.txt
+Response saved to results/20250505_011046/task_id_0/06_cleaned_proof.txt
+Response saved to results/20250505_011046/task_id_0/07_full_test.txt
+Response saved to results/20250505_011046/task_id_0/08_final_solution.txt
+Solution generated in 76.36 seconds
+Generated code length: 1 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_58...
+Reading problem description and code template from tasks/task_id_58...
+Problem description length: 700 characters
+Reading unit tests...
+Unit tests length: 462 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_011046
+Processing task: task_id_58 (Task index: 1)
+Response saved to results/20250505_011046/task_id_58/01_planning.txt
+Response saved to results/20250505_011046/task_id_58/02_raw_code.txt
+Response saved to results/20250505_011046/task_id_58/03_cleaned_code.txt
+Response saved to results/20250505_011046/task_id_58/04_code_test.txt
+Response saved to results/20250505_011046/task_id_58/05_raw_proof.txt
+Response saved to results/20250505_011046/task_id_58/06_cleaned_proof.txt
+Response saved to results/20250505_011046/task_id_58/07_full_test.txt
+Response saved to results/20250505_011046/task_id_58/08_final_solution.txt
+Solution generated in 37.24 seconds
+Generated code length: 36 characters
+Generated proof length: 4 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+Testing Summary:
+Task task_id_0:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 76.35567307472229 seconds
+---
+Task task_id_58:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 37.2411789894104 seconds
+---
+Starting test of 4 tasks: task_id_0, task_id_58, task_id_77, task_id_127
+
+==================================================
+Processing task task_id_0...
+Reading problem description and code template from tasks/task_id_0...
+Problem description length: 310 characters
+Reading unit tests...
+Unit tests length: 69 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_011454
+Processing task: task_id_0 (Task index: 0)
+Response saved to results/20250505_011454/task_id_0/01_planning.txt
+Response saved to results/20250505_011454/task_id_0/02_raw_code.txt
+Response saved to results/20250505_011454/task_id_0/03_cleaned_code.txt
+Response saved to results/20250505_011454/task_id_0/04_code_test.txt
+Response saved to results/20250505_011454/task_id_0/05_raw_proof.txt
+Response saved to results/20250505_011454/task_id_0/06_cleaned_proof.txt
+Response saved to results/20250505_011454/task_id_0/07_full_test.txt
+Response saved to results/20250505_011454/task_id_0/08_final_solution.txt
+Solution generated in 64.85 seconds
+Generated code length: 1 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_58...
+Reading problem description and code template from tasks/task_id_58...
+Problem description length: 700 characters
+Reading unit tests...
+Unit tests length: 462 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_011454
+Processing task: task_id_58 (Task index: 1)
+Response saved to results/20250505_011454/task_id_58/01_planning.txt
+Response saved to results/20250505_011454/task_id_58/02_raw_code.txt
+Response saved to results/20250505_011454/task_id_58/03_cleaned_code.txt
+Response saved to results/20250505_011454/task_id_58/04_code_test.txt
+Response saved to results/20250505_011454/task_id_58/05_raw_proof.txt
+Response saved to results/20250505_011454/task_id_58/06_cleaned_proof.txt
+Response saved to results/20250505_011454/task_id_58/07_full_test.txt
+Response saved to results/20250505_011454/task_id_58/08_final_solution.txt
+Solution generated in 61.30 seconds
+Generated code length: 36 characters
+Generated proof length: 4 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_77...
+Reading problem description and code template from tasks/task_id_77...
+Problem description length: 456 characters
+Reading unit tests...
+Unit tests length: 449 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_011454
+Processing task: task_id_77 (Task index: 2)
+Response saved to results/20250505_011454/task_id_77/01_planning.txt
+Response saved to results/20250505_011454/task_id_77/02_raw_code.txt
+Response saved to results/20250505_011454/task_id_77/03_cleaned_code.txt
+Response saved to results/20250505_011454/task_id_77/04_code_test.txt
+Response saved to results/20250505_011454/task_id_77/05_raw_proof.txt
+Response saved to results/20250505_011454/task_id_77/06_cleaned_proof.txt
+Response saved to results/20250505_011454/task_id_77/07_full_test.txt
+Response saved to results/20250505_011454/task_id_77/08_proof_error_analysis_1.txt
+Response saved to results/20250505_011454/task_id_77/09_proof_fix_attempt_1.txt
+Response saved to results/20250505_011454/task_id_77/10_cleaned_proof_fix_1.txt
+Response saved to results/20250505_011454/task_id_77/11_full_test_attempt_1.txt
+Response saved to results/20250505_011454/task_id_77/12_proof_error_analysis_2.txt
+Response saved to results/20250505_011454/task_id_77/13_proof_fix_attempt_2.txt
+Response saved to results/20250505_011454/task_id_77/14_cleaned_proof_fix_2.txt
+Response saved to results/20250505_011454/task_id_77/15_full_test_attempt_2.txt
+Response saved to results/20250505_011454/task_id_77/16_final_solution.txt
+Solution generated in 170.81 seconds
+Generated code length: 11 characters
+Generated proof length: 4 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_127...
+Reading problem description and code template from tasks/task_id_127...
+Problem description length: 342 characters
+Reading unit tests...
+Unit tests length: 219 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_011454
+Processing task: task_id_127 (Task index: 3)
+Response saved to results/20250505_011454/task_id_127/01_planning.txt
+Response saved to results/20250505_011454/task_id_127/02_raw_code.txt
+Response saved to results/20250505_011454/task_id_127/03_cleaned_code.txt
+Response saved to results/20250505_011454/task_id_127/04_code_test.txt
+Response saved to results/20250505_011454/task_id_127/05_raw_proof.txt
+Response saved to results/20250505_011454/task_id_127/06_cleaned_proof.txt
+Response saved to results/20250505_011454/task_id_127/07_full_test.txt
+Response saved to results/20250505_011454/task_id_127/08_final_solution.txt
+Solution generated in 36.13 seconds
+Generated code length: 5 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+Testing Summary:
+Task task_id_0:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 64.84522318840027 seconds
+---
+Task task_id_58:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 61.29987192153931 seconds
+---
+Task task_id_77:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 170.80746912956238 seconds
+---
+Task task_id_127:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 36.12848210334778 seconds
+---

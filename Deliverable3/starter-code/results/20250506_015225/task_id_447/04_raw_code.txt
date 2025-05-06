@@ -1,0 +1,3 @@
+```lean
+a.map (fun x => x * x * x)
+```

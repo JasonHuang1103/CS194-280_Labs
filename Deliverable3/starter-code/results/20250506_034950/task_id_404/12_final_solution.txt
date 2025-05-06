@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then a else b",
+  "proof": "split_ifs\ncase pos (h : a \u2264 b) =>\n  constructor\n  \u00b7 exact \u27e8le_refl a, h\u27e9\n  \u00b7 left; rfl\ncase neg (h : \u00ac a \u2264 b) =>\n  constructor\n  \u00b7 exact \u27e8Int.le_of_lt (by\n      have h' : b < a := Int.lt_of_not_ge h\n      exact h'), le_refl b\u27e9\n  \u00b7 right; rfl"
+}

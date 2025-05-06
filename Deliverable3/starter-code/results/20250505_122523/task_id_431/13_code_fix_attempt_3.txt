@@ -1,0 +1,17 @@
+Below is a corrected version of the function implementation. The error was caused by stray text outside of a comment (i.e. “This change ensures …” was not commented) and so Lean tried to parse that text as code. In the fixed version the extra explanation is removed so that only valid Lean code remains.
+
+Corrected function implementation:
+
+--------------------------------------------------
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  (a.toList).any (fun x => (b.toList).contains x)
+--------------------------------------------------
+
+Alternatively, you could write it without the extra parentheses as:
+
+--------------------------------------------------
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  List.any a.toList (fun x => List.contains (b.toList) x)
+--------------------------------------------------
+
+Both versions compile successfully in Lean 4.

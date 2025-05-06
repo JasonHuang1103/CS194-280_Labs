@@ -1,0 +1,49 @@
+unfold minOfThree minOfThree_spec
+  split
+  · split
+    · -- Prove result <= a
+      by_cases h₁ : a <= b
+      · by_cases h₂ : a <= c
+        · simp [h₁, h₂] -- result = a
+        · simp [h₁, h₂] -- result = c
+          apply le_trans h₂
+          apply Int.le_max_right
+      · by_cases h₂ : b <= c
+        · simp [h₁, h₂] -- result = b
+        · simp [h₁, h₂] -- result = c
+          apply le_trans h₂
+          apply Int.le_max_right
+    · -- Prove result <= b
+      by_cases h₁ : a <= b
+      · by_cases h₂ : a <= c
+        · simp [h₁, h₂] -- result = a
+          apply le_trans h₁
+          apply Int.le_max_left
+        · simp [h₁, h₂] -- result = c
+          apply le_trans h₂
+          apply Int.le_max_right
+      · by_cases h₂ : b <= c
+        · simp [h₁, h₂] -- result = b
+        · simp [h₁, h₂] -- result = c
+          apply le_trans h₂
+          apply Int.le_max_right
+    · -- Prove result <= c
+      by_cases h₁ : a <= b
+      · by_cases h₂ : a <= c
+        · simp [h₁, h₂] -- result = a
+          apply le_trans h₂
+          apply Int.le_max_left
+        · simp [h₁, h₂] -- result = c
+      · by_cases h₂ : b <= c
+        · simp [h₁, h₂] -- result = b
+          apply le_trans h₂
+          apply Int.le_max_right
+        · simp [h₁, h₂] -- result = c
+  · -- Prove result is one of a, b, c
+    by_cases h₁ : a <= b
+    · by_cases h₂ : a <= c
+      · simp [h₁, h₂] -- result = a
+      · simp [h₁, h₂] -- result = c
+    · by_cases h₂ : b <= c
+      · simp [h₁, h₂] -- result = b
+      · simp [h₁, h₂] -- result = c

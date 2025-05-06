@@ -1,0 +1,7 @@
+```lean
+simp [Array.map]
+constructor
+· rfl
+· intro i hi
+  simp [Array.getElem_map, hi]
+```

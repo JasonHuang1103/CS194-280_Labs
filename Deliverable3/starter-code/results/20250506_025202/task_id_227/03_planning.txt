@@ -1,0 +1,176 @@
+Below is one complete answer. In the discussion that follows, I explain step‐by‐step how we arrive at the implementation and proof.
+
+──────────────────────────────
+Step 1. Understanding the Function
+
+We must implement a Lean function
+
+  minOfThree (a : Int) (b : Int) (c : Int) : Int
+
+which returns one of a, b, or c. Furthermore, the returned integer must be less than or equal to each of the three inputs. One common solution is to use nested if–then–else terms. For example, we can first compare a and b; if a is less or equal to b then compare a with c (return a if a ≤ c, otherwise return c), else (i.e. b < a) compare b and c (return b if b ≤ c, otherwise c).
+
+──────────────────────────────
+Step 2. Breaking Down the Problem
+
+The problem splits into two parts:
+ • Implementation: Write the function using nested conditional tests.
+ • Proof: Prove that the computed value, say result, meets the specification:
+  – result ≤ a, result ≤ b, and result ≤ c
+  – result is exactly one of a, b, or c
+
+Because we have an if–else structure with nested cases, the proof will also proceed by doing a case analysis on the result of the if–else conditions.
+
+──────────────────────────────
+Step 3. Considering Input Types and Edge Cases
+
+Inputs are of type Int. Since integers have a total order, every pair can be compared and every if–then–else branch is exhaustive. Edge cases are treated naturally by the conditionals. For example, if some of the integers are equal, the structure of our if-tests makes sure we return one of those equal values that is minimal.
+
+──────────────────────────────
+Step 4. Proof Techniques
+
+Since our function is defined using if–then–else expressions, the proof will use:
+ • unfolding of definitions (with the tactic ‘unfold’).
+ • case analysis on the outcomes of comparisons. We use “by cases h : cond” for each if–condition.
+ • The transitivity of order (to prove, for example, that if c < a and a ≤ b then c < b) and then transform strict inequality into non-strict inequality (via le_of_lt).
+ • Basic tactic commands like «split», «exact», and «linarith», although in our simple cases we can do the reasoning by hand.
+
+──────────────────────────────
+Step 5. Similar Patterns from Lean Examples
+
+The provided examples mention using tactics such as “by cases” for handling if–then–else and using “linarith” to resolve simple arithmetic inequalities. We apply these ideas: 
+ – For each branch, we prove three inequalities and then the fact that the chosen result is one of the inputs.
+ – We compare the values using transitivity when needed.
+
+──────────────────────────────
+Detailed Plan (Implementation and Proof)
+
+a. Implementation:
+ • If a ≤ b then
+  ◦ if a ≤ c then return a, else return c.
+ • Else (b < a) then
+  ◦ if b ≤ c then return b, else return c.
+
+b. Proof:
+ 1. Unfold the definitions of minOfThree and minOfThree_spec.
+ 2. Do a case split on (a ≤ b).  
+  – In the first branch (a ≤ b): then split again on (a ≤ c).
+   • If a ≤ c then the result is a. We show that:
+    – a ≤ a (trivial by reflexivity)
+    – a ≤ b (by assumption)
+    – a ≤ c (by assumption)
+    And a = a, so it is one of {a, b, c}.
+   • Otherwise (not a ≤ c) then a > c. In this branch the result is c. Then:
+    – c ≤ a, since we have c < a (and le_of_lt converts strict inequality to ≤)
+    – c ≤ b follows because from a ≤ b we get c < a ≤ b, so c < b and then c ≤ b.
+    – c ≤ c trivially.
+    And c is one of the inputs.
+ 3. In the second branch (¬ (a ≤ b), i.e. b < a), perform a similar split on (b ≤ c).
+   – If b ≤ c then result is b. Then:
+    – b ≤ a (since b < a gives b ≤ a)
+    – b ≤ b trivially,
+    – b ≤ c (by comparison)
+    And b = b.
+   – If not (b ≤ c) then b > c and result is c. Then:
+    – c ≤ b (since c < b)
+    – c ≤ a follows from c < b and b < a 
+    – c ≤ c holds trivially.
+    And c is one of the inputs.
+ 4. In each case, we conclude that the returned value meets the spec.
+
+──────────────────────────────
+Final Lean 4 Code
+
+Below is the complete Lean code with the implementation and the accompanying proof.
+
+---------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  if a ≤ b then 
+    if a ≤ c then a else c
+  else 
+    if b ≤ c then b else c
+
+-- Specification: The returned value is the minimum of the three input numbers.
+def minOfThree_spec (a : Int) (b : Int) (c : Int) (result : Int) : Prop :=
+  (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧
+  (result = a ∨ result = b ∨ result = c)
+
+-- Theorem: minOfThree_spec is satisfied by the function minOfThree.
+theorem minOfThree_spec_satisfied (a : Int) (b : Int) (c : Int) :
+  minOfThree_spec a b c (minOfThree a b c) := by
+  -- Unfold the definitions so the structure of the if–then–else becomes explicit.
+  unfold minOfThree minOfThree_spec
+  -- Case analysis on the first if: a ≤ b vs. ¬ (a ≤ b)
+  by_cases h₁ : a ≤ b
+  · -- Case: a ≤ b.
+    simp only [if_pos h₁]
+    -- Now perform case analysis on the inner if: a ≤ c vs. ¬ (a ≤ c)
+    by_cases h₂ : a ≤ c
+    · -- Subcase: a ≤ c, so minOfThree returns a.
+      simp only [if_pos h₂]
+      -- We need to show (a ≤ a ∧ a ≤ b ∧ a ≤ c) ∧ (a = a ∨ a = b ∨ a = c).
+      constructor
+      · -- The inequality part.
+        constructor; 
+        [exact Int.le_refl a, exact h₁, exact h₂]
+      · -- The equality part.
+        left; rfl
+    · -- Subcase: ¬ (a ≤ c), so a > c. Then minOfThree returns c.
+      simp only [if_neg h₂]
+      constructor
+      · -- Show c ≤ a, c ≤ b, and c ≤ c.
+        constructor
+        · -- c ≤ a because ¬(a ≤ c) means a > c.
+          exact Int.le_of_lt (Int.lt_of_not_ge h₂)
+        · constructor
+          · -- To show c ≤ b, note that from h₁ (a ≤ b) and c < a (from h₂) we have c < b.
+            have h : c < a := Int.lt_of_not_ge h₂
+            have h' : c < b := Int.lt_of_lt_of_le h h₁
+            exact Int.le_of_lt h'
+          · exact Int.le_refl c
+      · -- The result c is clearly one of the inputs.
+        right; right; rfl
+  · -- Case: ¬ (a ≤ b), meaning b < a.
+    simp only [if_neg h₁]
+    -- Now perform case analysis on: b ≤ c vs. ¬ (b ≤ c)
+    by_cases h₃ : b ≤ c
+    · -- Subcase: b ≤ c, so minOfThree returns b.
+      simp only [if_pos h₃]
+      constructor
+      · -- Show b ≤ a, b ≤ b, and b ≤ c.
+        constructor
+        · -- b ≤ a follows from b < a.
+          exact Int.le_of_lt (Int.lt_of_not_ge h₁)
+        · constructor
+          · exact Int.le_refl b
+          · exact h₃
+      · -- b is one of a, b, c.
+        right; left; rfl
+    · -- Subcase: ¬ (b ≤ c), meaning b > c, so minOfThree returns c.
+      simp only [if_neg h₃]
+      constructor
+      · -- Show c ≤ a, c ≤ b, and c ≤ c.
+        constructor
+        · -- From b < a (from h₁) and c < b (from ¬(b ≤ c)) we derive c < a.
+          have h₄ : c < b := Int.lt_of_not_ge h₃
+          have h₅ : c < a := Int.lt_of_lt_of_le h₄ (Int.le_of_lt (Int.lt_of_not_ge h₁))
+          exact Int.le_of_lt h₅
+        · constructor
+          · -- c ≤ b because c < b.
+            exact Int.le_of_lt (Int.lt_of_not_ge h₃)
+          · exact Int.le_refl c
+      · -- c is one of the inputs.
+        right; right; rfl
+
+---------------------------------------------------------
+
+──────────────────────────────
+Conclusion
+
+The plan was to first implement minOfThree by simply comparing a, b, and c using nested if statements, then prove by case analysis that the returned value is indeed the minimum among the three inputs and is exactly one of them. Every branch of our case analysis shows:
+ – the chosen value is ≤ all a, b, and c, and
+ – it is equal to one of a, b, or c.
+This completes the implementation and its formal proof in Lean 4.

@@ -1,0 +1,5 @@
+```lean
+simp [Array.size_map, Array.getElem_map]
+intro i hi
+rfl
+```

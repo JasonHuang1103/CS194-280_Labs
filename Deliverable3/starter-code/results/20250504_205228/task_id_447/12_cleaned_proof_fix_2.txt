@@ -1,0 +1,7 @@
+unfold cubeElements cubeElements_spec
+  constructor
+  case left =>
+    exact Array.size_map _ _
+  case right =>
+    intro i hi
+    simp [Array.getElem, Array.map, hi]

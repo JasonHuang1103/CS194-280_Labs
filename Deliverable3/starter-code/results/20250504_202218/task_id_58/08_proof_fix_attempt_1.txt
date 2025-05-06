@@ -1,0 +1,41 @@
+Here is the corrected proof:
+
+```lean
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  unfold hasOppositeSign hasOppositeSign_spec
+  apply Iff.intro
+  case mp =>
+    intro h
+    cases h
+    case inl h₁ =>
+      simp only [h₁.left, h₁.right, Bool.true_iff, Bool.or_true, and_self]
+    case inr h₂ =>
+      simp only [h₂.left, h₂.right, Bool.true_iff, Bool.true_or, and_self]
+  case mpr =>
+    intro h
+    simp only [Bool.or_eq_true] at h
+    cases h
+    case inl h₁ =>
+      left
+      apply And.intro
+      case left =>
+        exact of_decide_eq_true h₁.left
+      case right =>
+        exact of_decide_eq_true h₁.right
+    case inr h₂ =>
+      right
+      apply And.intro
+      case left =>
+        exact of_decide_eq_true h₂.left
+      case right =>
+        exact of_decide_eq_true h₂.right
+```
+
+### Explanation:
+1. **Remove Duplicate Theorem Statement**: The theorem was declared twice, remove the redundant declaration.
+2. **Proof Adjustment**: Fixed the proof structure to properly handle the unfolding and simplifications. Instead of duplicating the same tactic calls, the proof uses `simp` in a more structured way to handle specifics for each case splitting on logic.
+3. **Clarification and Correction**: Use `of_decide_eq_true` to convert `decide` (`Bool`) to `Prop` to ensure correct handling of the logic.
+4. **Error Handling**: Handle each case using `cases` on the result of `Bool.or_eq_true` for better clarity and correct assumption applications.
+
+Ensure no duplicate declarations and the correct use of tactics to handle logical simplifications and case splits.

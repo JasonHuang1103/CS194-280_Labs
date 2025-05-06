@@ -1,0 +1,26 @@
+Lean Error: lean_playground/TempTest.lean:25:26: warning: unused name: h₄
+lean_playground/TempTest.lean:22:46: error: unsolved goals
+case pos
+a b c : ℤ
+h₁ : a ≤ b
+h₂ : a ≤ c
+⊢ (a ≤ a ∧ a ≤ b ∧ a ≤ c) ∧ (a = a ∨ a = b ∨ a = c)
+
+case neg
+a b c : ℤ
+h₁ : a ≤ b
+h₂ : ¬a ≤ c
+⊢ (c ≤ a ∧ c ≤ b ∧ c ≤ c) ∧ (c = a ∨ c = b ∨ c = c)
+
+case pos
+a b c : ℤ
+h₁ : ¬a ≤ b
+h₃ : b ≤ c
+⊢ (b ≤ a ∧ b ≤ b ∧ b ≤ c) ∧ (b = a ∨ b = b ∨ b = c)
+
+case neg
+a b c : ℤ
+h₁ : ¬a ≤ b
+h₃ : ¬b ≤ c
+⊢ (c ≤ a ∧ c ≤ b ∧ c ≤ c) ∧ (c = a ∨ c = b ∨ c = c)
+lean_playground/TempTest.lean:26:0: error: unexpected identifier; expected command

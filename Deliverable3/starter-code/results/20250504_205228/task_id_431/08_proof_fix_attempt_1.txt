@@ -1,0 +1,30 @@
+The error you encountered is due to the usage of `unfold` on `hasCommonElement_spec`, which indeed should be unfolded to replace itself with its definition, but your specification (a bi-directional implication) cannot directly unfold to the given Boolean value without interpretation. Here's the corrected proof without using `unfold` for the wrong part, and using `unfold` for `hasCommonElement` only:
+
+```lean
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  hasCommonElement_spec a b (hasCommonElement a b) := by
+  unfold hasCommonElement
+  apply Iff.intro
+  · -- Prove the direction: if hasCommonElement a b is true, then ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!
+    intro h
+    simp only [Array.any_eq_true] at h
+    obtain ⟨i, hi, h_inner⟩ := h
+    simp only [Array.any_eq_true] at h_inner
+    obtain ⟨j, hj, h_eq⟩ := h_inner
+    exact ⟨i, j, hi, hj, of_decide_eq_true h_eq⟩
+
+  · -- Prove the direction: if ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!, then hasCommonElement a b is true
+    intro h
+    simp only [Array.any_eq_true]
+    obtain ⟨i, j, hi, hj, h_eq⟩ := h
+    use i, hi
+    simp only [Array.any_eq_true]
+    use j, hj
+    exact decide_eq_true rfl
+```
+
+### Explanation:
+- **`unfold hasCommonElement`**: Unfolding the function `hasCommonElement` is correct since you want to reason about the internals of the function.
+- **`Array.any_eq_true`**: This simplification rule breaks down the `any` function to the existence of an element satisfying a property. 
+- **`of_decide_eq_true`**: This converts the `Bool` equality check `x = y` within `decide` into a `Prop` equality, since `decide` returns `true` if the equality of type `x = y : Bool` is true.
+- **`decide_eq_true rfl`**: Used in the backward implication to transform a proof of `x = y` into a Boolean true value which was already proven as a propositional fact.

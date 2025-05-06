@@ -1,0 +1,4 @@
+{
+  "code": "decide ((a < 0 \u2227 b > 0) \u2228 (a > 0 \u2227 b < 0))",
+  "proof": "simp"
+}

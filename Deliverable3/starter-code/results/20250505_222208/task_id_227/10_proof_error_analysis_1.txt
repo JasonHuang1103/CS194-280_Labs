@@ -1,0 +1,77 @@
+Below is a discussion that goes through a typical “failure‐mode” when someone tries to prove
+
+  ¬(p ↔ ¬p)
+
+in Lean without using classical reasoning.
+
+Often one’s attempted proof goes something like this (in pseudocode):
+
+  assume h : (p ↔ ¬p)  
+  – “split” into the two directions  
+  have h₁ : p → ¬p := h.left  
+  have h₂ : ¬p → p := h.right  
+  – now “case‐analyze” p  
+  by_cases hp : p  
+   – in case p holds, then hp and h₁ hp give ¬p and so p and ¬p, a contradiction  
+  or in the other case, ¬p holds, so applying h₂ would yield p and again a contradiction  
+  thus produce False
+
+There is a subtle but fatal problem with this approach in a constructive (nonclassical) setting. Let’s break down what happens in Lean when one tries such a proof.
+
+────────────────────────────────────────────
+Step 1. Which tactic is failing and why?
+
+A common “failure” is that a tactic like “by_cases” (or a call to the classical law of excluded middle) is used on the arbitrary proposition p. In Lean the tactic
+
+  by_cases hp : p
+
+requires an instance “decidable p” in order to decide between the two cases “p” and “¬p.” In a constructive development (and with no extra assumption on p) no such instance is given automatically. (In other words, p is an arbitrary proposition and there is no proof that “p ∨ ¬p” holds.) As a result Lean complains that it “does not know how to synthesize” the necessary decidability, or it leaves goals unsolved.
+
+────────────────────────────────────────────
+Step 2. What is the proof state at that point?
+
+Before making the case split one has assumed
+
+  h : p ↔ ¬p
+
+and then one deduces
+
+  h₁ : p → ¬p  and  h₂ : ¬p → p.
+
+At this point the goal is to show False. The natural idea is “either p is true or p is false; in the first case h₁ gives ¬p and we have p and ¬p; in the second h₂ gives p so again we can pair with ¬p and get a contradiction.”
+
+Unfortunately, without a decidability instance for p you cannot “split” the situation into the two alternatives in the proof state. Lean’s proof state remains “stuck” because it does not have the nonconstructive fact “p ∨ ¬p” available.
+
+────────────────────────────────────────────
+Step 3. Does the proof approach match the specification?
+
+The specification is to prove ¬(p ↔ ¬p) without resorting to classical reasoning. (In other words, the proof must work in intuitionistic logic.) On the one hand the argument “if p then contradiction, and if ¬p then contradiction” is perfectly valid classically; on the other hand in constructive logic it implicitly makes use of the law of excluded middle (by “splitting” p into p or ¬p). So the apparent approach conflicts with the constructive requirement since it “chooses a case” on p without knowing that p is decidable.
+
+────────────────────────────────────────────
+Step 4. Are there type mismatches or incorrect assumptions?
+
+The type mismatch is not so much a mis‐typed term as the fact that the tactic “by_cases hp : p” expects a term of type “decidable p” (or a proof that p is decidable) so that Lean can split the proof into two cases. Since p is arbitrary, Lean cannot automatically find such an instance. (One cannot call “classical.em p” because that is a classical axiom and using it would violate the “without classical logic” requirement.) In a nutshell, the proof is “assuming” you can do a case-split on an arbitrary proposition when in fact you cannot do so constructively.
+
+────────────────────────────────────────────
+Step 5. Alternative strategies and suggestions for fixing
+
+Because the natural “by cases” proof uses nonconstructive reasoning, one must find another way to show that h : (p ↔ ¬p) leads to a contradiction. (In fact, you can show that from h one may deduce both ¬p and ¬¬p, which is enough to derive a contradiction if one already knew that double negation cancellation holds for p—but note that in pure intuitionistic logic double negation elimination is not valid in general.) 
+
+One possible direction is to “internalize” the contradiction: try proving that (p ↔ ¬p) implies (p ∧ ¬p), and then use that fact to produce False. But note that to transform (p ↔ ¬p) into (p ∧ ¬p) one normally uses that “either p or ¬p” holds; even if you try to “chain” the implications, there is no way to choose one branch without additional assumptions.
+
+Thus one sees the root cause: the usual proof that “no proposition is equivalent to its own negation” proceeds by a case analysis on p, and that case analysis is not available constructively because p is not known to satisfy p ∨ ¬p.
+
+A direction for fixing the proof is either
+ • to add an extra hypothesis that p is decidable (or work in a context where all propositions are assumed to be decidable), or
+ • to rework the proof so that it does not require a case split on p (if such a reorganization is even possible constructively).
+
+Since many proofs of ¬(p ↔ ¬p) in the literature are “by contradiction” using classical reasoning, one might have to use a classical axiom such as “em p” (the law of excluded middle) at some point. Under the restriction “without using classical logic” the error indicates that the intended proof approach is not valid—there is no constructive proof of this statement unless you assume some decidability. (In fact, while the “paradoxical” equivalence p ↔ ¬p is classically impossible, in intuitionistic logic one cannot show ¬(p ↔ ¬p) without some help from excluded middle or decidability assumptions.)
+
+────────────────────────────────────────────
+Conclusion
+
+The root cause of the error in the proof is that the tactic chosen (typically a case split via “by_cases” or using classical “em”) requires deciding the truth of an arbitrary proposition p. Since no decidability for p is available constructively, Lean cannot complete the proof. In other words, the intended approach—splitting on “p or ¬p” to get a contradiction—is nonconstructive, and the error reflects the fact that the proof does not “match the specification” when one is not allowed to use classical reasoning.
+
+To fix the problem one must either work in a setting where p is decidable (or add an explicit instance of “decidable p”) or revise the approach so that it does not require a case analysis on p (which appears to be difficult in this situation). This explains why the proof “fails” in Lean and points toward the need for either classical methods or extra hypotheses to complete the proof.
+
+By analyzing each step we see that the error is not a simple syntax error but a fundamental clash between the proof strategy (case-splitting on an undecidable proposition) and the constraints of constructive logic.

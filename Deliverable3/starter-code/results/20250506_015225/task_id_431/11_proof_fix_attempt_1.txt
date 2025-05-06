@@ -1,0 +1,9 @@
+```lean
+apply Iff.intro
+· rintro ⟨i, j, hi, hj, heq⟩
+  apply a.any_spec.2 ⟨_, hi, b.any_spec.2 ⟨_, hj, heq⟩⟩
+· intro h
+  obtain ⟨x, hx⟩ := a.exists_any h
+  obtain ⟨y, hy, heq⟩ := b.exists_any hx
+  exact ⟨x, y, hx, hy, heq⟩
+```

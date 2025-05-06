@@ -1,0 +1,55 @@
+Let's walk through the error and its resolution step-by-step.
+
+──────────────────────────────
+Step 1. Identify the specific part of the code causing the error
+
+The error message points to the use of the expression Int.min in the definition of minOfThree:
+
+  Int.min a (Int.min b c)
+
+──────────────────────────────
+Step 2. Explain why this is causing an issue
+
+Lean complains that it does not know any constant named Int.min. In Lean 4 (with Mathlib), unlike some other languages or libraries, there is no built‐in function called Int.min. The error “unknown constant 'Int.min'” indicates that Lean cannot resolve the identifier ‘Int.min’, so the code won’t type-check.
+
+──────────────────────────────
+Step 3. Consider the type system and Lean 4 requirements
+
+Although we are working with Ints, we need a function that takes two Ints and returns the smaller one. Lean 4 does not automatically provide an “Int.min” function in the expected namespace. We must therefore either import and use a proper min function from a library (if available) or define the behavior explicitly. Because our goal is simply to return the minimum value among a, b, and c, we can implement the comparison manually with if–then–else expressions that respect the total ordering of Int.
+
+──────────────────────────────
+Step 4. Think through potential solutions
+
+One approach is to rewrite minOfThree so that it first computes the minimum of a and b (say, store it in a variable m) and then compares m with c. For instance:
+
+  let m := if a ≤ b then a else b
+  if m ≤ c then m else c
+
+This solution uses Lean’s if–then–else construct and is straightforward to type-check.
+
+An alternative is to nest if–then–else directly:
+
+  if a ≤ b then (if a ≤ c then a else c) else (if b ≤ c then b else c)
+
+Both alternatives are correct; the first version is slightly cleaner by introducing an intermediate variable.
+
+──────────────────────────────
+Step 5. Test each solution in your head
+
+Both solutions compare the necessary pairs of Ints:
+• The intermediate computation chooses the smaller of a and b.
+• Then we take the smaller between that result and c.
+This will indeed yield the minimum value among a, b, and c and adheres to Lean’s satisfaction of the type system.
+
+──────────────────────────────
+Fixed Version of the Function Implementation
+
+Below is the corrected version of the minOfThree function using the intermediate variable approach:
+
+------------------------------------------------------------
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  let m := if a ≤ b then a else b
+  if m ≤ c then m else c
+------------------------------------------------------------
+
+This version avoids using the non-existent Int.min and should compile without error.

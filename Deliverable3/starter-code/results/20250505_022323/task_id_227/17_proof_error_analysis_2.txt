@@ -1,0 +1,15 @@
+The error isn’t with your underlying logic at all—it’s a parsing issue caused by the use of a dot (period) immediately after a tactic name. In your proof you write
+
+  apply And.intro.
+
+and then open a block with { … } on the next line. In Lean 4 the “.” after And.intro is interpreted as if you were trying to use field notation (for example, to access a field of a structure), so when Lean sees the following “{” it complains “invalid field notation, identifier or numeral expected.” (It also complains later about “no goals to be solved” because the state of the proof gets messed up by the mis-parsing.) 
+
+Essentially, by writing “apply And.intro.” you are unintentionally invoking a syntax that Lean 4 does not expect. (In Lean 3 tactics the trailing dot sometimes appeared in tactic mode, but Lean 4’s refined syntax doesn’t allow it in this context.) 
+
+To fix the problem you should remove the extraneous dot so that the tactic reads
+
+  apply And.intro
+
+and then provide the proof blocks. This should allow Lean 4 to correctly parse the subsequent “{ … }” blocks as tactic scripts for the subgoals.
+
+In summary, the root cause of the error is that the dot after And.intro is read as a field projection operator, which then confuses the parser when it meets the following curly brace. Removing the dot (or otherwise revising that part of the tactic script) is the proper remedy.

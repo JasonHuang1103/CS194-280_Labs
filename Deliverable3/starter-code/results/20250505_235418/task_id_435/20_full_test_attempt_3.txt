@@ -1,0 +1,9 @@
+Lean Error: lean_playground/TempTest.lean:19:36: error: unsolved goals
+case left
+n : ℕ
+⊢ 0 ≤ n % 10 ∧ n % 10 < 10
+
+case right
+n : ℕ
+⊢ n % 10 = n % 10
+lean_playground/TempTest.lean:23:0: error: unexpected token '·'; expected command

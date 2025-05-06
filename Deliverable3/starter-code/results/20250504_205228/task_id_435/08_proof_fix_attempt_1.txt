@@ -1,0 +1,15 @@
+Certainly! The error you are encountering is due to attempting to unfold `lastDigit` after `lastDigit_spec` has already been manually expanded in the proof context. Since `lastDigit` is a simple definition already expressed as `n % 10`, there's nothing further to unfold after the expression is inlined. Here’s the corrected proof, focusing on properly leveraging the goals and tactic steps:
+
+```lean
+theorem lastDigit_spec_satisfied (n : Nat) :
+  lastDigit_spec n (lastDigit n) := by
+  unfold lastDigit lastDigit_spec
+  constructor
+  . constructor
+    . apply Nat.zero_le
+    . apply Nat.mod_lt
+      exact Nat.zero_lt_succ 9
+  . rfl
+```
+
+The main issue was the redundancy created when calling `unfold` on both `lastDigit` and `lastDigit_spec`, the latter of which expands to an already simplified form, which leads to the failure of the `unfold` tactic. Thus, a single `unfold` at the beginning correctly expands everything needed in one go, achieving the necessary conditions to satisfy your theorem.

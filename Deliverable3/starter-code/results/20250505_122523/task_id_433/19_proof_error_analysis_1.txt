@@ -1,0 +1,38 @@
+The mistake isn’t in your overall strategy but in how Lean is parsing the lambda in your definition of isGreater. In your code
+
+ def isGreater (n : Int) (a : Array Int) : Bool :=
+   (a.toList).all (fun x => decide (n > x))
+
+you intend for the entire lambda (fun x => decide (n > x)) to be passed as the argument to the .all function. However, without enough extra parentheses (or with a different formatting) Lean ends up mis‐interpreting the application. In other words, because of operator precedence and the way dot‐notation works, Lean “sees” something like
+
+ a.toList.all fun x => decide (n > x)
+
+and thinks you are trying to partially apply .all or use it in the wrong way. The error message
+
+ error: function expected at a.toList.all fun x => decide (n > x)
+ term has type
+   Bool
+
+is telling you that Lean expected a function in that position but instead it got a Bool. (The “unexpected token ‘to’” error that follows is due to the parser getting confused by the mis‐parsing earlier in the file.)
+
+The comment you wrote
+
+ -- This tells Lean that the argument to .all is the entire lambda (fun x => decide (n > x)) ...
+
+is exactly hinting that you need the correct grouping.
+
+A possible fix is to make sure the lambda is clearly grouped as the argument to .all. For instance, you can write
+
+ def isGreater (n : Int) (a : Array Int) : Bool :=
+   (a.toList).all (fun x => decide (n > x))
+
+or, if you run into problems with the dot notation, you might even write
+
+ def isGreater (n : Int) (a : Array Int) : Bool :=
+   List.all (a.toList) (fun x => decide (n > x))
+
+This way there is no ambiguity about which expression is being applied to which.
+
+Note also that later in your proof some goals remain “unsolved” (as indicated by the unsolved goal printing that features “↔ sorry () = true”), but that error is a consequence of the earlier parsing issue and possibly incomplete rewriting by simp. Once the lambda is correctly parsed the rest of the proof should be easier to complete. 
+
+In summary, the root cause is that Lean mis-parses the lambda argument to .all due to a grouping/precedence issue. Fixing the grouping (by adding parentheses or using a different style of function application) will resolve the error.

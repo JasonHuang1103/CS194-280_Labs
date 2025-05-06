@@ -1,0 +1,9 @@
+```lean
+simp [List.all, Array.toList, List.all]
+apply Iff.intro
+· intro h i hi
+  exact h (a[i]!) (by rwa [Array.toList_getElem])
+· intro h x hx
+  rcases List.mem_toList.mp hx with ⟨i, hi, rfl⟩
+  exact h i (by rwa [Array.toList_length])
+```

@@ -1,0 +1,13 @@
+The error comes from the fact that in tactic mode you must issue commands (or tactics) rather than just writing a term using the angle-bracket notation. In your proof, after unfolding the definitions, you write
+
+  ⟨⟨Nat.zero_le (n % 10), Nat.mod_lt n (by decide)⟩, rfl⟩
+
+Lean’s parser expects a command (like a tactic keyword) at that point but encounters a term (an application of the tuple constructor using ⟨…⟩). As a result, it reports "unexpected token '⟨'; expected command" and does not consider the goal solved.
+
+In Lean 4, if you want to provide the proof term directly in tactic mode you need to use a tactic like “exact” (or “apply” if appropriate) so that Lean knows that this term is meant to complete the goal. One way to fix your proof is to change the last line to
+
+  exact ⟨⟨Nat.zero_le (n % 10), Nat.mod_lt n (by decide)⟩, rfl⟩
+
+This tells Lean to accept the given term as the final proof, solving the unsolved goal.
+
+In summary, the root cause is that you used the term construction ⟨…⟩ directly in tactic mode without a preceding command like “exact” to indicate that this is the proof term for the goal. By prefixing it with “exact”, the error will be fixed.

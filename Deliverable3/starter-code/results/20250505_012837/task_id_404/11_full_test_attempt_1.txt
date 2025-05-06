@@ -1,0 +1,16 @@
+Lean Error: lean_playground/TempTest.lean:24:4: error: tactic 'split' failed, consider using `set_option trace.split.failure true`
+case isTrue
+a b : ℤ
+h✝ : a ≤ b
+⊢ (a ≤ a ∧ a ≤ b) ∧ ((b < a → b = a) ∨ (a ≤ b → a = b))
+lean_playground/TempTest.lean:32:4: error: unsolved goals
+case pos
+a b : ℤ
+h✝ : ¬a ≤ b
+h : a ≤ b
+⊢ b ≤ a
+lean_playground/TempTest.lean:33:4: error: unsolved goals
+case neg
+a b : ℤ
+h✝ h : ¬a ≤ b
+⊢ b ≤ a

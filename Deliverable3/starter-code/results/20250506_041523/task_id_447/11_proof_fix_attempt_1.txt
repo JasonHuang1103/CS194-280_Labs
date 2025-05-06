@@ -1,0 +1,7 @@
+```
+split
+· simp [Array.size_map]
+· intro i h
+  simp [Array.getElem_map, Function.comp]
+  rfl
+```

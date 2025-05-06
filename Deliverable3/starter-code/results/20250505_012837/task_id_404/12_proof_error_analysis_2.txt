@@ -1,0 +1,39 @@
+The problem isn’t with the definition of myMin or its specification but with the way the proof is structured. In your proof you perform several nested case splits (by using “by_cases h : a ≤ b” multiple times) which end up “colliding” or interfering with each other. In one branch you inadvertently end up with two contradictory hypotheses at the same time (one saying a ≤ b and another saying ¬(a ≤ b)) and then try to use these to prove an inequality like b ≤ a. (For example, one error message shows:
+
+  case isTrue  
+  a b : ℤ  
+  h✝ : ¬ a ≤ b  
+  h : a ≤ b  
+  ⊢ b ≤ a
+
+This is a clear sign that the same name (h) is being re-used in nested cases so that the inner by_cases reintroduces a hypothesis “h” that clashes with an outer one.)
+
+In more detail:
+• Your specification says that myMin_spec a b result should be ((result ≤ a ∧ result ≤ b) ∧ (result = a ∨ result = b)).
+• For myMin a b, the “if” returns a when a ≤ b and b otherwise. So you need to show that:
+ – if a ≤ b then a ≤ a and a ≤ b (and a = a)
+ – if ¬(a ≤ b) then b ≤ a and b ≤ b (and b = b).
+• To do that you try to “split” and then do case analysis on a ≤ b several times.
+• However, because you are using “by_cases h” repeatedly without renaming the hypothesis or restructuring the proof, Lean ends up with a context that contains both h: a ≤ b and h: ¬(a ≤ b) in some branches. This conflicting information prevents the split tactic from successfully closing the goals (as seen by the unsolved goals b ≤ a).
+
+A good way to fix this is to avoid nesting multiple by_cases (or, at least, avoid reusing the same name h). Instead, you could do a single case analysis on a ≤ b at the top level and then prove the two conjuncts in each branch separately. For example, you might restructure the proof like this (roughly speaking):
+
+  theorem myMin_spec_satisfied (a : Int) (b : Int) :
+   myMin_spec a b (myMin a b) := by
+   by_cases h : a ≤ b
+   · -- In the case a ≤ b, myMin a b is a.
+    have L1 : a ≤ a := by infer_instance  -- or simply trivial
+    have L2 : a ≤ b := h
+    split
+    · exact ⟨L1, L2⟩
+    · right; rfl
+   · -- In the case ¬(a ≤ b), myMin a b is b.
+    have L1 : b ≤ a := le_of_lt (not_le.1 h)  -- since ¬(a ≤ b) gives b < a
+    have L2 : b ≤ b := by infer_instance
+    split
+    · exact ⟨L1, L2⟩
+    · left; rfl
+
+This approach avoids nested by_cases and makes clear in each branch which fact you are using.
+
+In summary, the root cause is that you are reusing the same hypothesis name “h” in nested case splits. This leads Lean to end up with contradictory assumptions (one branch reproving a ≤ b when you already had ¬(a ≤ b)) and unsolvable goals. The fix is to restructure (or rename) your proof so that you only case-split on “a ≤ b” once (or carefully avoid naming conflicts) and then dispatch the proof for each case appropriately.

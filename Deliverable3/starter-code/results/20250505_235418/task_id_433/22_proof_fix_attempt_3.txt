@@ -1,0 +1,14 @@
+```lean
+  intro result_eq
+  apply Iff.symm
+  rw [←result_eq]
+  induction a using Array.inductionOn with
+  | empty => simp
+  | push a arr ih =>
+    simp only [Array.toList_push, List.all_cons, and_iff_right_iff_imp]
+    intro h
+    intro i hi
+    cases Nat.lt_or_eq_of_le (Nat.le_of_lt_succ hi) with
+    | inl hlt => exact ih.mp h i hlt
+    | inr heq => exact (by simp [heq, h])
+```

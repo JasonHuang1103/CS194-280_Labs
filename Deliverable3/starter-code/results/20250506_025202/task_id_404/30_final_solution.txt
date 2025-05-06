@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then a else b",
+  "proof": "by_cases h : a \u2264 b\n\u00b7 apply And.intro\n  \u00b7 exact \u27e8le_refl a, h\u27e9\n  \u00b7 left\n    rfl\n\u00b7 apply And.intro\n  \u00b7 have h' : b \u2264 a := Int.le_of_lt (Int.lt_of_not_ge h)\n    exact \u27e8h', le_refl b\u27e9\n  \u00b7 right\n    rfl"
+}

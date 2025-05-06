@@ -1,0 +1,98 @@
+Below is a detailed breakdown of how to approach the task:
+
+──────────────────────────────
+Step 1. Understand the Function Specification
+
+• The function cubeSurfaceArea takes an integer (size) as an input.  
+• It should return the surface area of a cube computed using the formula:
+  Surface Area = 6 × (edge length)²  
+• In Lean, the function must compute 6 * size * size.
+
+──────────────────────────────
+Step 2. Break Down the Problem
+
+a) Implementation:  
+ • Write the function cubeSurfaceArea that multiplies six by the square of the size.  
+ • The straightforward calculation is: 6 * size * size.
+
+b) The Specification:  
+ • There is a provided predicate cubeSurfaceArea_spec which states that for any given size and result, the equality result = 6 * size * size holds.  
+ • We need to show that our function satisfies this specification.
+
+c) The Proof:  
+ • We need to prove that cubeSurfaceArea_spec size (cubeSurfaceArea size) holds by unfolding both the function definition and the predicate that defines the specification.  
+ • Since our function is defined as 6 * size * size, after unfolding, the left-hand side becomes exactly that, and the proof should reduce to a simple reflexivity (rfl) reasoning.
+
+──────────────────────────────
+Step 3. Consider the Input Types and Edge Cases
+
+• The edge length is given as an Int, and we assume it is greater than 0 (as per the problem statement).  
+• Although a negative value would normally be an issue for a cube’s surface area, the specification is given and we assume the input satisfies the condition.  
+• No extra runtime checks are necessary based on the problem description.
+
+──────────────────────────────
+Step 4. Proof Techniques
+
+• We will use the tactic "unfold" to expand our definition of cubeSurfaceArea and cubeSurfaceArea_spec.
+• Then we will apply rfl (reflexivity) since the expanded form on both sides is identically the same computation.
+• This is a common pattern when proving that a concrete function satisfies a basic arithmetic specification.
+
+──────────────────────────────
+Step 5. Similar Patterns and Examples
+
+• This style, where a trivial arithmetic relation is proved by unfolding and then using "rfl", is seen often in Lean examples with simple functions.
+• The pattern is:
+  - Unfold the definitions to express both sides in the same form.
+  - Conclude with rfl because the two expressions are definitionally equal.
+
+──────────────────────────────
+Detailed Plan (Implementation and Proof)
+
+A) Implementation:
+ 1. Define the function cubeSurfaceArea such that it returns 6 * size * size.
+
+B) Specification:
+ 1. The predicate cubeSurfaceArea_spec is already provided; it specifies that result = 6 * size * size.
+
+C) Proof:
+ 1. In theorem cubeSurfaceArea_spec_satisfied, start by unfolding both cubeSurfaceArea and cubeSurfaceArea_spec.
+ 2. After unfolding, the goal will be to show:
+   6 * size * size = 6 * size * size
+ 3. This is true by reflexivity, so simply using “rfl” concludes the proof.
+
+──────────────────────────────
+Final Lean 4 Code Sketch
+
+Below is the complete Lean 4 code based on our plan:
+
+------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation: Calculate the cube's surface area
+def cubeSurfaceArea (size : Int) : Int :=
+  -- << CODE START >>
+  6 * size * size
+  -- << CODE END >>
+
+-- Theorem: The surface area of the cube is calculated correctly
+def cubeSurfaceArea_spec (size : Int) (result : Int) : Prop :=
+  -- << SPEC START >>
+  result = 6 * size * size
+  -- << SPEC END >>
+
+theorem cubeSurfaceArea_spec_satisfied (size : Int):
+  cubeSurfaceArea_spec size (cubeSurfaceArea size) := by
+  -- << PROOF START >>
+  unfold cubeSurfaceArea cubeSurfaceArea_spec
+  rfl
+  -- << PROOF END >>
+------------------------------------------------
+
+──────────────────────────────
+Conclusion
+
+• The function cubeSurfaceArea is implemented to compute the surface area of a cube using a simple multiplication formula.  
+• The accompanying theorem cubeSurfaceArea_spec_satisfied confirms that this implementation meets the specification using a direct definition unfolding and reflexivity.  
+
+This completes the implementation and the proof.

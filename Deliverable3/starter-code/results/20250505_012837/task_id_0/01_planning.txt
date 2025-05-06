@@ -1,0 +1,30 @@
+Below is a detailed plan for the implementation and proof:
+
+1. Implementation
+   • The function is meant to just return the input natural number.
+   • Since the identity function simply returns its argument, implement it by writing:
+     
+         def ident (x : Nat) : Nat := x
+
+2. Specification
+   • The specification is given by ident_spec where for a number x and a result, the condition is result = x.
+   • This is already provided in the template:
+     
+         def ident_spec (x : Nat) (result: Nat) : Prop :=
+           result = x
+
+3. Proof of Specification
+   • The theorem ident_spec_satisfied needs to prove that for all x, ident_spec x (ident x) holds.
+   • By unfolding the definition of ident and ident_spec, the goal reduces to proving x = x.
+   • This equality is trivially true, so the proof can be completed by reflexivity (using the tactic “rfl”).
+
+4. Putting It All Together
+   • In the implementation section of the template, replace the placeholder with x.
+   • In the proof section, after unfolding definitions, apply “rfl” to close the goal.
+
+The key steps are:
+- Implement ident as the identity function.
+- Use unfold to reduce the goal.
+- Use the reflexivity tactic to finish the proof.
+
+This structured approach guarantees that the specification is satisfied by the function, as the function simply returns its input and the equality x = x is automatically true.

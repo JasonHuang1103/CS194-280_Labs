@@ -1,0 +1,8 @@
+split
+· rintro (⟨ha, hb⟩ | ⟨hc, hd⟩)
+  · right; constructor; assumption
+  · left; constructor; assumption
+· intro h
+  cases h
+  · rw [Bool.and_eq_true]; exact ⟨decide_eq_true_of_ne_zero ‹_›, decide_eq_true_of_ne_zero ‹_›⟩
+  · rw [Bool.or_eq_true, Bool.and_eq_true]; exact Or.inr ⟨decide_eq_true_of_ne_zero ‹_›, decide_eq_true_of_ne_zero ‹_›⟩

@@ -1,0 +1,37 @@
+The error message
+
+  "error: unexpected identifier; expected command"
+
+points to a syntactic issue in your proof script rather than a logical error with your theorem. In Lean 4 (and Lean in general), tactic blocks started with “by” require that every tactic line be indented consistently so that the parser knows they all belong to the same block.
+
+Looking at your proof:
+
+  theorem isDivisibleBy11_spec_satisfied (n : Int) :
+    isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+    -- << PROOF START >>
+    unfold isDivisibleBy11 isDivisibleBy11_spec
+    simp
+  rw [Int.ediv_eq_iff_eq_mul_right, mul_comm]
+  apply Int.ne_of_ne_zero
+  norm_num
+    -- << PROOF END >>
+
+you can see that the first two tactics (“unfold …” and “simp”) are properly indented (by two spaces) under the “by” keyword. However, the subsequent tactics (“rw …”, “apply …”, and “norm_num”) are not indented—they start at the beginning of the line. As a result, Lean’s parser treats these as top-level commands instead of being part of the tactic block.
+
+For example, on the line starting with “rw [Int.ediv_eq_iff_eq_mul_right, mul_comm]”, Lean expects a new command (like a definition, theorem declaration, etc.) at the top level, so when it sees “rw” (which is recognized only within a tactic block), it reports an “unexpected identifier.”
+
+To fix this error, you need to indent all the tactics in the “by” block consistently. For instance, you could write:
+
+  theorem isDivisibleBy11_spec_satisfied (n : Int) :
+    isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+    -- << PROOF START >>
+    unfold isDivisibleBy11 isDivisibleBy11_spec
+    simp
+    rw [Int.ediv_eq_iff_eq_mul_right, mul_comm]
+    apply Int.ne_of_ne_zero
+    norm_num
+    -- << PROOF END >>
+
+This way, every tactic belongs to the same block started by “by” and Lean’s parser can correctly interpret them.
+
+In summary, the root cause of the error is that some of your tactic commands are not indented and hence are treated as top‐level declarations rather than being part of the proof block. Reindenting those lines should resolve the “unexpected identifier; expected command” error.

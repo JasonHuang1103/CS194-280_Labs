@@ -1,0 +1,4 @@
+let minAB := if (a <= b) then a else b
+  if (minAB <= c) then minAB else c
+
+Now Lean will correctly interpret the conditions as Boolean expressions.

@@ -1,0 +1,6 @@
+simp [lastDigit, lastDigit_spec]
+constructor
+· constructor
+  · exact Nat.mod_nonneg n 10
+  · exact Nat.mod_lt _ (by norm_num)
+· rfl

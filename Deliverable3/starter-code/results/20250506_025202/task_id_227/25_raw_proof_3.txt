@@ -1,0 +1,21 @@
+```
+by_cases h₁ : a ≤ b
+· by_cases h₂ : a ≤ c
+  · simp [h₁, h₂]
+    split
+    · exact ⟨Int.le_refl a, h₁, h₂⟩
+    · left; rfl
+  · simp [h₁, h₂]
+    split
+    · exact ⟨Int.le_of_not_ge h₂, h₁.trans (Int.le_of_not_ge h₂), Int.le_refl c⟩
+    · right; right; rfl
+· by_cases h₃ : b ≤ c
+  · simp [h₁, h₃]
+    split
+    · exact ⟨Int.le_of_not_ge h₁, Int.le_refl b, h₃⟩
+    · right; left; rfl
+  · simp [h₁, h₃]
+    split
+    · exact ⟨(Int.le_of_not_ge h₁).trans_lt (Int.lt_of_not_ge h₃), Int.le_of_not_ge h₃, Int.le_refl c⟩
+    · right; right; rfl
+```

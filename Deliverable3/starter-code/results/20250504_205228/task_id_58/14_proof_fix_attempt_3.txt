@@ -1,0 +1,17 @@
+The error in your proof is occurring due to an incorrect handling of goals and a redundant duplication of the theorem inside its own body. Let's correct the proof:
+
+```lean
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  unfold hasOppositeSign hasOppositeSign_spec
+  apply Iff.intro
+  · intro h
+    simp only [Bool.of_decide_eq_true, decide_eq_true_iff, *]
+  · intro h
+    rw [Bool.of_decide_eq_true]
+    exact h
+```
+
+**Key Changes:**
+1. Remove the erroneous duplicate declaration of `hasOppositeSign_spec_satisfied` inside its definition.
+2. Import and utilize the theorem `decide_eq_true_iff` from Lean's built-ins to properly bridge the gap between the propositions and Boolean values given by `decide`. This ensures the equivalence holds after unfolding the definitions and converting between `Prop` and `Bool`.

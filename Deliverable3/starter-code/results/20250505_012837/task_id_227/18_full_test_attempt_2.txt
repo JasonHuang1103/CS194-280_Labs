@@ -1,0 +1,8 @@
+Lean Error: lean_playground/TempTest.lean:25:9: error: tactic 'unfold' failed to unfold 'minOfThree' at
+  ((if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ a ∧
+      (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ b ∧
+        (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ c) ∧
+    ((if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) = a ∨
+      (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) = b ∨
+        (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) = c)
+lean_playground/TempTest.lean:26:0: error: unexpected identifier; expected command

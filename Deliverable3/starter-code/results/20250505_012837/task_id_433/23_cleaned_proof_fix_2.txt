@@ -1,0 +1,6 @@
+constructor
+intros h i hi
+apply h
+intros h x hx
+specialize h x (Array.toList_size a x)
+exact h

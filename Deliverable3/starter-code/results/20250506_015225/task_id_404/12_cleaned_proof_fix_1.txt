@@ -1,0 +1,4 @@
+split_ifs with h
+· exact ⟨⟨le_refl a, h⟩, Or.inl rfl⟩
+· have : b < a := Int.not_le.mp h
+  exact ⟨⟨le_of_lt this, le_refl b⟩, Or.inr rfl⟩

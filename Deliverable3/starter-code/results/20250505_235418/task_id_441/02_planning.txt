@@ -1,0 +1,92 @@
+Below is a step-by-step analysis of how to approach the problem, followed by a detailed plan for both the Lean implementation and the accompanying proof.
+
+──────────────────────────────
+Step 1. Understanding the Function
+
+• The function is named cubeSurfaceArea.
+• It takes one parameter, size, of type Int.
+• Its purpose is to compute the surface area of a cube given that one edge has length size.
+• The standard formula for the surface area of a cube is 6 × (edge length)².
+• Therefore, the function should return 6 * size * size.
+
+──────────────────────────────
+Step 2. Breaking Down the Problem
+
+• Implementation:
+  – Write a Lean function that multiplies size by itself (to get the square) and then multiplies that result by 6.
+• Specification:
+  – A predicate cubeSurfaceArea_spec is defined, where for a given size and result, result must equal 6 * size * size.
+• Proof:
+  – We need to prove that for every size, cubeSurfaceArea_spec holds when we pass cubeSurfaceArea size as the result.
+  – This means proving that cubeSurfaceArea size computes exactly 6 * size * size.
+
+──────────────────────────────
+Step 3. Input, Edge Cases, and Expected Behavior
+
+• Input type: Int.
+• The note in the problem states that the edge length is assumed to be greater than 0. For the proof, we do not need any extra verification because the formula holds generally even if size were to be 0 or negative, but in our context positive integers are assumed.
+• Expected behavior: For any valid (i.e., positive) integer size, the function returns an integer equal to 6 * size * size.
+
+──────────────────────────────
+Step 4. Suitable Proof Techniques
+
+• Unfold the definitions of both cubeSurfaceArea and cubeSurfaceArea_spec to expose the expressions.
+• Use the reflexivity tactic (rfl) which proves that two expressions are identical if they are syntactically the same.
+• No complicated arithmetic is necessary, as this is a direct equality.
+
+──────────────────────────────
+Step 5. Related Examples and Patterns
+
+• Notice how the structure of cubeSurfaceArea_spec takes the output of cubeSurfaceArea and compares it directly with 6 * size * size.
+• A common approach in Lean is to unfold the function definitions and then use rfl (reflexivity) to complete the proof when both sides of the equality are identical.
+• This pattern is seen in many introductory Lean proofs where the goal is to show that two algebraic expressions are exactly equal.
+
+──────────────────────────────
+Detailed Plan for Implementation
+
+1. Define the function cubeSurfaceArea:
+   • It will take an integer size.
+   • It will compute the value 6 * size * size and return it.
+2. Confirm that the specification cubeSurfaceArea_spec matches the above reasoning (result = 6 * size * size).
+3. Prove the theorem cubeSurfaceArea_spec_satisfied:
+   • Start by unfolding (expanding) the definitions of cubeSurfaceArea and cubeSurfaceArea_spec.
+   • After unfolding, the goal will be to show that 6 * size * size = 6 * size * size.
+   • Apply rfl which completes the proof.
+
+──────────────────────────────
+Final Lean Code (Plan)
+
+Below is the final Lean code snippet based on the discussed plan:
+
+---------------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def cubeSurfaceArea (size : Int) : Int :=
+  -- << CODE START >>
+  6 * size * size
+  -- << CODE END >>
+
+-- Theorem: The surface area of the cube is calculated correctly
+def cubeSurfaceArea_spec (size : Int) (result : Int) : Prop :=
+  -- << SPEC START >>
+  result = 6 * size * size
+  -- << SPEC END >>
+
+theorem cubeSurfaceArea_spec_satisfied (size : Int):
+  cubeSurfaceArea_spec size (cubeSurfaceArea size) := by
+  -- << PROOF START >>
+  unfold cubeSurfaceArea cubeSurfaceArea_spec
+  rfl
+  -- << PROOF END >>
+---------------------------------------------------------------
+
+──────────────────────────────
+Summary
+
+• The cubeSurfaceArea function is implemented by returning 6 * size * size.
+• The cubeSurfaceArea_spec predicate checks that a given computed result matches the expected surface area calculation.
+• The proof unfolds these definitions and then verifies that the computed result is exactly equal to the expected value using rfl.
+
+This detailed plan covers both the reasoning and the implementation steps required to complete the task in Lean 4.

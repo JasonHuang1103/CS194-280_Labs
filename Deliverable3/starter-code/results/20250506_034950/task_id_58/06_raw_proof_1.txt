@@ -1,0 +1,5 @@
+```lean
+by_cases h : ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+· simp [h]
+· simp [h]
+```

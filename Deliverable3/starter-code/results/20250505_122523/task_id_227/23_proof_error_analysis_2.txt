@@ -1,0 +1,44 @@
+Below is an explanation of what went wrong.
+
+Your definition of minOfThree is
+
+  def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+    let minAB := if decide (a ≤ b) then a else b
+    if decide (minAB ≤ c) then minAB else c
+
+This definition “works” in the sense that you have used decide to turn the propositions into Booleans. However, when you try to prove
+
+  theorem minOfThree_spec_satisfied (a : Int) (b : Int) (c : Int) :
+    minOfThree_spec a b c (minOfThree a b c) := by
+    ...
+    split_ifs
+    · exact …
+    · exact …
+    · exact …
+    · exact …
+
+what happens is that after unfolding minOfThree the goal contains two nested if–then–else’s. (That is, one “if decide (minAB ≤ c)” where minAB itself is defined via “if decide (a ≤ b) then a else b”.) When you use the tactic split_ifs the cases that are generated come out in a way that Lean does not wholly “resolve” the inner if‐expression. In fact, in some branches the inner if–then–else is “left behind” and (in your error output) you see something like
+
+  if decide ((if decide (a ≤ b) = true then a else b) ≤ c) = true then if decide (a ≤ b) = true then a else b else sorry
+
+Notice that instead of the intended value (namely c) you obtain “sorry”, which is a placeholder for the missing term. Moreover, in one place Lean complains that it found a term of type ℤ (the “c”) in a position where it expected a function. This is because the if–then–else structure (with its nested “if decide …”) is not being deconstructed in the way you expect, so the “split_ifs” tactic is “hanging” on the inner if. (Also, the stray “using” token error is a symptom that the tactic script is being parsed at the wrong level due to the incomplete structure.)
+
+In short, the root cause is this: by unfolding minOfThree, you reveal a nested if–then–else that uses decide in its condition. When you then run “split_ifs”, Lean generates cases based on these if–conditions but does not “drill down” into the inner if as you intended. As a result, some branches end up with a “sorry” in place of the proper term and the names (like h and h_1) are not available or not what you expect. That is why you see an error message saying that at “c” a function was expected (because the overall term is mis‐parsed) and unsolved goals with “sorry” present.
+
+A way to move forward is to change your approach so that the proof “sees” exactly what your definition does. For example, you might prove a lemma that shows
+
+  if decide (minAB ≤ c) then minAB else c = if decide (a ≤ b) then (if decide (a ≤ c) then a else c) else
+                                               (if decide (b ≤ c) then b else c)
+
+or simply do a case‐analysis by “by cases” on (decide (a ≤ b)) and (decide (minAB ≤ c)) manually. In other words, explicitly split the proof into the cases that you expect, instead of using “split_ifs” in one go. This will allow you to avoid having “nested” ifs whose structure changes when you unfold the definitions.
+
+Another approach is to “refine” your definition of minOfThree so that it is formulated in a way that is easier to handle by reflection or by simplification. For instance, you might give a definition using match or a nested let–bindings that are easier to unfold cleanly.
+
+By reorganizing either the definition or the proof (or both) so that the nested if-expressions are handled explicitly, you can avoid the “function expected at c” error and the extra “sorry” placeholders that arise when Lean cannot properly decompose the if–then–else structure.
+
+To summarize:
+• The error message “function expected at c …” comes from the fact that after unfolding minOfThree the if–expressions are not completely “split” by split_ifs.
+• In some branches the inner if leaves a “sorry” (an incomplete placeholder) and mis-parsed terms.
+• To fix it, you need to restructure the proof (or the definition) so that you do a case–analysis explicitly on the two Boolean decisions. This way you avoid the nested if that causes Lean to generate a malformed term.
+
+That is the detailed analysis and a suggestion on how to move forward.

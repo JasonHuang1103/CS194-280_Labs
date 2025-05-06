@@ -1,0 +1,9 @@
+Lean Error: lean_playground/TempTest.lean:18:52: error: unsolved goals
+case mp
+a b : ℤ
+⊢ a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 → (decide (a > 0) && decide (b < 0) || decide (a < 0) && decide (b > 0)) = true
+
+case mpr
+a b : ℤ
+⊢ (decide (a > 0) && decide (b < 0) || decide (a < 0) && decide (b > 0)) = true → a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0
+lean_playground/TempTest.lean:22:0: error: unexpected token '·'; expected command

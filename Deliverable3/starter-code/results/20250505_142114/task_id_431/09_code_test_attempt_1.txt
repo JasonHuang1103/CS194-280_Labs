@@ -1,0 +1,3 @@
+Lean Error: lean_playground/TempTest.lean:9:31: error: missing end of character literal
+lean_playground/TempTest.lean:9:97: error: unexpected token '.'; expected ':'
+lean_playground/TempTest.lean:19:8: warning: declaration uses 'sorry'

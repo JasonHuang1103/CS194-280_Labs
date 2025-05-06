@@ -1,0 +1,15 @@
+split
+· intro h
+  cases h with
+  | inl h₁ => cases h₁ with
+    | intro ha hb => simp [ha, hb]
+  | inr h₂ => cases h₂ with
+    | intro ha hb => simp [ha, hb]
+· intro h
+  by_cases ha : a < 0
+  · left; exact ⟨ha, h⟩
+  by_cases ha' : a > 0
+  · right; exact ⟨ha', h⟩
+  exfalso
+  apply not_le_of_gt (Int.lt_trans (Int.ofNat_pos zero_lt_one) ha)
+  apply le_of_not_gt ha'

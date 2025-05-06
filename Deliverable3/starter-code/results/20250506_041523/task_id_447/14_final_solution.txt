@@ -1,0 +1,4 @@
+{
+  "code": "a.map (\u03bb x => x * x * x)",
+  "proof": "split\n\u00b7 simp [Array.size_map]\n\u00b7 intro i h\n  simp [Array.getElem_map, Function.comp]\n  rfl"
+}

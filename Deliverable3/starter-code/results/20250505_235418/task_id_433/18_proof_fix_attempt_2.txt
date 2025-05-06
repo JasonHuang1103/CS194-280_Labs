@@ -1,0 +1,9 @@
+```lean
+  simp [isGreater, isGreater_spec, List.all_iff_forall]
+  constructor
+  { intro h i hi
+    exact h i hi }
+  { intro h x hx
+    obtain ⟨i, hi, rfl⟩ := List.mem_of_get_eq hx
+    exact h i hi }
+```

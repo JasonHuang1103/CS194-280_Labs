@@ -1,0 +1,51 @@
+Below is a high‐level plan for tackling the problem. We need to both implement a function that returns true exactly when one integer is negative and the other positive (with zero ruled out) and prove that the implementation meets the specification. Here’s an outline of the approach:
+
+───────────────────────────────  
+Step 1. Implementation
+
+• The function is supposed to check that one integer is less than 0 and the other is greater than 0. Remember that when an integer is 0 the inequality fails, so we get the intended behavior automatically.  
+• Write the function using Lean’s Boolean operators. In Lean 4 the standard Boolean conjunction is “&&” and disjunction is “||”.  
+• Hence, we can define the function as  
+  hasOppositeSign a b := (a < 0 && b > 0) || (a > 0 && b < 0)  
+This exactly encodes the statement: “a is negative and b is positive, or a is positive and b is negative.”
+
+───────────────────────────────  
+Step 2. Specifying and Stating the Theorem
+
+• The specification (hasOppositeSign_spec) is given as a Prop stating that  
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result  
+where result is the outcome of hasOppositeSign.  
+• Notice that the left-hand side of the equivalence is the “propositional” version of our condition while the right-hand side is the Boolean value computed by our function.
+
+───────────────────────────────  
+Step 3. Proving the Correctness Theorem
+
+• In the theorem hasOppositeSign_spec_satisfied we need to show that when we plug (hasOppositeSign a b) into our spec, the equivalence holds.  
+• Start by “unfolding” the definitions. After unfolding, the goal becomes:  
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ ((a < 0 && b > 0) || (a > 0 && b < 0)).  
+• Now, the task is to prove that the Boolean expression is equivalent to the corresponding proposition.  
+  ○ One common approach is to break the proof into two implications.  
+  ○ For the → direction: Assume (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0). Then, by definition of “&&” (Boolean and), the Boolean expression (a < 0 && b > 0) or (a > 0 && b < 0) will evaluate to true.  
+  ○ For the ← direction: Assume the Boolean disjunction evaluates to true. Then by the definition of “&&” (which only yields true when both components are true) and “||”, one of the conditions (a < 0 ∧ b > 0) or (a > 0 ∧ b < 0) must hold.  
+• You might use simplification tactics (e.g., simp or decide) to finish the proof. Lean’s built‐in Boolean reflection lemmas can help, though even a manual case analysis works well here.
+
+───────────────────────────────  
+Step 4. Filling in the Template
+
+• In the “hasOppositeSign” definition, replace “{{code}}” with the function body.  
+• In the theorem “hasOppositeSign_spec_satisfied”, after unfolding the definitions, fill in “{{proof}}” with a proof that splits into the two directions.  
+• The final proof could be something along the lines of:
+  unfold hasOppositeSign hasOppositeSign_spec
+  apply Iff.intro
+  • For the forward direction, use case analysis on the disjunction.
+  • For the backwards direction, analyze the Boolean expression and show that it gives you the corresponding proposition.  
+Depending on the power of the tactics available in your Lean 4 environment, you may even get away with a “by decide” if the reflection is automated.
+
+───────────────────────────────  
+Summary
+
+1. Implementation: Define hasOppositeSign as (a < 0 && b > 0) || (a > 0 && b < 0).  
+2. Specification: State the equivalence between the propositional condition ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) and the Boolean result.  
+3. Proof: Unfold the definitions and show both implications. The “forward” implication follows by a direct case analysis of the propositional disjunction while the “backward” implication follows by analyzing the Boolean evaluation of “&&” and “||.”
+
+This plan ensures that both the function and the theorem align perfectly with the problem statement. You can now use the plan as a blueprint to implement the Lean code.

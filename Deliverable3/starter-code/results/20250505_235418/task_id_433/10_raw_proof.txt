@@ -1,0 +1,6 @@
+```lean
+simp
+intro h
+apply List.all_all
+simp [h]
+```

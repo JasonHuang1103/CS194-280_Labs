@@ -1,0 +1,169 @@
+Below is our detailed reasoning followed by a plan of attack.
+
+──────────────────────────────
+Step 1. Understand the Function Specification
+
+• We must write a Lean 4 function that accepts three integers (a, b, c) and returns the smallest among them.
+• The output value must satisfy two properties:
+  (1) It is less than or equal to a, b, and c.
+  (2) It is exactly one of the three given numbers.
+
+──────────────────────────────
+Step 2. Break Down the Problem
+
+• A natural idea is to use the “min” function on integers. In Lean’s Mathlib, a function Int.min is already defined (using if-then-else) so that
+  Int.min x y = if x ≤ y then x else y.
+• Then the minimum of three numbers can be defined as:
+  minOfThree a b c = Int.min a (Int.min b c).
+ 
+This definition meets our needs because:
+  – In the first branch, if a is less than or equal to both b and c, then Int.min a (Int.min b c) returns a.
+  – Otherwise, it returns the minimum of b and c. In that branch, one must show Int.min b c equals b or equals c.
+
+──────────────────────────────
+Step 3. Consider Input Types, Edge Cases, and Expected Behavior
+
+• Since we are working with integers (Int) which have a total order, standard comparisons hold.
+• Edge cases occur when two or three inputs are equal. In such cases, our use of Int.min ensures that one of the equal values is returned.
+• There is no worry about “undefined” behavior because the ordering on Int is well-founded.
+
+──────────────────────────────
+Step 4. What Proof Techniques Are Appropriate?
+
+• Our specification predicate is:
+  minOfThree_spec a b c result ↔ (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c).
+• We must prove that when result is defined as Int.min a (Int.min b c), it satisfies both halves.
+• A good strategy is to carry out a case analysis:
+  (i) First, let m = Int.min b c.
+  (ii) Case 1: Assume a ≤ m. Then the definition returns a; it is trivial to show that a is ≤ a, b, c (using the properties of m).
+  (iii) Case 2: Assume a > m. Then the function returns m. Now, apply a further case analysis on whether b ≤ c holds. In that subcase m = b; otherwise m = c. In either subcase, the result matches one of the inputs and satisfies the inequalities.
+• For many of the linear ordering claims, we can use the linarith tactic.
+
+──────────────────────────────
+Step 5. Similar Patterns from Examples
+
+• The examples in the documentation show the use of linarith to resolve chains of inequalities.
+• They also show how to “unfold” definitions to reveal the underlying if-then-else structure (or the structure of min). That methodology fits with our case analysis in the proof.
+
+──────────────────────────────
+Detailed Plan: Implementation and Proof
+
+1. Implementation
+
+ • Define the function as follows:
+  def minOfThree (a b c : Int) : Int :=
+   Int.min a (Int.min b c)
+ 
+ This simple definition reuses the built-in min function.
+
+2. Specification Predicate
+
+ • Define minOfThree_spec as given:
+  def minOfThree_spec (a b c result : Int) : Prop :=
+   (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c)
+
+3. Proof Outline for minOfThree_spec_satisfied
+
+ a. Unfold both minOfThree and minOfThree_spec.
+ b. Let m = Int.min b c.
+ c. Perform a case analysis on whether (a ≤ m):
+  • Case 1: a ≤ m
+   – Then minOfThree a b c = a.
+   – Show a ≤ a trivially.
+   – Show a ≤ b and a ≤ c using the known property of m: since m = Int.min b c, we have m ≤ b and m ≤ c.
+   – Conclude that a is one of the inputs.
+  • Case 2: ¬(a ≤ m) (i.e. a > m)
+   – Then minOfThree returns m.
+   – By property of min, m ≤ b and m ≤ c.
+   – Also, a > m implies m ≤ a.
+   – Now, further do a case split on (b ≤ c):
+    ◦ If b ≤ c then by the definition of Int.min, m = b.
+    ◦ Otherwise, m = c.
+   – In both subcases, m equals either b or c.
+   – Thus, the result is one of the inputs.
+ 
+ d. Use the linarith tactic (or direct argument) to handle inequality chains.
+ e. Finally, conclude the proof by assembling both parts (inequalities and the “equal to one of” disjunction).
+
+──────────────────────────────
+Conclusion
+
+The implementation plan is:
+
+• Define minOfThree using Int.min.
+• Prove by a two-level case analysis: first on a versus m = Int.min b c, then (if needed) on b versus c.
+• Use basic properties of min and the linarith tactic to verify the required inequalities and the identity (result equals one of the inputs).
+
+Below is a draft of our Lean 4 code (with placeholders for the proof steps):
+
+------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  -- We use the built-in min function.
+  Int.min a (Int.min b c)
+
+-- Theorem: The returned value is the minimum of the three input numbers
+def minOfThree_spec (a : Int) (b : Int) (c : Int) (result : Int) : Prop :=
+  (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧
+  (result = a ∨ result = b ∨ result = c)
+
+theorem minOfThree_spec_satisfied (a : Int) (b : Int) (c : Int) :
+  minOfThree_spec a b c (minOfThree a b c) :=
+by
+  unfold minOfThree minOfThree_spec
+  let m := Int.min b c
+  -- Case analysis on whether a ≤ m.
+  by_cases h₁ : a ≤ m
+  · -- Case 1: a ≤ m. Then minOfThree = a.
+    rw [if_pos h₁]  -- if it were defined by if-then-else; with Int.min the proof uses its properties.
+    -- Show a ≤ a, a ≤ b, a ≤ c.
+    have h₂ : a ≤ b := by
+      have : m ≤ b := sorry  -- use the property: Int.min b c ≤ b
+      linarith
+    have h₃ : a ≤ c := by
+      have : m ≤ c := sorry  -- similarly, use: Int.min b c ≤ c
+      linarith
+    exact ⟨⟨by linarith, by linarith, by linarith⟩, Or.inl rfl⟩
+  · -- Case 2: a > m. Then minOfThree = m.
+    rw [if_neg h₁]
+    -- Now, do case analysis on b ≤ c.
+    by_cases h₄ : b ≤ c
+    · -- If b ≤ c then m = b.
+      have eq_m : m = b := sorry  -- by property of Int.min when b ≤ c.
+      rw [eq_m]
+      -- Now show b ≤ a, b ≤ b, b ≤ c.
+      have h : m ≤ a := by linarith [h₁]
+      have h_b : b ≤ a := by rwa [←eq_m] at h
+      exact ⟨⟨by linarith, by simp, by linarith⟩, Or.inr (Or.inl rfl)⟩
+    · -- Otherwise, m = c.
+      have eq_m : m = c := sorry  -- by property of Int.min when ¬ (b ≤ c).
+      rw [eq_m]
+      -- Show c ≤ a, c ≤ b, c ≤ c.
+      have h : m ≤ a := by linarith [h₁]
+      have h_c : c ≤ a := by rwa [←eq_m] at h
+      exact ⟨⟨by linarith, by linarith, by simp⟩, Or.inr (Or.inr rfl)⟩
+
+------------------------------------------------
+
+In the above skeleton:
+ – The "rw [if_pos h₁]" and "rw [if_neg h₁]" are schematic steps if one had defined minOfThree by explicit if-then-else. With our definition via Int.min, one should appeal directly to known lemmas about Int.min.
+ – The “sorry” placeholders indicate where one would invoke results such as:
+  • Int.min_left (b, c) : Int.min b c ≤ b,
+  • Int.min_right (b, c) : Int.min b c ≤ c, and
+  • the lemmas that show that if b ≤ c then Int.min b c = b, otherwise Int.min b c = c.
+ – In a final version these would be replaced by the proper lemma invocations.
+
+──────────────────────────────
+Summary
+
+Our plan is to:
+1. Implement minOfThree using the composition of Int.min.
+2. Prove the specification by unfolding definitions and performing a two-level case analysis:
+  – First comparing a with m = Int.min b c.
+  – Then (if needed) comparing b and c to show that m equals one of them.
+3. Use straightforward linear reasoning (linarith) and known properties of the min function to discharge the goals.
+
+This step-by-step plan covers both the implementation and the correctness proof of the minimum-of-three function in Lean 4.

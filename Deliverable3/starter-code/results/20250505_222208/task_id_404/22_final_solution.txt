@@ -1,0 +1,4 @@
+{
+  "code": "if a <= b then a else b",
+  "proof": "by_cases h : a \u2264 b\n{ rw [if_pos h]\n  exact \u27e8\u27e8le_refl a, h\u27e9, Or.inl rfl\u27e9 }\n{ rw [if_neg h]\n  have : b < a := lt_of_not_le h\n  exact \u27e8\u27e8le_of_lt this, le_refl b\u27e9, Or.inr rfl\u27e9 }"
+}

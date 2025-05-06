@@ -1,0 +1,11 @@
+```lean
+simp [min_assoc]
+split
+· split
+  · apply if_pos; apply le_min
+  · apply if_neg
+  · apply if_neg
+· by_cases h : a ≤ min b c
+  · left; exact h
+  · right; exact min_le_left _ _
+```

@@ -1,0 +1,4 @@
+split
+· exact Array.map_size _
+· intros i hi
+  simp [Array.get_map]

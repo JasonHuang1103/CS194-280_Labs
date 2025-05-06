@@ -1,0 +1,6 @@
+Lean Error: lean_playground/TempTest.lean:7:2: error: function expected at
+  a.toList.all fun x => decide (n > x)
+term has type
+  Bool
+lean_playground/TempTest.lean:9:34: error: unexpected token 'to'; expected command
+lean_playground/TempTest.lean:19:8: warning: declaration uses 'sorry'

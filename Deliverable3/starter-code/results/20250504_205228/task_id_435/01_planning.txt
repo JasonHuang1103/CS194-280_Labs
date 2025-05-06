@@ -1,0 +1,57 @@
+Below is an outline of a detailed plan to solve the problem. The plan is broken down into two parts: implementing the function and proving that it satisfies the specification.
+
+────────────────────────
+Step 1. Implementation
+
+• We need to implement a function lastDigit that takes a natural number n and returns the last digit.
+• In Lean, the last digit can be computed using the modulus operator (n % 10).
+• Thus, we can define:
+  def lastDigit (n : Nat) : Nat := n % 10
+• This operation automatically returns a natural number between 0 and 9 because of the properties of modulus when the divisor is 10 (since 10 > 0).
+
+────────────────────────
+Step 2. Specification and the Corresponding Proof
+
+The specification (lastDigit_spec) requires two things:
+ (a) The result must be between 0 and 9: That is, 0 ≤ result < 10.
+ (b) The result must equal n % 10.
+
+• To prove that the computed result d = n % 10 satisfies lastDigit_spec, we need to prove:
+ 1. 0 ≤ n % 10. This holds because the natural number modulus is always non-negative.
+ 2. n % 10 < 10. Lean’s math library typically provides a lemma such as Nat.mod_lt which states that for any natural number and a positive divisor, the modulus result is less than the divisor. Since 10 > 0, we can use Nat.mod_lt n (by decide/norm_num) to establish n % 10 < 10.
+ 3. n % 10 = n % 10 is immediate.
+
+• In the proof, we can unfold the definitions of lastDigit and lastDigit_spec.
+• Then, the proof essentially reduces to constructing the pair (and then applying the natural equality):
+  ⟨Nat.zero_le (n % 10), Nat.mod_lt n (by decide or by norm_num)⟩
+• Finally, the equality part of the specification is trivial as it is just a rewriting.
+
+────────────────────────
+Step 3. Writing the Lean Code
+
+Below are the two main parts in Lean:
+
+1. The implementation of lastDigit:
+  def lastDigit (n : Nat) : Nat :=
+    n % 10
+
+2. The proof that lastDigit satisfies lastDigit_spec:
+  theorem lastDigit_spec_satisfied (n : Nat) :
+   lastDigit_spec n (lastDigit n) := by
+   unfold lastDigit lastDigit_spec
+   apply And.intro
+   • exact ⟨Nat.zero_le (n % 10), Nat.mod_lt n (by decide)⟩
+   • rfl
+
+Alternatively, one may use tactics like split and simp to simplify the proof.
+
+────────────────────────
+Summary
+
+The key steps are:
+1. Write lastDigit using the modulus operation.
+2. Prove the first part of the specification by demonstrating that n % 10 is nonnegative and strictly less than 10 (by using the existing lemma Nat.mod_lt).
+3. Prove the remainder of the specification by showing the equality is trivial.
+4. Use unfolding and basic tactics (split, apply, exact, rfl) to construct the proof.
+
+Following this structured plan will yield both the required Lean 4 function and its supporting proof.

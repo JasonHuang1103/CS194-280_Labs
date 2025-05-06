@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:9:0: error: expected token
+lean_playground/TempTest.lean:20:8: warning: declaration uses 'sorry'

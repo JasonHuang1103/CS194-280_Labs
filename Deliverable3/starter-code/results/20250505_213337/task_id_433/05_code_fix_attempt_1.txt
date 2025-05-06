@@ -1,0 +1,44 @@
+Below is the step-by-step analysis and then the fixed version of the function.
+
+──────────────────────────
+Step 1. Identifying the culprit
+
+• The error occurs at the call to a.fold in the definition of isGreater:
+  a.fold true (λ acc x => acc && (n > x))
+ The error message says that the environment does not contain Array.fold.
+
+──────────────────────────
+Step 2. Explaining the issue
+
+• In Lean 4’s Array type, there isn’t a method called fold. Instead, Lean provides similar functions such as foldl (fold left) or foldr (fold right).
+• The code tries to use a non-existent method “fold” on an Array, which leads Lean to complain.
+
+──────────────────────────
+Step 3. Considering the type system and Lean 4 requirements
+
+• The function isGreater is supposed to aggregate over an array of Ints starting with an initial Boolean value (true) and applying a Boolean combination (&&) with each element test.
+• The intended behavior is to check that for every element x in the array, n > x.
+• Lean’s Array.foldl takes a function (accumulator → element → accumulator), an initial accumulator value, and returns the accumulated result. Its type is
+  ∀ {α β}, (β → α → β) → β → Array α → β.
+• Hence, foldl is an appropriate replacement for the intended fold operation.
+
+──────────────────────────
+Step 4. Considering potential solutions
+
+• Replace fold with foldl:
+  a.foldl (λ acc x => acc && (n > x)) true
+• Alternatively, one might consider foldr. However, given that the operation is simple and (&&) is associative, foldl is standard.
+• Testing in our head: If a is empty, foldl returns true (as desired). For non-empty arrays, it checks each element for n > x.
+
+──────────────────────────
+Step 5. Finalizing the solution
+
+• We update the implementation of isGreater to use foldl instead of fold.
+
+──────────────────────────
+Fixed version of the function implementation:
+
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  a.foldl (fun acc x => acc && (n > x)) true
+
+This change ensures that the folding operation is using a defined method on Array in Lean 4, and the function now type-checks correctly.

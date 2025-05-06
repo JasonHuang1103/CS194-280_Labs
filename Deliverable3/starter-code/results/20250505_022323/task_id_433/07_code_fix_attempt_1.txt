@@ -1,0 +1,4 @@
+The issue is that Lean 4 does not provide an "all?" method on Arrays. You can fix the error by converting the array to a list and then using List.all. Here’s the corrected implementation of the function:
+
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  a.toList.all (fun x => n > x)

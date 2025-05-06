@@ -1,0 +1,82 @@
+Below is a detailed plan to develop the function and its correctness proof.
+
+─────────────────────────────  
+1. Implementation Strategy
+
+• The function isDivisibleBy11 must take an integer n and return a Boolean indicating whether 11 divides n.  
+• Since divisibility by 11 is expressed by the proposition n % 11 = 0 (where % is the modulo operation on integers), the straightforward implementation is to check if n % 11 equals 0.  
+• In Lean, you can use an if-then-else statement. For example, you can write:  
+  if n % 11 = 0 then true else false  
+This directly returns true if n is divisible by 11, and false otherwise.
+
+─────────────────────────────  
+2. Specification Setup
+
+• The specification (isDivisibleBy11_spec) relates the Boolean output with the mathematical statement “n % 11 = 0”.  
+• It is defined as:  
+  n % 11 = 0 ↔ result  
+This means the returned Boolean is true exactly when n % 11 equals 0.
+
+─────────────────────────────  
+3. Proof Plan for isDivisibleBy11_spec_satisfied
+
+Key steps in proving the theorem include:
+
+a. Unfold Definitions  
+ – Begin the proof by unfolding both isDivisibleBy11 and isDivisibleBy11_spec. This makes their definitions visible in the goal.
+
+b. Analyze the if-then-else Expression  
+ – The definition of isDivisibleBy11 is an if-expression that branches on (n % 11 = 0).  
+ – Consider two cases:
+  • Case 1: Assume n % 11 = 0. In this branch, the if-expression evaluates to true. Hence, the equivalence n % 11 = 0 ↔ true holds (the left side is assumed true).  
+  • Case 2: Assume n % 11 ≠ 0. Then the if-expression evaluates to false, and you must show n % 11 = 0 ↔ false, which also holds because the left side is false.
+ – Lean’s support for if expressions over decidable propositions (like equality on integers) can be utilized, and the simplification lemmas for if-expressions (like if_pos and if_neg) might be useful.
+
+c. Formal Reasoning  
+ – You might either use tactics such as "by_cases" or "split" to separately consider the two cases.  
+ – Alternatively, you can use the simp tactic after unfolding the definitions, since Lean’s simp can simplify the if-then-else constructions given the condition.
+
+─────────────────────────────  
+4. Summary of the Steps
+
+1. Implement isDivisibleBy11:
+  – Use an if-else based on whether n % 11 equals 0.
+
+2. Write the isDivisibleBy11_spec which equates (n % 11 = 0) with the returned Boolean.
+
+3. Prove isDivisibleBy11_spec_satisfied by:
+  a. Unfolding the definitions.
+  b. Considering the two cases coming from the if-else (i.e., the condition n % 11 = 0 holding or not holding).
+  c. Showing that in each case the equivalence holds.
+
+─────────────────────────────  
+5. A Pseudocode Sketch
+
+The following sketch mirrors the approach:
+
+─────────────────────────────  
+Implementation:
+ def isDivisibleBy11 (n : Int) : Bool :=
+   if n % 11 = 0 then true else false
+
+Specification:
+ def isDivisibleBy11_spec (n : Int) (result : Bool) : Prop :=
+   n % 11 = 0 ↔ result
+
+Proof:
+ theorem isDivisibleBy11_spec_satisfied (n : Int) :
+   isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+   unfold isDivisibleBy11 isDivisibleBy11_spec
+   by_cases h : n % 11 = 0
+   · -- Case when h is true:
+     simp [if_pos h]
+   · -- Case when h is false:
+     simp [if_neg h]
+─────────────────────────────  
+
+This plan shows the key insights:
+ – Implementing by directly checking the modulo.
+ – Unfolding definitions to expose the structure.
+ – Splitting the proof into two cases where the if-then-else simplifies auto.
+
+By following these steps, you will achieve both the function implementation and the correctness proof according to the given specification.

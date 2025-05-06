@@ -1,0 +1,3 @@
+a.toList.any (λ x => (b.toList.contains x))
+
+This converts both arrays to lists and then uses List.any and List.contains, which are available in Lean 4.

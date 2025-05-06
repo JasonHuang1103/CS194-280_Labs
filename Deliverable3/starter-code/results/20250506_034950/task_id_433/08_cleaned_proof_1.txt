@@ -1,0 +1,20 @@
+let l := a.toList
+
+have h_all: a.all (λ x => n > x) = l.all (λ x => n > x) := by
+  rfl
+
+rw [h_all]
+
+have h_list := List.all_eq_forall l (λ x => n > x)
+rw [h_list]
+
+apply Iff.intro
+· intro h i hi
+  have : a.toList.nthLe i hi = a[i]! := by
+    simp only [Array.get?_eq_nthLe]
+  rw [← this]
+  exact h (List.mem_nthLe l i hi)
+
+· intros h x hx
+  obtain ⟨i, hi, rfl⟩ := List.mem_nthLe.1 hx
+  exact h i hi

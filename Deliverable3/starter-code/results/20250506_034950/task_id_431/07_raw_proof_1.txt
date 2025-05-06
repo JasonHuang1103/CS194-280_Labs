@@ -1,0 +1,29 @@
+```
+apply Iff.intro
+· intro ⟨i, j, hi, hj, h⟩
+  apply Array.any_eq_true.mpr
+  use a[i]!
+  constructor
+  · apply Array.get_mem
+  · apply Array.any_eq_true.mpr
+    use b[j]!
+    constructor
+    · apply Array.get_mem
+    · exact h
+· intro h
+  apply Array.any_eq_true.mp h
+  intro x
+  intro ⟨hx, hy⟩
+  apply Array.any_eq_true.mp hy
+  intro y
+  intro ⟨hy, heq⟩
+  have ⟨i, hi⟩ := Array.mem_iff_get.mp hx
+  have ⟨j, hj⟩ := Array.mem_iff_get.mp hy
+  exists i, j
+  constructor
+  · apply i.2
+  · constructor
+    · apply j.2
+    · rw [← heq]
+      exact hi
+```

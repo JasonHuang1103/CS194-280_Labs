@@ -1,0 +1,3 @@
+split_ifs with h
+· exact ⟨⟨le_refl a, h⟩, Or.inl rfl⟩
+· exact ⟨⟨not_le.mp h, le_refl b⟩, Or.inr rfl⟩

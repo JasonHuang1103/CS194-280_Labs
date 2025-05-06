@@ -1,0 +1,71 @@
+Below is an outline for a solution. In our plan we will:
+
+1. Implement the function in a straightforward way using an iteration over the array. One common approach is to “fold” the array with a boolean “and” operator that, for every element x, tests whether n > x. In Lean 4 this can be done with Array.foldl. (Another possibility is to use Array.all? if available.)
+
+2. State the specification as an equivalence: n is strictly greater than every element in the array (for all valid indices, n > a[i]!) if and only if the returned Boolean is true.
+
+3. Prove the theorem by induction on the size of the array. The steps are:
+  a. Base case: When the array is empty, the property ∀ i, i < 0 → n > a[i]! is trivially true, and our folding (or all? function) returns true.
+  b. Inductive step: Assume the equivalence holds for an array a. For a new array (for example, by “pushing” a new element x on the back), show that:
+   i. If the function returns true then it must be the case that n > x and the induction hypothesis holds for the original part of the array.
+   ii. Conversely, if n > x and n is strictly greater than every element in the original array, then the folding returns true.
+  c. In the proof we “unfold” the definitions of both isGreater and the specification, and use the properties of foldl and boolean conjunction (&&) to relate the two sides.
+
+4. Finally, conclude that the implemented function indeed satisfies the specification.
+
+A more detailed plan is as follows:
+
+---------------------------------
+Step 1. Implementation
+
+We will define:
+
+ def isGreater (n : Int) (a : Array Int) : Bool :=
+  a.foldl (fun acc x => acc && (n > x)) true
+
+Here, we start with true, then for each element check that n > x and combine the result using &&. By the properties of &&, the entire expression evaluates to true if and only if for every element in a the inequality holds.
+
+---------------------------------
+Step 2. Specification
+
+We already have a specification in the form
+
+ def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+  (∀ i, i < a.size → n > a[i]!) ↔ result
+
+which exactly states that the Boolean result is true precisely when n > every element of the array.
+
+---------------------------------
+Step 3. Proof Outline
+
+In the proof theorem isGreater_spec_satisfied, we need to prove the equivalence:
+  ∀ i, i < a.size → n > a[i]!  ↔ (a.foldl (λ b x => b && (n > x)) true)
+
+Plan details:
+
+1. Unfold the definitions of isGreater and isGreater_spec.
+
+2. Proceed by induction on the structure (size) of the array:
+ • Base Case: When a is empty (a.size = 0), the left-hand side (∀ i, i < 0 → n > a[i]!) is vacuously true, while the folding returns true. So the equivalence holds.
+ • Inductive Case: Assume the statement is true for an array a and then consider the array a.push x for some integer x. Use the properties of foldl and the fact that (true && b) equals b; then show that:
+  - The fold returns true if and only if (n > x) and the fold on a returns true.
+  - By the inductive hypothesis, the latter is equivalent to n being greater than every element of a.
+  - Hence, overall, the fold returns true exactly when n > x and n > every element of a – i.e., n is strictly greater than every element in a.push x.
+3. Conclude the proof by the inductive principle.
+
+---------------------------------
+Step 4. Writing the Code
+
+In the actual Lean file you would substitute the placeholders {{code}} and {{proof}} by the implementation and the above-indicated inductive proof. In our plan, we highlight that one must carefully manage the unfolding of definitions and use properties of foldl and boolean conjunction.
+
+---------------------------------
+Summary
+
+The key steps are:
+ 1. Choosing an implementation that iterates over the array (via foldl), ensuring that for every element the condition n > element holds.
+ 2. Stating the specification as an equivalence (∀ i, i < a.size → n > a[i]!) ↔ (result = true).
+ 3. Proving the base case for an empty array.
+ 4. Proving the inductive case by appending an element to the array and using the inductive hypothesis.
+ 5. Concluding that the function meets its specification.
+
+This plan gives you the roadmap needed to implement the function and rigorously prove that it meets the provided specifications in Lean 4.

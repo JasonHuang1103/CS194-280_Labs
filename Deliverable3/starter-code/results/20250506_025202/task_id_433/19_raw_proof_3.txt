@@ -1,0 +1,23 @@
+```
+simp [List.all?, Array.toList, List.foldr_eq_foldl', foldl_and]
+apply Iff.intro
+· intro h1
+  induction a.toList with
+  | nil => simp
+  | cons x xs ih => simp at h1 ⊢
+    cases h1 x (List.mem_cons_self x xs) with
+    | intro h₂ h₃ =>
+      apply And.intro h₂
+      apply ih
+      intro y hy
+      apply h₃
+      apply List.mem_cons_of_mem
+      assumption
+· intro h
+  intro i hi
+  have h_toList := Array.getElem_toList i hi
+  rw [Array.getElem_toList] at h_toList
+  cases List.mem_iff_nth_le.mpr ⟨i, h_toList.symm⟩ with
+  | intro _ h_n =>
+    exact List.all?_iff_forall.mp h ⟨i, rfl⟩
+```

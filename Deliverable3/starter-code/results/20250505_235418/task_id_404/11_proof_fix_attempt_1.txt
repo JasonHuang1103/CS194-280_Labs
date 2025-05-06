@@ -1,0 +1,6 @@
+```lean
+split_ifs with h
+  exact ⟨le_refl _, h, Or.inl rfl⟩
+  have h' : b ≤ a := not_le.mp h
+  exact ⟨h', le_refl _, Or.inr rfl⟩
+```

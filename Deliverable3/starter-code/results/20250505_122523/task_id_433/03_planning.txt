@@ -1,0 +1,65 @@
+We can break down the problem into two main parts:
+
+1. Implementation of the isGreater function.
+2. Proving that the function meets the given specification (isGreater_spec).
+
+Below is a detailed plan explaining the key steps and ideas for each part.
+
+───────────────────────────── 
+Step 1. Implementation
+
+• The function isGreater takes an integer n and an array of integers a. The goal is to return true if for every element x in a the inequality n > x holds and false otherwise.
+
+• Lean’s Array library provides tools for iterating over arrays. One common strategy is to use a built‐in higher-order function that “tests” a predicate for every element in the array. For example, one can use a function like all? (or an equivalent construct) which checks whether the predicate holds for all elements.
+
+• Hence, you can implement isGreater simply as:
+  isGreater n a = a.all? (fun x ↦ n > x)
+
+ This is concise and exactly captures the specification:
+  “Return true if ∀ x ∈ a, n > x; otherwise false.”
+
+───────────────────────────── 
+Step 2. Theorem and Proof
+
+The theorem isGreater_spec states:
+  “(∀ i, i < a.size → n > a[i]!) ↔ result”
+when result = isGreater n a.
+
+Here’s how you might plan the proof:
+
+• Unfold the definitions for isGreater and isGreater_spec. After unfolding, the goal is to prove:
+
+  (∀ i, i < a.size → n > a[i]!) ↔ a.all? (fun x ↦ n > x)
+
+• One key observation is that the predicate (∀ i, i < a.size → n > a[i]!) is equivalent to saying “for every element of a (accessed via array’s indexing), the predicate n > x holds”. 
+
+• If Lean’s mathlib (or Lean’s Array module) provides a lemma stating that “a.all? p ↔ (∀ i, i < a.size → p (a[i]!))”, then you can simply apply that lemma. (Often such a lemma is named something similar to Array.all?_iff_forall.)
+
+• If such a lemma is not directly available, you can prove the equivalence by induction on a, or by reasoning via the definition of all? (which is usually defined using a recursive helper that traverses the array).
+
+• Thus the proof will be mostly by unfolding the definitions and applying (or proving) the equivalence between all? and the forall-version of the predicate.
+
+───────────────────────────── 
+Summary of the Detailed Plan
+
+1. Write the function:
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+   a.all? (fun x ↦ n > x)
+
+2. State the specification:
+  def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+   (∀ i, i < a.size → n > a[i]!) ↔ result
+
+3. Prove the theorem:
+  theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :
+   isGreater_spec n a (isGreater n a) := by
+   unfold isGreater isGreater_spec
+   /– Now, either apply a lemma such as Array.all?_iff_forall if available,
+    or prove the equivalence by induction on the array’s structure. –/
+   … (details)
+
+This plan provides a clear path:
+ • Use the array’s built‐in all? function for a short and faithful implementation.
+ • Unfold the specifications and prove that the boolean produced by the function corresponds exactly to the logical condition that n is greater than all array elements.
+
+Using this plan, you can now implement the code and fill in the proof details accordingly.

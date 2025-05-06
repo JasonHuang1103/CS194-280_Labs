@@ -1,0 +1,4 @@
+a.any (λ x => b.contains x)
+
+──────────────────────────────
+With the extraneous text removed (or commented out), Lean will now accept the code without errors.

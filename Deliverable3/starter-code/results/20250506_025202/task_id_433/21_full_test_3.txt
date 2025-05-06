@@ -1,0 +1,8 @@
+Lean Error: lean_playground/TempTest.lean:21:8: error: unknown constant 'List.all?'
+lean_playground/TempTest.lean:21:33: error: unknown constant 'List.foldr_eq_foldl''
+lean_playground/TempTest.lean:21:55: error: unknown identifier 'foldl_and'
+lean_playground/TempTest.lean:18:40: error: unsolved goals
+n : ℤ
+a : Array ℤ
+⊢ (∀ i < a.size, a[i]! < n) ↔ Array.foldr (fun x acc => decide (x < n) && acc) true a = true
+lean_playground/TempTest.lean:22:0: error: unexpected identifier; expected command

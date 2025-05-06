@@ -1,0 +1,10 @@
+by_cases h1 : decide (a ≤ b)
+by_cases h2 : decide (if h1 then a ≤ c else b ≤ c)
+{ rw [if_pos h1, if_pos h2]
+  exact ⟨⟨le_rfl, h1, if h1 then h2 else le_of_not_le h2⟩, Or.inl rfl⟩ }
+{ rw [if_pos h1, if_neg h2]
+  exact ⟨⟨le_rfl, h1, if h1 then le_of_not_le h2 else h2⟩, Or.inr (Or.inr rfl)⟩ }
+{ rw [if_neg h1, if_pos h2]
+  exact ⟨⟨if h1 then le_of_not_le h1 else h2, le_rfl, h2⟩, Or.inr (Or.inl rfl)⟩ }
+{ rw [if_neg h1, if_neg h2]
+  exact ⟨⟨if h1 then le_of_not_le h1 else h2, le_rfl, if h1 then h2 else le_of_not_le h2⟩, Or.inr (Or.inr rfl)⟩ }

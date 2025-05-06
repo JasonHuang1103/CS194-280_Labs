@@ -1,0 +1,9 @@
+Lean Error: lean_playground/TempTest.lean:18:54: error: unsolved goals
+case mp
+a b : Array ℤ
+⊢ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) → (a.any fun x => b.any fun y => decide (x = y)) = true
+
+case mpr
+a b : Array ℤ
+⊢ (a.any fun x => b.any fun y => decide (x = y)) = true → ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!
+lean_playground/TempTest.lean:22:0: error: unexpected identifier; expected command

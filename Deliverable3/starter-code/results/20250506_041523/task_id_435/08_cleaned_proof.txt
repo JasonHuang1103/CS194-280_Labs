@@ -1,0 +1,5 @@
+simp
+apply And.intro
+· apply Nat.mod_nonneg
+  exact Nat.zero_lt_succ 9
+· rfl

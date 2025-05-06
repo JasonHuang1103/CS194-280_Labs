@@ -1,0 +1,8 @@
+```lean
+if a < 0 then
+  b > 0
+else if a > 0 then
+  b < 0
+else
+  false
+```

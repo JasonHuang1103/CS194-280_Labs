@@ -1,0 +1,12 @@
+Lean Error: lean_playground/TempTest.lean:8:41: error: function expected at
+  c
+term has type
+  ℤ
+lean_playground/TempTest.lean:10:67: error: unexpected token 'using'; expected command
+lean_playground/TempTest.lean:28:6: error: no goals to be solved
+lean_playground/TempTest.lean:37:6: error: tactic 'constructor' failed, no applicable constructor found
+case pos
+a b c : ℤ
+h1 : ¬a ≤ b
+h2 : b ≤ c
+⊢ b ≤ a

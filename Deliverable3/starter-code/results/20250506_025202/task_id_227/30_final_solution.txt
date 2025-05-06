@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then \n  if a \u2264 c then a else c\nelse \n  if b \u2264 c then b else c",
+  "proof": "by_cases h\u2081 : a \u2264 b\n\u00b7 by_cases h\u2082 : a \u2264 c\n  \u00b7 simp [h\u2081, h\u2082]\n    split\n    \u00b7 exact \u27e8Int.le_refl a, h\u2081, h\u2082\u27e9\n    \u00b7 left; rfl\n  \u00b7 simp [h\u2081, h\u2082]\n    split\n    \u00b7 exact \u27e8Int.le_of_not_ge h\u2082, h\u2081.trans (Int.le_of_not_ge h\u2082), Int.le_refl c\u27e9\n    \u00b7 right; right; rfl\n\u00b7 by_cases h\u2083 : b \u2264 c\n  \u00b7 simp [h\u2081, h\u2083]\n    split\n    \u00b7 exact \u27e8Int.le_of_not_ge h\u2081, Int.le_refl b, h\u2083\u27e9\n    \u00b7 right; left; rfl\n  \u00b7 simp [h\u2081, h\u2083]\n    split\n    \u00b7 exact \u27e8(Int.le_of_not_ge h\u2081).trans_lt (Int.lt_of_not_ge h\u2083), Int.le_of_not_ge h\u2083, Int.le_refl c\u27e9\n    \u00b7 right; right; rfl"
+}

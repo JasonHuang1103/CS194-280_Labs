@@ -1,0 +1,3 @@
+Lean Error: lean_playground/TempTest.lean:25:10: error: unknown constant 'Array.getElem_eq_data_get'
+lean_playground/TempTest.lean:25:37: warning: `Array.get!` has been deprecated: Use indexing notation `as[i]!` instead
+lean_playground/TempTest.lean:25:4: error: simp made no progress

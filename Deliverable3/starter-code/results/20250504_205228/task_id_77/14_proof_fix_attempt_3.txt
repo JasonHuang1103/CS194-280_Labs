@@ -1,0 +1,23 @@
+Certainly! The main issue with your proof is a redundancy and a mistake in handling the split cases correctly. Additionally, the error message indicates that there is an accidental duplication of the theorems' name. Here's the corrected proof for `isDivisibleBy11_spec_satisfied`:
+
+```lean
+theorem isDivisibleBy11_spec_satisfied (n : Int) :
+  isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  split_ifs
+  case _ h₁ =>
+    constructor
+    . intro; exact h₁
+    . intro; rfl
+  case _ h₂ =>
+    constructor
+    . intro h; contradiction
+    . intro h; exact h₂ h
+```
+
+### Key Points:
+
+- I removed the duplicated `theorem` declaration.
+- Cleaned up the split cases to directly handle the proof paths.
+- Used `contradiction` correctly in the second case to derive a contradiction from `n % 11 = 0`.
+- Ensured that the constructor forms are used correctly to handle the bidirectional implication.

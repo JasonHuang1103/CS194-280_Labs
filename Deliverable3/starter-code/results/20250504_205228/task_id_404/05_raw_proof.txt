@@ -1,0 +1,16 @@
+```lean
+unfold myMin myMin_spec
+split
+· split
+  · by_cases h : a ≤ b
+    · simp [h]
+    · simp [h]
+      exact le_of_not_le h
+  · by_cases h : a ≤ b
+    · simp [h]
+      exact le_trans h (le_refl b)
+    · simp [h]
+· by_cases h : a ≤ b
+  · simp [h]
+  · simp [h]
+```

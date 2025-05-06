@@ -1,0 +1,105 @@
+Below is one way to attack the problem. I will explain in detail how one can think about and plan the solution. (Note that we focus here on the “plan” and the reasoning behind it; once you’re satisfied with the plan you can implement it in Lean.)
+
+──────────────────────────────
+Step 1. Understanding the function “hasCommonElement”
+
+The specification requires that, given two arrays a and b (both containing Int values), we return true exactly when there exists a pair of indices i and j so that
+
+  i < a.size, j < b.size, and a[i]! = b[j]! .
+
+Note that if one array is empty then there is no chance of a common element, so the answer should be false.
+
+──────────────────────────────
+Step 2. Breaking the function into subproblems
+
+A natural way of “searching” for a common element is to do the following:
+ • Iterate over the elements of the first array a.
+ • For each element x in a, check if there is some element y in b such that x = y.
+If any such x is found (with y in b), then the answer is true; otherwise, it is false.
+
+In Lean (and functional programming in general) the combinator “any” is very convenient. (The Array.any method takes a predicate and returns true if there is at least one element in the array satisfying the predicate.) We can therefore “nest” two such searches:
+ – For each x in a, check b.any (λ y => x = y).
+
+Thus, our function can be coded as:
+  a.any (fun x => b.any (fun y => x = y))
+
+This form immediately meets the requirement (if a is empty then a.any returns false).
+
+──────────────────────────────
+Step 3. Considering the inputs, edge cases, and expected behavior
+
+• Input types: Both a and b are Array Int.  
+• Edge cases:  
+ – If either a or b is empty then a.any (… ) won’t find any element and so returns false.  
+ – If one or both arrays have repeated elements, that is irrelevant; we need only one match.
+• Expected Behavior: The function exactly returns true when and only when there exists some pair (i, j) such that a[i]! equals b[j]! (as specified).
+
+──────────────────────────────
+Step 4. Proof techniques
+
+We need to prove that our function “hasCommonElement” satisfies the specification:
+
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+where result is exactly (hasCommonElement a b). This amounts to proving an “if and only if” statement. The tactic “constructor” or “apply iff.intro” is natural here because we must give both directions:
+ • (→) Assume the left-hand side (an existence statement) and deduce that a.any … returns true.  
+ • (←) Assume that a.any … returns true and use that to extract an element from a and from b that witness the existence.
+
+Since the definitions of “Array.any” (and related predicates or lemmas concerning “Array.any”) reflect an existential condition, you may use a lemma like “if an array.any predicate returns true then there is an element in the array that satisfies the predicate” and conversely. (Sometimes one “unfolds” the definition of “any” or uses the “exists_mem” properties.)
+
+A likely proof outline is to:
+ 1. Unfold the definitions of hasCommonElement and the specification.
+ 2. Split the ↔ into two implications.
+ 3. For the forward implication, use the existence of indices to show that at least one element x in a has the property that “b.any (λ y => x = y)” is true.
+ 4. For the backward implication, start with “hasCommonElement a b = true” and then use the semantics of “Array.any” to show that there is some x in a and some y in b such that x = y. Then repackage this information as “∃ i j, …”.
+
+One thing to be careful about is that our specification is phrased in terms of indices (i, j) and our function uses the values in the array. You may need to “recover” the index information by using the fact that if x ∈ a then there exists an index i such that a[i]! = x. (Lean’s Array datatype comes with a membership predicate that you can sometimes use together with index search lemmas. Alternatively, you can build a small “auxiliary” lemma that every element in the array comes with an index.)
+
+──────────────────────────────
+Step 5. Noting similar patterns
+
+If you have seen examples where one proves an existence statement from a result on “any”, then the structure is very similar. For example, one typical proof pattern is:
+ – To prove “if a.any p then ∃ x, x ∈ a ∧ p x”, one uses the definition of “Array.any”.
+Likewise, the converse “if ∃ x ∈ a, p x then a.any p” is immediate.
+
+You might structure your proof using “cases” on the existential quantifier to obtain the witnesses, then “use” to supply the witnesses for the existential.
+
+──────────────────────────────
+Detailed Plan Summary
+
+1. Implementation:
+ • Define
+  def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+   a.any (fun x => b.any (fun y => x = y))
+ • This definition uses the Array.any method (which returns false for an empty array).
+
+2. Specification (already given):
+ • hasCommonElement_spec a b result is defined as:
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+3. Proof of the theorem “hasCommonElement_spec_satisfied”:
+ • Begin by unfolding the definitions of hasCommonElement and hasCommonElement_spec.
+ • Split the iff into two cases:
+  a. (→) Assume ∃ i j, … then show that for the element a[i]! the inner shown predicate b.any (λ y => …) becomes true. Use the fact that the array search “any” is defined to return true if there is a witness.
+  b. (←) Assume hasCommonElement a b = true. Unfold the definition of “a.any” to show that there exists some x in a (with some index i) such that b.any (λ y => x = y) is true. Then further use the b.any property to get a corresponding index j for b, showing that a[i]! = b[j]!.
+ • Tactics you may use: “cases”, “use” (to supply witnesses), “constructor” or “split” for the “↔” and “unfold” for the definitions.
+
+────────────────────────────--
+Conclusion
+
+The plan is as follows:
+
+A. Implementation:
+ – Write
+  def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+   a.any (fun x => b.any (fun y => x = y))
+
+B. Proof:
+ 1. Unfold the definitions.
+ 2. Prove “(∃ i j, …) → a.any … = true” by taking the witness i and j given by the hypothesis and then arguing that a.any and b.any “detect” the common element.
+ 3. Prove “a.any … = true → (∃ i j, …)” by using the semantics of “any” to extract a witness from a and then from b.
+ 4. Structure your proof using tactics such as “apply iff.intro”, “cases”, “use”, and “simp” (or any other simplification/rewriting tactics) on the definitions of Array.any.
+
+Once you have the plan, you can update the Lean template with the implementation in the CODE section and provide a detailed proof in the PROOF section.
+
+This concludes the step-by-step plan for both the implementation and the formal proof in Lean 4.

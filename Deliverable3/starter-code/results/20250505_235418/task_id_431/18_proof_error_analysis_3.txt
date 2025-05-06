@@ -1,0 +1,64 @@
+Below is a step‐by‐step explanation of what is going wrong. In short, the proof is “misusing” conversion lemmas (in particular, the ones that relate Boolean computations to propositions) so that Lean ends up with “unsolved goals” that it cannot automatically fill.
+
+Below are the details:
+
+──────────────────────────────
+1. Which tactic is failing and why
+
+The error message pinpoints problems with the calls to
+  (Bool.decide_eq_true_iff _).mpr …  and  (Bool.decide_eq_true_iff _).mp …
+in the “mp” and “mpr” branches of the ↔. Lean complains that there are “unsolved goals” when trying to use these conversion lemmas. Moreover, the unexpected token “{” suggests that Lean got “confused” by the block structure that follows a failing tactic.
+
+Essentially, the tactic calls that try to “convert back and forth” between a Boolean equality (that the computed value is true) and a proposition (an existential claim) are not being applied in a way that Lean can automatically discharge.
+
+──────────────────────────────
+2. What is the proof state at that point
+
+After unfolding the definitions of hasCommonElement and hasCommonElement_spec we have two directions to prove:
+ (a) from an existence statement ∃ i j, … to the Boolean equation
+  a.any (λ x => b.any (λ y => decide (x = y))) = true,
+ (b) and conversely from that Boolean equality to the existence statement.
+
+At the beginning of each branch, the proof is trying to convert between a Prop (an existential) and a Bool (the result of using .any). In order to “bridge” these two worlds Lean calls on lemmas like Array.exists_mem_iff_any and Bool.decide_eq_true_iff. However, inside those lemmas the inner predicates are “wrapped” in decide and Expecting decidability. The proof tries to interleave these lemmas in a nested way but leaves Lean with unsolved conversion subgoals.
+
+──────────────────────────────
+3. Does the proof approach match the specification?
+
+Your specification asserts that
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ hasCommonElement a b.
+The idea is correct: you want to relate the implementation (a nested any over Boolean decisions) with the existential property. In principle you should be able to prove this via the appropriate rewriting lemmas. However, the approach chosen here uses “off‐the‐shelf” lemmas such as Array.exists_mem_iff_any and Bool.decide_eq_true_iff in a way that assumes they “just cancel out” the decide. In the process you also try to work with an “exists” predicate on a function that is itself constructed by applying any to a Boolean–valued function. This double conversion is where the tactic calls get “muddled.”
+
+──────────────────────────────
+4. Type mismatches or incorrect assumptions
+
+A closer look shows that the inner predicate you’re working with is
+  λ x => b.any (λ y => decide (x = y))
+which is itself Boolean. The lemma Array.exists_mem_iff_any is meant to convert a statement like
+  ∃ x, x ∈ a ∧ P x
+to
+  a.any (λ x => decide (P x)) = true.
+But here P is chosen as “b.any (λ y => decide (x = y))”, which already is produced using .any and decide. In other words, you are “nesting” the conversion:
+  Bool.decide_eq_true_iff (∃ x, …)
+and then using it again inside an Array.exists_mem_iff_any. (You also call Bool.decide_eq_true_iff twice.) The underscores you provide to these lemmas are not fully determined by Lean so that some decidability instances remain as unsolved “side‐goals.”
+
+Thus the “mismatch” is that you are mixing decidable computations (which yield Bool) with propositions (∃ …) in a way that the lemmas do not automatically resolve. Lean is expecting a direct connection between a proposition P and decide P, but the inner “P” is itself a Boolean function coming from using .any on b.
+
+──────────────────────────────
+5. Alternative proof strategies
+
+A different strategy can avoid this labyrinth of conversions. For example, you might:
+ • Prove separately lemmas that show:
+  (a) If a.any f = true then ∃ x ∈ a, (decide (f x) = true) (or, equivalently, f x is true).
+  (b) Conversely, if ∃ x ∈ a, f x then a.any f = true.
+ • Then specialize these results to your particular predicates.
+ • Alternatively, work on the “Prop side” only. That is, change your specification (or even your implementation, if possible) so that you prove directly that the computed Bool being true is equivalent to the existence of some indices with the given properties without nesting “any” on both arrays.
+ • Or, if you prefer to work in the Boolean world, prove and use lemmas that “lift” existentials about array indices to the Boolean “any” structure in a more step‐by‐step fashion.
+
+──────────────────────────────
+Conclusion and Suggestion
+
+The root cause of the error is that the proof is “over‐eagerly” converting between Bool and Prop with the lemmas Bool.decide_eq_true_iff and Array.exists_mem_iff_any. In doing so, Lean is left with unsolved subgoals of type “decide (∃ …)” that it cannot automatically resolve. In addition, the nesting of the predicates (using .any on the inner array as part of an outer conversion) confuses Lean’s mechanism for instantiating the decidability arguments.
+
+To fix the problem you should try to simplify the conversion; for example, prove separate helper lemmas that relate a.any (λ x => decide (P x)) = true to ∃ x ∈ a, P x with P a “simple” predicate. Then specialize these helper lemmas to your context. Alternatively, you can restructure the proof to avoid nested conversions and work with one “layer” at a time. This would both clarify the intent and allow Lean to resolve the necessary decidability instances.
+
+By avoiding the “over-nesting” of decide calls and by structuring the conversion between Bool and Prop more explicitly, the unsolved goals will be eliminated.

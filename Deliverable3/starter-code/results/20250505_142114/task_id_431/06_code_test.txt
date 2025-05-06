@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:7:12: error: unexpected token ','; expected '↦', '=>'
+lean_playground/TempTest.lean:17:8: warning: declaration uses 'sorry'

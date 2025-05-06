@@ -1,0 +1,20 @@
+```lean
+  simp
+  apply Iff.intro
+  · intro h
+    simp [List.any, List.contains] at h
+    rcases h with ⟨x, hx, hb⟩
+    rw [List.mem_toList] at hx
+    rw [List.mem_toList] at hb
+    obtain ⟨i, hi⟩ := hx
+    obtain ⟨j, hj⟩ := hb
+    use [i, j]
+    simp [hi, hj]
+  · intro h
+    simp [List.any, List.contains]
+    rcases h with ⟨i, j, hi, hj, hab⟩
+    have hai : a[i]! ∈ a.toList := List.mem_toList.mpr ⟨i, hi, rfl⟩
+    have hbj : a[i]! ∈ b.toList := List.mem_toList.mpr ⟨j, hj, hab ▸ rfl⟩
+    use a[i]!
+    simp [hai, hbj]
+```

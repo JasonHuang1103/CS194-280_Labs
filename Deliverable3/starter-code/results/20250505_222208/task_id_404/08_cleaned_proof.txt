@@ -1,0 +1,9 @@
+by_cases h : a <= b
+· constructor
+  · apply h
+  · apply Int.le_trans h
+  · left; rfl
+· constructor
+  · apply le_of_not_le h
+  · apply le_refl
+  · right; rfl

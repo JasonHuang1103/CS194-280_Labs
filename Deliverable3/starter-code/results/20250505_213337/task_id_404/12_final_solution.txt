@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then a else b",
+  "proof": "split\n\u00b7 split_ifs\n  \u00b7 exact \u27e8le_refl a, le_of_lt (le_trans (le_of_not_le h) h)\u27e9\n  \u00b7 exact \u27e8le_of_not_le h, le_refl b\u27e9\n\u00b7 split_ifs\n  \u00b7 left; rfl\n  \u00b7 right; rfl"
+}

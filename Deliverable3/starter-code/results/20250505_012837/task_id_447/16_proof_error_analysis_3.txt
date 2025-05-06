@@ -1,0 +1,17 @@
+The error arises because your proof calls a constant named Array.getElem_eq_data_get, but that constant doesn’t exist in Lean 4’s libraries. In your simp invocation, you wrote:
+
+  simp [Array.getElem_eq_data_get, Array.get!]
+
+Lean complains with "unknown constant 'Array.getElem_eq_data_get'" because there is no such lemma available. This name may have existed in an earlier version of Lean or Mathlib, or perhaps was mistaken for another conversion rule. Additionally, the warning about Array.get! tells you that the indexing notation as[i]! should now be preferred over calling Array.get!.
+
+In short, the issue is that you are trying to simplify using a lemma that Lean does not know about. Since this lemma is central to the part of the proof you’re trying to simplify (namely, reasoning about the result of a.map over indices), the simp tactic fails to make progress on that subgoal.
+
+To fix the proof, you should remove Array.getElem_eq_data_get from your simp list and instead use the appropriate lemmas or rewrite rules that are available in Lean 4’s Mathlib. You may need to:
+
+1. Look up the current Lean 4 lemmas for Array.map and the properties of indexing into Arrays.  
+2. Replace the reference with the correct lemma or rewrite the proof to use the current indexing notation (for example, as[i]!).
+3. Adjust the handling of Array.get! in the proof according to its new deprecation notice.
+
+Once you update the proof to use the correct rules for Array mapping and indexing, the error about the unknown constant will disappear, and Lean will be able to simplify the expression as expected.
+
+This is the detailed analysis: Your proof error is not due to your underlying theorem being false, but simply because you referenced a lemma that either never existed or has been removed/renamed in the Lean 4 ecosystem.

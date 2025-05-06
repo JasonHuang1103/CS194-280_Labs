@@ -1,0 +1,6 @@
+Lean Error: lean_playground/TempTest.lean:21:2: error: tactic 'rfl' failed, the left-hand side
+  n % 11 = 0
+is not definitionally equal to the right-hand side
+  (n % 11 == 0) = true
+n : ℤ
+⊢ n % 11 = 0 ↔ (n % 11 == 0) = true

@@ -1,0 +1,176 @@
+We want to write a function in Lean 4 that checks whether a given integer n is strictly larger than every element in an array a. In other words, we must return true exactly when
+
+  ∀ i, i < a.size → n > a[i]!
+
+and false when (and only when) there is some index i with i < a.size for which n ≤ a[i]!. Because our array is assumed to be non-null (that is, we always have some array, possibly empty), we can implement this by “folding” over the array and “accumulating” the Boolean (using Boolean “and”) of the predicate “n > x” for every element x.
+
+Below is a step‐by‐step outline of our reasoning and plan.
+
+────────────────────────────
+Step 1. Understand the Function’s Specification
+
+The specification tells us that:
+• If for every valid index i we have n > a[i]! then our function should return true.
+• Otherwise (there exists an index with n ≤ a[i]!), the function should return false.
+
+In Lean we then want a predicate isGreater_spec that states:
+  (∀ i, i < a.size → n > a[i]!) ↔ result.
+
+────────────────────────────
+Step 2. Break Down the Problem into Subproblems
+
+For the implementation:
+a) Decide on a method to “check” every element of the array.
+ One common method is to use foldl. The idea is to start with true (the neutral element for ∧) and then “accumulate” with the function:
+  fun (acc : Bool) (x : Int) => acc && (n > x)
+ Thus, if any element fails the condition (n > x), the “and” will eventually turn false.
+
+b) We need to consider the edge case where the array is empty. In that case the “forall” statement is true by vacuity, and the fold returns the initial value true.
+
+For the proof:
+a) We have to show that the foldl implementation returns true if and only if n is greater than every element of a.
+b) A natural approach is to “unfold” the definition of isGreater and then argue by induction on the (finite) list of elements of the array. (It is often convenient to pass to a.toList and use standard induction on lists.) In the base case (empty list) both sides are trivially true. In the inductive step, one shows that:
+  (acc && (n > x)) = true if and only if (acc = true and n > x),
+which fits nicely with the “forall” property.
+
+────────────────────────────
+Step 3. Consider Input Types, Edge Cases, and Expected Behavior
+
+Inputs:
+• n is an Int.
+• a is an Array Int.
+
+Edge Cases:
+• When a is empty, the specification is true (nothing to check) and the function must return true.
+• Otherwise, each element gets “checked.”
+
+Expected Behavior:
+• We require that isGreater n a returns a Boolean that “mirrors” the condition:
+  (∀ i, i < a.size → n > a[i]!).
+
+────────────────────────────
+Step 4. Think about the Proof Technique
+
+The proof of isGreater_spec_satisfied (that is, that our function satisfies its specification) will be done by:
+1. Unfolding the definitions.
+2. Possibly converting the array to a list (using a.toList) so that we can argue by induction on the structure of the list.
+3. In the base case (empty list) the property is immediate.
+4. In the inductive step, we note that the fold on a nonempty list will “and” the result for the head with the rest’s result. That is, we want to show:
+  ((n > head) ∧ (∀ x in tail, n > x)) ↔ (∀ i, i < (head :: tail).length → n > (head :: tail)[i]!).
+5. The Boolean “and” (&&) in Lean behaves as expected and mirrors the logical ∧ on decidable propositions.
+
+────────────────────────────
+Step 5. Note Similar Patterns from Examples
+
+The examples in the documentation show:
+• How to define recursive functions or to use fold/accumulate constructs.
+• How to convert a recursion (or induction) argument from a list’s structure to prove a property.
+In our case, our foldl “accumulator” directly corresponds to a series of and-ing conditions over the list. One common pattern is to prove that:
+  foldl (λ acc x, acc ∧ p x) true = true ↔ ∀ x in the list, p x
+and this is exactly what we need for our predicate p(x) := n > x.
+
+────────────────────────────
+Detailed Plan for Implementation
+
+1. Implementation:
+
+We define:
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    a.foldl (fun acc x => acc && (n > x)) true
+
+This function:
+• Starts with true.
+• For each element x in a, “updates” the accumulator to acc && (n > x).
+• Returns the final accumulated Boolean.
+
+2. Specification:
+
+Define the specification predicate as:
+  def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+    (∀ i, i < a.size → n > a[i]!) ↔ result
+
+3. Proof:
+
+We prove that for all n and a the computed result satisfies our specification:
+  theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :
+    isGreater_spec n a (isGreater n a)
+The proof plan is as follows:
+ a. Unfold the definitions of isGreater and isGreater_spec.
+ b. Convert the array a into a list (using a.toList) so that we can use induction on the list.
+ c. Prove by induction on the list l = a.toList that:
+  foldl (λ acc x, acc && (n > x)) true = true if and only if ∀ x ∈ l, n > x.
+ d. Finally, note that “∀ x in l, n > x” is equivalent to “∀ i, i < a.size → n > a[i]!”.
+
+One may either prove this directly by induction or find (or prove) an auxiliary lemma that establishes this connection between the fold and the “forall” predicate.
+
+────────────────────────────
+Conclusion: Detailed Plan
+
+────────────────────────────
+Implementation Plan:
+
+• Write the function as:
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    a.foldl (fun acc x => acc && (n > x)) true
+
+• Write the specification predicate:
+  def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+    (∀ i, i < a.size → n > a[i]!) ↔ result
+
+────────────────────────────
+Proof Plan:
+
+• Unfold the definitions of isGreater and isGreater_spec.
+• Change the world from “array” to “list” (using a.toList) so that you can apply induction. That is, prove:
+  ∀ l : List Int, (foldl (λ acc x, acc && (n > x)) true = true) ↔ (∀ x ∈ l, n > x)
+by induction on l.
+• For the base case (l = []), the equivalence is trivial.
+• For the inductive case (l = x :: xs), observe that:
+  (acc && (n > x)) = true if and only if (acc = true) ∧ (n > x),
+and then use the induction hypothesis.
+• Map the statement “∀ x ∈ a.toList, n > x” back to “∀ i, i < a.size → n > a[i]!”, noting that a.toList contains exactly the elements of a in order.
+• Conclude that the returned Boolean is true if and only if n is greater than every element in a.
+
+────────────────────────────
+This plan gives us a complete view of both how to implement the function and how to prove that our implementation satisfies the specification.
+
+Below is a draft template (with placeholders for the detailed proof) that follows exactly this plan:
+
+----------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  -- We fold over the array with the Boolean and
+  a.foldl (fun acc x => acc && (n > x)) true
+
+-- Specification: n is greater than all elements in a if and only if the result is true.
+def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+  (∀ i, i < a.size → n > a[i]!) ↔ result
+
+-- Theorem: Our function meets its specification.
+theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :
+  isGreater_spec n a (isGreater n a) :=
+by
+  -- PROOF START
+  -- Unfold definitions:
+  simp [isGreater, isGreater_spec]
+  -- It suffices to show that 
+  --   a.foldl (λ acc x, acc && (n > x)) true = true 
+  -- if and only if ∀ i, i < a.size → n > a[i]!.
+  --
+  -- One approach is to convert a into a list (say l = a.toList) and prove by induction on l that:
+  --   List.foldl (λ acc x, acc && (n > x)) true = true ↔ ∀ x ∈ l, n > x.
+  --
+  -- After that, note that ∀ i, i < a.size → n > a[i]! is equivalent to ∀ x ∈ a.toList, n > x.
+  --
+  -- [Here you can either invoke a previously proven lemma about foldl or provide the induction details.]
+  admit
+  -- PROOF END
+
+----------------------------------------------------------
+
+In an actual complete development, you would replace “admit” with the full induction proof. However, the above plan shows exactly how to implement the function and structure its correctness proof.
+
+This completes the detailed plan for both implementation and proof.

@@ -1,0 +1,4 @@
+{
+  "code": "a.any (\u03bb x => b.any (\u03bb y => x = y))",
+  "proof": "constructor\n\u00b7 intro h\n  obtain \u27e8i, j, hi, hj, hij\u27e9 := h\n  apply Array.any_eq_true (\u03bb x => b.any (\u03bb y => decide (x = y))) i\n  { apply Array.any_eq_true (\u03bb y => decide (a[i]! = y)) j\n    { rw [\u2190 eq_true]\n      exact hij }\n    { exact hj } } \n  { exact hi }\n\u00b7 intro h\n  rw [Array.any_eq_true_iff] at h\n  obtain \u27e8x, hx, hx_any\u27e9 := h\n  rw [Array.any_eq_true_iff] at hx_any\n  obtain \u27e8y, hy, hy_eq\u27e9 := hx_any\n  use a.indexOf x, b.indexOf y\n  split\n  { apply Array.indexOf_lt_size_of_mem\n    exact hx }\n  split\n  { apply Array.indexOf_lt_size_of_mem\n    exact hy }\n  exact hy_eq"
+}

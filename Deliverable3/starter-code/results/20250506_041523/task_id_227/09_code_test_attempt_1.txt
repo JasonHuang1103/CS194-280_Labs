@@ -1,0 +1,6 @@
+Lean Error: lean_playground/TempTest.lean:8:23: error: function expected at
+  c
+term has type
+  ℤ
+lean_playground/TempTest.lean:10:20: error: unexpected token 'using'; expected command
+lean_playground/TempTest.lean:21:8: warning: declaration uses 'sorry'

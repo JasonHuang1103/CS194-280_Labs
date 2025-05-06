@@ -1,0 +1,2 @@
+simp
+exact Iff.refl _

@@ -1,0 +1,41 @@
+The error is not in your implementation of hasCommonElement at all but rather in the way the interactive proof is written. In your theorem proof you begin a tactic script with
+
+  by
+    unfold hasCommonElement hasCommonElement_spec
+    apply Iff.intro
+    · intro h
+      sorry
+    · intro ⟨i, j, hi, hj, h_eq⟩
+      sorry
+
+Two problems occur here:
+
+1. The parser complains at something like “unexpected token 'def'; expected 'in'”. This is a symptom of a layout/indentation problem. When you write a definition (or theorem) using tactic mode with the “by” keyword, Lean expects the proof to be properly delimited. In your file the bullet (·) notation is causing the parser to “think” that something hasn’t ended yet (for example, the definition of hasCommonElement or even the proof itself). In Lean 4 the punctuation and indentation of tactic blocks is important. If bullets are not indented in the expected manner (or if you mix bullets and “by begin ... end” incorrectly), then Lean will complain that it was expecting a keyword like “in” (which marks the end of a binding) but found a new definition (e.g. def …) instead.
+
+2. The second complaint about “unexpected token '·'; expected command” in the second bullet is the same kind of issue: Lean’s parser is not recognizing your bullet symbols as part of a properly indented tactic block. (If you are more comfortable with it, you might want to use the “begin … end” block structure rather than the “by” with bullets.) Moreover, the two “sorry” placeholders mean that you leave two open (unsolved) subgoals. (Lean even tells you, “unsolved goals”, one for the forward and one for the backward direction of the ↔ statement.)
+
+To correct these problems, you should check two things:
+
+• Make sure that the bullet points (or any tactic proofs) are indented consistently inside the “by” block. In Lean 4 you can either use a “by begin … end” block with proper bullet markers (such as “-” or “·”) on indented lines or you can write a one‐line tactic script when appropriate.
+
+• Finally, note that the “sorry” placeholders leave the proof incomplete. (Lean is giving unsolved-goals errors because of the “sorry”s.)
+
+A possible fix would be to reformat your theorem as follows:
+
+---------------------------------------------------------------
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  hasCommonElement_spec a b (hasCommonElement a b) :=
+by
+  unfold hasCommonElement hasCommonElement_spec
+  apply Iff.intro
+  · intro h
+    -- TODO: complete this direction of the proof (∃ i j ... → result)
+    sorry
+  · intro ⟨i, j, hi, hj, h_eq⟩
+    -- TODO: complete this direction of the proof (result → ∃ i j ...)
+    sorry
+---------------------------------------------------------------
+
+This makes sure that all tactic commands, including the bullet points “·”, are correctly indented and clearly part of the same “by” block. (Alternatively, you could use “begin … end”.) Once the bullet indentation is fixed (and the “sorry”s are replaced by actual proofs) Lean will be able to parse your code.
+
+In summary, the root cause of the error is the misformatted proof block—specifically, the bullet syntax and its indentation (and the unresolved “sorry” goals) are confusing Lean’s parser, which then reports unexpected tokens where it expected the termination of a block.

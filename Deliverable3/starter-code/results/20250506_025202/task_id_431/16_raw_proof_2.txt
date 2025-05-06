@@ -1,0 +1,11 @@
+```lean
+apply Iff.intro
+· intro ⟨i, j, hi, hj, h_eq⟩
+  have hj' : b.any (fun y => a[i]! = y) = true :=
+    Array.any_iff.mpr ⟨j, hj, h_eq⟩
+  exact Array.any_iff.mpr ⟨i, hi, hj'⟩
+· intro result
+  obtain ⟨i, hi, hb⟩ := Array.any_iff.mp result
+  obtain ⟨j, hj, h_eq⟩ := Array.any_iff.mp hb
+  exact ⟨i, j, hi, hj, h_eq⟩
+```

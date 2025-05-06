@@ -1,0 +1,4 @@
+{
+  "code": "a * b",
+  "proof": "theorem multiply_spec_satisfied (a : Int) (b : Int) :\n  multiply_spec a b (multiply a b) := by\n  unfold multiply multiply_spec\n  rfl"
+}

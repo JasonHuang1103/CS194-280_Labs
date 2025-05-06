@@ -1,0 +1,21 @@
+Certainly! The errors you're encountering are due to redundant declarations and an incomplete proof. Let's correct the proof:
+
+```lean
+  -- PROOF START
+  unfold cubeElements cubeElements_spec
+  constructor
+  case left =>
+    -- Use size_map property of Array.map which ensures the size remains unchanged
+    exact Array.size_map _ _
+  case right =>
+    intro i hi
+    -- We apply simp to unfold map and use getElem to resolve the correct element position
+    -- Given that hi is i < a.size, it follows i < a.size = map f a.size
+    simp [Array.getElem, Array.map, hi]
+  -- PROOF END
+```
+
+Key corrections made:
+1. Removed duplicate theorem declaration.
+2. The original proof already correctly utilized the `size_map` property under `case left`, which confirms the sizes are equal.
+3. Simplified the application of the lambda function in mapping with `simp` for the element-wise proof in `case right`.

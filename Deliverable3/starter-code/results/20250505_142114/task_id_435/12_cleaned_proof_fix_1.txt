@@ -1,0 +1,2 @@
+simp
+apply Nat.mod_lt n 10 (by decide)

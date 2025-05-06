@@ -1,0 +1,40 @@
+The problem is not that your underlying definition of myMin is “wrong” but that your proof never “gets around” the if‐expression. In other words, after you do
+
+  unfold myMin myMin_spec
+
+the goal still has a conditional
+
+  (if a ≤ b then a else b)
+
+embedded in it. In your proof you then split on a by_cases a ≤ b, but even in the branch where you know a ≤ b, the term
+
+  (if a ≤ b then a else b)
+
+has not automatically “reduced” to a. (The same is true for the other branch.) Because you are giving an “exact” term that uses a proof term like rfl expecting that the if‐expression reduces definitionally, Lean finds that the goal is not solved (and then it complains about the bullet “·” because a subgoal is still not finished).
+
+To explain in more detail:
+
+1. Your definition
+  def myMin (a : Int) (b : Int) : Int :=
+    if a ≤ b then a else b
+remains “stuck” on the if‐expression until further simplification occurs. Unlike a pattern match that immediately “peels off” a constructor, the if–then–else is a conditional that does not automatically simplify in your proof even after unfolding its definition.
+
+2. In the branch where you assume h : a ≤ b, you would like to have
+  if a ≤ b then a else b = a
+and similarly for the other branch. But unfolding alone does not do this conversion. You need to “tell” Lean to do the case-splitting on the conditional. (Usually, one would use tactics such as split_ifs or dsimp.)
+
+3. The unsolved goals tell you that even after the by_cases analysis, the goal remains
+  ((if a ≤ b then a else b) ≤ a ∧ …) ∧ ((if a ≤ b then a else b) = a ∨ …)
+so that your provided witness ⟨⟨le_refl a, h⟩, Or.inl rfl⟩ does not match up with that “if”–containing goal.
+
+4. The “unexpected token ‘·’” error is a secondary consequence. Because the first branch of your by_cases hasn’t been completely solved (the goal still contains unsimplified if‐terms), Lean gets confused when you try to start the next bullet at the same level.
+
+A way to correct this is to “split” or “simplify” the if–then–else by using the tactic split_ifs. For example, after unfolding your definitions you might add a command like
+
+  split_ifs
+  · ... -- now the goal is in the case a ≤ b, where the if is replaced by a
+  · ... -- the other case, where the if is replaced by b
+
+Alternatively, you could directly simplify using dsimp or simp lemmas if you have provided the corresponding simp rule for the if–expression.
+
+In summary, the root cause is that unfolding your definitions leaves an if–expression that does not automatically reduce even when you know its condition; hence your bullet proofs are “off” because you never address the conditional’s behavior. The way forward is to explicitly “split” or simplify the if–expression in each case of your proof.

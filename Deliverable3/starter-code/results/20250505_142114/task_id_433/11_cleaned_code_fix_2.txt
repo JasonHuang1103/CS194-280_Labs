@@ -1,0 +1,1 @@
+a.toList.all (λ m => n > m)

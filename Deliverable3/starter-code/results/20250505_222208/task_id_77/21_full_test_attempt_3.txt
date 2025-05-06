@@ -1,0 +1,11 @@
+Lean Error: lean_playground/TempTest.lean:18:48: error: unsolved goals
+case pos
+n : ℤ
+h✝ : n % 11 = 0
+⊢ n % 11 = 0 ↔ true = true
+
+case neg
+n : ℤ
+h✝ : ¬n % 11 = 0
+⊢ n % 11 = 0 ↔ False
+lean_playground/TempTest.lean:22:0: error: unexpected token '·'; expected command

@@ -1,0 +1,122 @@
+Below is one way to think about the problem, along with a detailed plan for both the implementation and the proof.
+
+────────────────────────
+Step 1. Understanding the function
+
+We need to write a function called cubeElements that accepts an array of integers and returns a new array where every element is replaced by its cube. In Lean 4, one natural way to do that is to “map” a function over the array. Recall that the Array type provides a map method that applies a given function to every element of the array and returns a new array. In our case the function is
+
+   λ x, x * x * x
+
+so that each integer x is replaced by x * x * x.
+
+────────────────────────
+Step 2. Breaking Down the Problem
+
+1. Implementation Subproblem:
+   • Use the Array.map function.
+   • The function cubeElements simply becomes:
+     
+        def cubeElements (a : Array Int) : Array Int :=
+          a.map (λ x => x * x * x)
+
+2. Proof Subproblem:
+   We must prove that the output (result) satisfies the specification:
+   • The length of the output array is the same as the input array.
+   • For each index i (with i < a.size), the element result[i]! equals a[i]! * a[i]! * a[i]!.
+     
+   For the proof, we make use of the properties of Array.map:
+   • The size of a.map f is the same as the size of a.
+   • For any index i such that i < a.size, it holds that (a.map f)[i]! = f (a[i]!).
+     
+   These properties are typically provided as lemmas (for example, Array.size_map and Array.get_map). If these lemmas are available (or we can just use the definition of map), then both parts of the property become straightforward.
+
+────────────────────────
+Step 3. Considering Edge Cases
+
+• When the array is empty the map function returns an empty array. In that case:
+   – The sizes obviously agree (0 = 0).
+   – The universal property about the elements is vacuously true.
+     
+Thus, our function works for both empty and non-empty arrays.
+
+────────────────────────
+Step 4. Proof Techniques
+
+For the proof, the following are useful:
+   • Unfolding definitions to reveal that cubeElements is defined via map.
+   • Using intro to handle a universally quantified statement (for every index i).
+   • Using simp (or directly rewriting by definition) to show that (a.map f)[i]! becomes f (a[i]!) (i.e. the cube).
+   • And-ing the two parts (size equality and element-wise property) with the tactic and.intro.
+     
+The plan is to first prove that the size of a.map is the same as the size of a (by a hypothetical lemma Array.size_map). Next, for every index i, we show that (a.map (λ x, x * x * x))[i]! equals a[i]! * a[i]! * a[i]! by simply unfolding the definition.
+
+────────────────────────
+Step 5. Similar Patterns in Examples
+
+Similar patterns have been shown in Lean 4 documentation when using map and when proving properties about transformed lists or arrays:
+   • “map preserves size” is a common fact.
+   • Reasoning “for all i, (a.map f)[i]! = f (a[i]!)” is standard and sometimes provided by helper lemmas like Array.get_map.
+     
+We follow these patterns to complete our proof.
+
+────────────────────────
+Detailed Plan for Implementation and Proof:
+
+1. Implementation:
+   • Define cubeElements as follows:
+     def cubeElements (a : Array Int) : Array Int :=
+       a.map (λ x => x * x * x)
+
+2. Proof:
+   • Unfold cubeElements and cubeElements_spec.
+   • Prove the size condition:
+       Show that (a.map (λ x => x * x * x)).size = a.size. (Already true by the definition of map.)
+   • Prove the element-wise condition:
+       For any i with i < a.size, using the property of Array.map get, we have:
+           (a.map (λ x => x * x * x))[i]! = (λ x => x * x * x)(a[i]!) = a[i]! * a[i]! * a[i]!.
+   • Combine the two proofs using an and.intro.
+
+The final Lean 4 code is given below.
+
+────────────────────────
+Final Lean 4 Code:
+
+import Mathlib
+import Aesop
+
+-- Implementation
+def cubeElements (a : Array Int) : Array Int :=
+  -- << CODE START >>
+  a.map (λ x => x * x * x)
+  -- << CODE END >>
+
+-- Theorem: The length of the output array must be the same as the length of the input array;
+-- Each element in the output array is the cube of the corresponding element in the input array
+def cubeElements_spec (a : Array Int) (result : Array Int) : Prop :=
+  -- << SPEC START >>
+  (result.size = a.size) ∧
+  (∀ i, i < a.size → result[i]! = a[i]! * a[i]! * a[i]!)
+  -- << SPEC END >>
+
+theorem cubeElements_spec_satisfied (a : Array Int) :
+  cubeElements_spec a (cubeElements a) := by
+  -- << PROOF START >>
+  -- Unfold the definitions
+  unfold cubeElements cubeElements_spec
+  apply And.intro
+  · -- Prove that the sizes match.
+    -- By definition, a.map preserves the size
+    exact Array.size_map _ a
+  · -- Prove that every element in the result is the cube of the corresponding element in a.
+    intro i hi
+    -- By the definition of map, (a.map f)[i]! equals f (a[i]!)
+    have h := Array.get_map _ a i hi
+    simp [h]  -- This simplifies to (λ x => x * x * x) (a[i]!) = a[i]! * a[i]! * a[i]!
+  -- << PROOF END >>
+
+────────────────────────
+Conclusion
+
+The approach consists of using Array.map to implement cubeElements and then invoking known properties of Array.map (namely that it preserves the size and that each element is mapped by the given function) to prove cubeElements_spec_satisfied.
+
+This detailed plan and the provided implementation should correctly solve the problem in Lean 4.

@@ -1,0 +1,9 @@
+Lean Error: lean_playground/TempTest.lean:7:2: error: function expected at
+  a.toList.any fun x => b.toList.contains x
+term has type
+  Bool
+lean_playground/TempTest.lean:9:13: error: unexpected token ','; expected command
+lean_playground/TempTest.lean:14:37: error: unexpected identifier; expected command
+lean_playground/TempTest.lean:28:38: error: unknown constant 'List.mem_iff_nthLe'
+lean_playground/TempTest.lean:28:2: error: simp made no progress
+lean_playground/TempTest.lean:29:0: error: unexpected identifier; expected command

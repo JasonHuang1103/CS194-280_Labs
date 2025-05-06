@@ -1,0 +1,4 @@
+{
+  "code": "a.toList.all (fun x => n > x)",
+  "proof": "simp [isGreater, isGreater_spec],\nsplit,\n{ intros h i hi,\n  apply h,\n  assumption },\n{ intros h x hx,\n  rcases List.mem_toList.1 hx with \u27e8j, rfl\u27e9,\n  exact h j (by simp [Array.getElem_eq_data_get, hx]) }"
+}

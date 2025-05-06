@@ -1,0 +1,59 @@
+Below is a detailed plan outlining the key steps for both implementing the function and proving it meets its specification.
+
+──────────────────────────────
+1. Understanding the Requirements  
+
+• The function must return true exactly when one integer is positive and the other negative.  
+• We need to consider that zero is neither positive nor negative so any case in which one of the numbers is 0 must return false.  
+• In logical terms, the proposition is: (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0).
+
+──────────────────────────────
+2. Implementation Strategy
+
+• Most naturally, we define hasOppositeSign in terms of the logical proposition that checks the sign conditions.  
+• One option is to write a function that uses conditional expressions (if-then-else) to check both cases.  
+• A more elegant solution is to “decide” the truth value of the proposition. Lean 4 provides the function decide, which takes a decidable proposition and returns a Boolean.  
+  - In our case, we can write:  
+    hasOppositeSign a b := decide ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+• Note that Lean’s ordering on Int produces propositions, so using decide allows us to convert the proposition to a Bool automatically provided decidability instances exist (which they do for comparisons on Int).
+
+──────────────────────────────
+3. Specification
+
+• The specification has been provided in the template as:  
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result  
+  where result is the output of hasOppositeSign.
+• This spec neatly mirrors our intended semantics: the Boolean result should be true exactly when the logical condition holds.
+
+──────────────────────────────
+4. Proof Strategy
+
+• The proof goal is to show that, for every pair of integers a and b, we have:  
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ (hasOppositeSign a b)  
+• Start the proof by unfolding both definitions (hasOppositeSign and hasOppositeSign_spec) so that the equivalence becomes apparent.
+• Since we have defined hasOppositeSign using the decide function, we can leverage the property decide_spec, which states that for any decidable proposition p:  
+  decide p = true ↔ p  
+• With the equivalence from decide_spec, the proof should follow by showing that  
+  decide ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) returns true exactly when the proposition holds.
+• The proof can be completed by either directly applying decide_spec to the proposition or using the “simp” tactic (after unfolding) that simplifies to the required equivalence.
+
+──────────────────────────────
+5. Summary of Planned Changes in the Template
+
+• In the implementation section (inside hasOppositeSign), replace {{code}} with:  
+
+  decide ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+
+• In the theorem proof section (inside hasOppositeSign_spec_satisfied), after unfolding the definitions, either invoke the decide_spec property on the proposition or use a few simplification steps to reach the equivalence. For example:  
+
+  by simp [decide_spec]
+
+or equivalently, using a direct application of decide_spec tactics.
+
+──────────────────────────────
+6. Final Notes
+
+• This approach cleanly separates the decision procedure (implementation) from its specification (logical equivalence) while using Lean’s built‐in mechanisms for converting decidable propositions to Booleans.
+• The overall structure is simple: the key is to use the decide function and then show that this decision function indeed conforms to the desired specification.
+
+Following this plan, both the Lean 4 function and its accompanying proof should be straightforward to implement.

@@ -1,0 +1,24 @@
+split_ifs
+case h_1 =>
+  constructor
+  · intro h
+    cases h with
+    | inl _ => assumption
+    | inr _ => contradiction
+  · intro h
+    left; constructor; assumption
+case h_2 =>
+  constructor
+  · intro h
+    cases h with
+    | inl _ => contradiction
+    | inr h => assumption
+  · intro h
+    right; constructor; assumption
+case h_3 =>
+  constructor
+  · intro h
+    cases h with
+    | inl h => cases h.1
+    | inr h => cases h.1
+  · simp

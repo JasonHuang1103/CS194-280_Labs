@@ -1,0 +1,12 @@
+```lean
+simp only [List.all, List.map]
+have h : (∀ m, m ∈ a.toList → n > m) ↔ (∀ i, i < a.size → n > a[i]!) := by
+  constructor
+  · intro h i hi
+    have : a[i]! ∈ a.toList := Array.mem_toList a i hi
+    exact h _ this
+  · intro h m hm
+    obtain ⟨i, hi, rfl⟩ := List.mem_toList_iff.1 hm
+    exact h i hi
+rw [Bool.ofDecide_eq_iff, h]
+```

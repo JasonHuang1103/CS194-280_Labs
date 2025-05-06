@@ -1,0 +1,13 @@
+```lean
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  unfold hasOppositeSign hasOppositeSign_spec
+  apply Iff.intro
+  · intro h
+    simp only [Bool.of_decide_eq_true, *]
+  · intro h
+    rw [←Bool.of_decide_eq_true]
+    exact h
+```
+
+The proof error was mostly in handling the `decide` function correctly. In Lean, when using `decide`, it's more productive to use `Bool.of_decide_eq_true` to handle the transformation between a Boolean value from `decide` and the logical propositions you are working with. Additionally, there was a duplicated block in the proof which has been corrected.

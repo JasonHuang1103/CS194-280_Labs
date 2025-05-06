@@ -1,0 +1,104 @@
+Below is our step‐by‐step process for solving the problem along with our final plan.
+
+──────────────────────────────
+Step 1. Understanding the Function
+
+• The function should check if two given integers have opposite signs.
+• “Opposite signs” means one integer is strictly positive and the other is strictly negative.
+• Note that zero is not positive nor negative, so if either number is zero the answer must be false.
+• Thus, our condition is exactly:
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)
+
+──────────────────────────────
+Step 2. Breaking Down the Problem
+
+• We need a function (hasOppositeSign) that returns a Boolean.
+  – We compare the integers using the less-than operator.
+  – Use Boolean operators (&& for “and”, || for “or”) to combine the conditions.
+• Define the specification (hasOppositeSign_spec) as a proposition
+  – The specification states that: 
+   (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+  – Here “result” will be exactly what our function returns.
+• Finally, we need to prove (hasOppositeSign_spec_satisfied) that the implementation meets the spec.
+
+──────────────────────────────
+Step 3. Considering Inputs, Edge Cases, and Expected Behavior
+
+• Inputs are integers. Be wary of:
+  – Cases where a or b is 0 (should return false).
+  – Cases where both a and b are positive (false) or both negative (false).
+  – Only when one is positive and the other is negative we return true.
+• Our boolean expression above automatically covers these cases because 0 does not satisfy > 0 or < 0.
+
+──────────────────────────────
+Step 4. Thinking About the Proof Techniques
+
+• The proof will be by “unfolding” the definitions.
+  – Unfold both hasOppositeSign and hasOppositeSign_spec.
+  – After unfolding, both sides of the ↔ will be the same expression:
+   ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+• Therefore, the statement is clearly an equivalence (i.e. Iff.rfl).
+• We need to use the Lean tactic that confirms the equality of both sides.
+
+──────────────────────────────
+Step 5. Recognizing Similar Patterns
+
+• A common pattern in Lean proofs is to “unfold” definitions to see that two sides are definitionally equal.
+• Once unfolded, if both sides are literally the same, "exact Iff.rfl" sufficiently ends the proof.
+• No further case analysis is needed here.
+
+──────────────────────────────
+Detailed Plan for Implementation and Proof
+
+1. Implementation:
+ • Define hasOppositeSign (a b : Int) to return ((a < 0 && b > 0) || (a > 0 && b < 0)).
+ • This directly corresponds to our condition.
+
+2. Specification:
+ • hasOppositeSign_spec takes a and b along with the Boolean result.
+ • It is defined by the statement: 
+   (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+
+3. Proof:
+ • In the proof theorem hasOppositeSign_spec_satisfied, unfold both hasOppositeSign and hasOppositeSign_spec.
+ • After unfolding, the equivalence is between an expression and itself, so we use Iff.rfl.
+ • This shows that our implementation satisfies the specification.
+
+──────────────────────────────
+Final Lean 4 Code Based on the Plan
+
+Below is the Lean 4 code that implements our function and proves the specification:
+
+-----------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasOppositeSign (a : Int) (b : Int) : Bool :=
+  -- << CODE START >>
+  (a < 0 && b > 0) || (a > 0 && b < 0)
+  -- << CODE END >>
+
+-- Theorem: The result is true if a and b have opposite signs
+def hasOppositeSign_spec (a : Int) (b : Int) (result: Bool) : Prop :=
+  -- << SPEC START >>
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result
+  -- << SPEC END >>
+
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  -- << PROOF START >>
+  unfold hasOppositeSign hasOppositeSign_spec
+  exact Iff.rfl
+  -- << PROOF END >>
+-----------------------------------------------------------
+
+──────────────────────────────
+Conclusion
+
+By following these steps:
+• We analyzed the problem and broke it into smaller parts (function, specification, proof).
+• We handled the edge cases, ensuring zero is correctly processed.
+• We recognized the proof can be completed by unfolding and using reflexivity (Iff.rfl).
+
+This completes our plan and final solution.

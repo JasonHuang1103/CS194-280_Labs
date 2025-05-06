@@ -1,0 +1,11 @@
+constructor
+case mp => 
+  intro ⟨i, j, h₁, h₂, h₃⟩
+  apply Array.any_of_mem _ h₃
+  exact ⟨i, h₁, b.contains_iff.mpr ⟨j, h₂, h₃⟩⟩
+case mpr => 
+  intro h
+  obtain ⟨x, hx⟩ := Array.mem_of_any h
+  obtain ⟨i, hi⟩ := hx
+  obtain ⟨j, hj₁, hj₂⟩ := b.mem_iff_index.mp hi
+  exact ⟨i, j, Array.get_mem ⟨i, hi.1⟩, hj₁, hj₂⟩

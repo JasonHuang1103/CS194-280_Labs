@@ -1,0 +1,16 @@
+intro
+split
+· split
+  · split_ifs
+    · apply le_refl
+    · apply le_of_not_le
+      assumption
+  · split_ifs
+    · apply le_of_lt
+      assumption
+    · apply le_refl
+· split_ifs
+  · left
+    rfl
+  · right
+    rfl

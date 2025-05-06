@@ -1,0 +1,310 @@
+RAG components successfully imported.
+Starting test of 11 tasks: task_id_0, task_id_58, task_id_77, task_id_127, task_id_227, task_id_404, task_id_431, task_id_433, task_id_435, task_id_441, task_id_447
+
+==================================================
+Processing task task_id_0...
+Reading problem description and code template from tasks/task_id_0...
+Problem description length: 310 characters
+Reading unit tests...
+Unit tests length: 69 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_220718
+Processing task: task_id_0 (Task index: 0)
+Retrieving relevant examples for function 'ident'...
+ERROR: RAG query failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0)
+Please check your database and embedding model setup.
+RAG components successfully imported.
+Starting test of 11 tasks: task_id_0, task_id_58, task_id_77, task_id_127, task_id_227, task_id_404, task_id_431, task_id_433, task_id_435, task_id_441, task_id_447
+
+==================================================
+Processing task task_id_0...
+Reading problem description and code template from tasks/task_id_0...
+Problem description length: 310 characters
+Reading unit tests...
+Unit tests length: 69 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_222208
+Processing task: task_id_0 (Task index: 0)
+Detected OpenAI embedding model (1536 dimensions)
+Using OpenAI embedding model for all operations
+Retrieving relevant examples for function 'ident'...
+Response saved to results/20250505_222208/task_id_0/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250505_222208/task_id_0/02_proof_rag_examples.txt
+Response saved to results/20250505_222208/task_id_0/03_planning.txt
+Response saved to results/20250505_222208/task_id_0/04_raw_code.txt
+Response saved to results/20250505_222208/task_id_0/05_cleaned_code.txt
+Response saved to results/20250505_222208/task_id_0/06_code_test.txt
+Response saved to results/20250505_222208/task_id_0/07_raw_proof.txt
+Response saved to results/20250505_222208/task_id_0/08_cleaned_proof.txt
+Response saved to results/20250505_222208/task_id_0/09_full_test.txt
+Response saved to results/20250505_222208/task_id_0/10_final_solution.txt
+Solution generated in 118.66 seconds
+Generated code length: 1 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_58...
+Reading problem description and code template from tasks/task_id_58...
+Problem description length: 700 characters
+Reading unit tests...
+Unit tests length: 462 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_222208
+Processing task: task_id_58 (Task index: 1)
+Detected OpenAI embedding model (1536 dimensions)
+Using OpenAI embedding model for all operations
+Retrieving relevant examples for function 'hasOppositeSign'...
+Response saved to results/20250505_222208/task_id_58/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250505_222208/task_id_58/02_proof_rag_examples.txt
+Response saved to results/20250505_222208/task_id_58/03_planning.txt
+Response saved to results/20250505_222208/task_id_58/04_raw_code.txt
+Response saved to results/20250505_222208/task_id_58/05_cleaned_code.txt
+Response saved to results/20250505_222208/task_id_58/06_code_test.txt
+Response saved to results/20250505_222208/task_id_58/07_raw_proof.txt
+Response saved to results/20250505_222208/task_id_58/08_cleaned_proof.txt
+Response saved to results/20250505_222208/task_id_58/09_full_test.txt
+Response saved to results/20250505_222208/task_id_58/10_proof_error_analysis_1.txt
+Response saved to results/20250505_222208/task_id_58/11_proof_fix_attempt_1.txt
+Response saved to results/20250505_222208/task_id_58/12_cleaned_proof_fix_1.txt
+Response saved to results/20250505_222208/task_id_58/13_full_test_attempt_1.txt
+Response saved to results/20250505_222208/task_id_58/14_proof_error_analysis_2.txt
+Response saved to results/20250505_222208/task_id_58/15_proof_fix_attempt_2.txt
+Response saved to results/20250505_222208/task_id_58/16_cleaned_proof_fix_2.txt
+Response saved to results/20250505_222208/task_id_58/17_full_test_attempt_2.txt
+Response saved to results/20250505_222208/task_id_58/18_proof_error_analysis_3.txt
+Response saved to results/20250505_222208/task_id_58/19_proof_fix_attempt_3.txt
+Response saved to results/20250505_222208/task_id_58/20_cleaned_proof_fix_3.txt
+Response saved to results/20250505_222208/task_id_58/21_full_test_attempt_3.txt
+Response saved to results/20250505_222208/task_id_58/22_final_solution.txt
+Solution generated in 342.77 seconds
+Generated code length: 36 characters
+Generated proof length: 341 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:21:2: error: tactic 'split' failed, consider using `set_option trace.split.failure true`
+a b : ℤ
+⊢ a < 0 ∧ b > 0 ∨ a > 0...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_77...
+Reading problem description and code template from tasks/task_id_77...
+Problem description length: 456 characters
+Reading unit tests...
+Unit tests length: 449 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_222208
+Processing task: task_id_77 (Task index: 2)
+Detected OpenAI embedding model (1536 dimensions)
+Using OpenAI embedding model for all operations
+Retrieving relevant examples for function 'isDivisibleBy11'...
+Response saved to results/20250505_222208/task_id_77/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250505_222208/task_id_77/02_proof_rag_examples.txt
+Response saved to results/20250505_222208/task_id_77/03_planning.txt
+Response saved to results/20250505_222208/task_id_77/04_raw_code.txt
+Response saved to results/20250505_222208/task_id_77/05_cleaned_code.txt
+Response saved to results/20250505_222208/task_id_77/06_code_test.txt
+Response saved to results/20250505_222208/task_id_77/07_raw_proof.txt
+Response saved to results/20250505_222208/task_id_77/08_cleaned_proof.txt
+Response saved to results/20250505_222208/task_id_77/09_full_test.txt
+Response saved to results/20250505_222208/task_id_77/10_proof_error_analysis_1.txt
+Response saved to results/20250505_222208/task_id_77/11_proof_fix_attempt_1.txt
+Response saved to results/20250505_222208/task_id_77/12_cleaned_proof_fix_1.txt
+Response saved to results/20250505_222208/task_id_77/13_full_test_attempt_1.txt
+Response saved to results/20250505_222208/task_id_77/14_proof_error_analysis_2.txt
+Response saved to results/20250505_222208/task_id_77/15_proof_fix_attempt_2.txt
+Response saved to results/20250505_222208/task_id_77/16_cleaned_proof_fix_2.txt
+Response saved to results/20250505_222208/task_id_77/17_full_test_attempt_2.txt
+Response saved to results/20250505_222208/task_id_77/18_proof_error_analysis_3.txt
+Response saved to results/20250505_222208/task_id_77/19_proof_fix_attempt_3.txt
+Response saved to results/20250505_222208/task_id_77/20_cleaned_proof_fix_3.txt
+Response saved to results/20250505_222208/task_id_77/21_full_test_attempt_3.txt
+Response saved to results/20250505_222208/task_id_77/22_final_solution.txt
+Solution generated in 358.44 seconds
+Generated code length: 34 characters
+Generated proof length: 32 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:18:48: error: unsolved goals
+case pos
+n : ℤ
+h✝ : n % 11 = 0
+⊢ n % 11 = 0 ↔ true = true
+
+case neg
+n : ℤ
+h✝ : ¬n % 11 = 0
+...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_127...
+Reading problem description and code template from tasks/task_id_127...
+Problem description length: 342 characters
+Reading unit tests...
+Unit tests length: 219 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_222208
+Processing task: task_id_127 (Task index: 3)
+Detected OpenAI embedding model (1536 dimensions)
+Using OpenAI embedding model for all operations
+Retrieving relevant examples for function 'multiply'...
+Response saved to results/20250505_222208/task_id_127/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250505_222208/task_id_127/02_proof_rag_examples.txt
+Response saved to results/20250505_222208/task_id_127/03_planning.txt
+Response saved to results/20250505_222208/task_id_127/04_raw_code.txt
+Response saved to results/20250505_222208/task_id_127/05_cleaned_code.txt
+Response saved to results/20250505_222208/task_id_127/06_code_test.txt
+Response saved to results/20250505_222208/task_id_127/07_raw_proof.txt
+Response saved to results/20250505_222208/task_id_127/08_cleaned_proof.txt
+Response saved to results/20250505_222208/task_id_127/09_full_test.txt
+Response saved to results/20250505_222208/task_id_127/10_final_solution.txt
+Solution generated in 88.01 seconds
+Generated code length: 5 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_227...
+Reading problem description and code template from tasks/task_id_227...
+Problem description length: 608 characters
+Reading unit tests...
+Unit tests length: 339 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_222208
+Processing task: task_id_227 (Task index: 4)
+Detected OpenAI embedding model (1536 dimensions)
+Using OpenAI embedding model for all operations
+Retrieving relevant examples for function 'minOfThree'...
+Response saved to results/20250505_222208/task_id_227/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250505_222208/task_id_227/02_proof_rag_examples.txt
+Response saved to results/20250505_222208/task_id_227/03_planning.txt
+Response saved to results/20250505_222208/task_id_227/04_raw_code.txt
+Response saved to results/20250505_222208/task_id_227/05_cleaned_code.txt
+Response saved to results/20250505_222208/task_id_227/06_code_test.txt
+Response saved to results/20250505_222208/task_id_227/07_raw_proof.txt
+Response saved to results/20250505_222208/task_id_227/08_cleaned_proof.txt
+Response saved to results/20250505_222208/task_id_227/09_full_test.txt
+Response saved to results/20250505_222208/task_id_227/10_proof_error_analysis_1.txt
+Response saved to results/20250505_222208/task_id_227/11_proof_fix_attempt_1.txt
+Response saved to results/20250505_222208/task_id_227/12_cleaned_proof_fix_1.txt
+Response saved to results/20250505_222208/task_id_227/13_full_test_attempt_1.txt
+Response saved to results/20250505_222208/task_id_227/14_proof_error_analysis_2.txt
+Response saved to results/20250505_222208/task_id_227/15_proof_fix_attempt_2.txt
+Response saved to results/20250505_222208/task_id_227/16_cleaned_proof_fix_2.txt
+Response saved to results/20250505_222208/task_id_227/17_full_test_attempt_2.txt
+Response saved to results/20250505_222208/task_id_227/18_proof_error_analysis_3.txt
+Response saved to results/20250505_222208/task_id_227/19_proof_fix_attempt_3.txt
+Response saved to results/20250505_222208/task_id_227/20_cleaned_proof_fix_3.txt
+Response saved to results/20250505_222208/task_id_227/21_full_test_attempt_3.txt
+Response saved to results/20250505_222208/task_id_227/22_final_solution.txt
+Solution generated in 338.02 seconds
+Generated code length: 15 characters
+Generated proof length: 604 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:19:46: error: unsolved goals
+case left
+a b c : ℤ
+⊢ a ⊓ b ⊓ c ≤ a ∧ a ⊓ b ⊓ c ≤ b ∧ a ⊓ b ⊓ c ≤ c
+
+case right
+a b c : ℤ
+⊢...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_404...
+Reading problem description and code template from tasks/task_id_404...
+Problem description length: 483 characters
+Reading unit tests...
+Unit tests length: 228 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_222208
+Processing task: task_id_404 (Task index: 5)
+Detected OpenAI embedding model (1536 dimensions)
+Using OpenAI embedding model for all operations
+Retrieving relevant examples for function 'myMin'...
+Response saved to results/20250505_222208/task_id_404/01_rag_examples.txt
+Retrieving proof examples...
+Response saved to results/20250505_222208/task_id_404/02_proof_rag_examples.txt
+Response saved to results/20250505_222208/task_id_404/03_planning.txt
+Response saved to results/20250505_222208/task_id_404/04_raw_code.txt
+Response saved to results/20250505_222208/task_id_404/05_cleaned_code.txt
+Response saved to results/20250505_222208/task_id_404/06_code_test.txt
+Response saved to results/20250505_222208/task_id_404/07_raw_proof.txt
+Response saved to results/20250505_222208/task_id_404/08_cleaned_proof.txt
+Response saved to results/20250505_222208/task_id_404/09_full_test.txt
+Response saved to results/20250505_222208/task_id_404/10_proof_error_analysis_1.txt
+Response saved to results/20250505_222208/task_id_404/11_proof_fix_attempt_1.txt
+Response saved to results/20250505_222208/task_id_404/12_cleaned_proof_fix_1.txt
+Response saved to results/20250505_222208/task_id_404/13_full_test_attempt_1.txt
+Response saved to results/20250505_222208/task_id_404/14_proof_error_analysis_2.txt
+Response saved to results/20250505_222208/task_id_404/15_proof_fix_attempt_2.txt
+Response saved to results/20250505_222208/task_id_404/16_cleaned_proof_fix_2.txt
+Response saved to results/20250505_222208/task_id_404/17_full_test_attempt_2.txt
+Response saved to results/20250505_222208/task_id_404/18_proof_error_analysis_3.txt
+Response saved to results/20250505_222208/task_id_404/19_proof_fix_attempt_3.txt
+Response saved to results/20250505_222208/task_id_404/20_cleaned_proof_fix_3.txt
+Response saved to results/20250505_222208/task_id_404/21_full_test_attempt_3.txt
+Response saved to results/20250505_222208/task_id_404/22_final_solution.txt
+Solution generated in 262.31 seconds
+Generated code length: 23 characters
+Generated proof length: 173 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:19:32: error: unsolved goals
+case pos
+a b : ℤ
+h : a ≤ b
+⊢ ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_431...
+Reading problem description and code template from tasks/task_id_431...
+Problem description length: 597 characters
+Reading unit tests...
+Unit tests length: 465 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_222208
+Processing task: task_id_431 (Task index: 6)
+Detected OpenAI embedding model (1536 dimensions)
+Using OpenAI embedding model for all operations
+Retrieving relevant examples for function 'hasCommonElement'...
+ERROR: RAG query failed: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+Please check your database and embedding model setup.

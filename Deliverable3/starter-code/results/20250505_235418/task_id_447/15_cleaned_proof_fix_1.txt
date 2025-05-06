@@ -1,0 +1,4 @@
+apply And.intro
+· rfl
+· intro i hi
+  simp [Array.map]

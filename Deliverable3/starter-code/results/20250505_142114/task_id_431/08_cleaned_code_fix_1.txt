@@ -1,0 +1,3 @@
+a.any (λ x => b.contains x)
+
+This change satisfies Lean 4's lambda expression syntax requirements and should resolve the error.

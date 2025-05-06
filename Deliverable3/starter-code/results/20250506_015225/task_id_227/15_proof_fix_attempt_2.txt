@@ -1,0 +1,7 @@
+```
+split_ifs
+· refine ⟨⟨le_refl _, h₁, h₂⟩, Or.inl rfl⟩
+· refine ⟨⟨le_of_not_le h, le_refl _, h₃⟩, Or.inr (Or.inl rfl)⟩
+· refine ⟨⟨le_of_not_le h₂, le_refl _, h₄⟩, Or.inr (Or.inl rfl)⟩
+· refine ⟨⟨h₅, h₆, le_refl _⟩, Or.inr (Or.inr rfl)⟩
+```

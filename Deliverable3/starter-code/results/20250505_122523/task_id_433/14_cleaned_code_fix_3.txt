@@ -1,0 +1,3 @@
+(a.toList).all (fun x => decide (n > x))
+
+This tells Lean that the argument to .all is the entire lambda (fun x => decide (n > x)), and then it works as intended.

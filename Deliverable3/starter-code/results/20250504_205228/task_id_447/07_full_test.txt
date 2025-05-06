@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:22:9: error: tactic 'unfold' failed to unfold 'cubeElements' at
+  (Array.map (fun x => x * x * x) a).size = a.size ∧
+    ∀ i < a.size, (Array.map (fun x => x * x * x) a)[i]! = a[i]! * a[i]! * a[i]!
+lean_playground/TempTest.lean:23:0: error: unexpected identifier; expected command

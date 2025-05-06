@@ -1,0 +1,68 @@
+The underlying problem is not with your definition of myMin but with the proof in the branch for the case (¬ a ≤ b). In that branch you try to “prove” b ≤ a by writing
+
+  apply le_of_not_le  
+  exact h
+
+but no such lemma as le_of_not_le exists (at least not in the way you intended) and, consequently, the goal remains unsolved. (The error message “unsolved goals” indicates that after running your tactics Lean still has a leftover goal, and the “unexpected token ‘·’” is a symptom of the tactic script not being properly sealed when a branch is left unfinished.) 
+
+Let’s break it down:
+
+1. In the positive branch (when h : a ≤ b holds) you use “rw [if_pos h]” so that myMin becomes a and your goal reduces to proving
+
+  (a ≤ a ∧ a ≤ b) ∧ (a = a ∨ a = b).
+
+That branch is almost trivial – a ≤ a by reflexivity and a ≤ b is exactly h. (Proving a = a is trivial by rfl.) So that branch is okay.
+
+2. In the negative branch (when h : ¬ (a ≤ b) holds) the if-statement rewrites so that myMin becomes b and you have to show
+
+  (b ≤ a ∧ b ≤ b) ∧ (b = a ∨ b = b).
+
+Here b ≤ b is straightforward, but the nontrivial part is to prove b ≤ a. Notice that if a is not ≤ b, then by the totality (or trichotomy) of the order on ℤ we must have b < a (which immediately implies b ≤ a). However, your proof instead tried to “apply le_of_not_le” which is not an existing or valid lemma. In Lean 4 the available library (or even Mathlib) does not provide a lemma named le_of_not_le that would magically turn a proof of ¬ (a ≤ b) into a proof of b ≤ a. (One would need to use the fact that for integers ¬ (a ≤ b) is equivalent to b < a, but you must do that explicitly.)
+
+3. Also, the error message about an “unexpected token ‘·’” is a consequence of the fact that the tactic branch did not close off correctly (because of the unsolved goal). Lean saw your bullet “·” in a place it did not expect a new command, probably because the structure wasn’t complete.
+
+A good way to fix this is to explicitly use the order properties of integers. For example, you might show that if a is not ≤ b then b < a by using the trichotomy of the order on ℤ. (In Mathlib there is typically a lemma along the lines of lt_or_eq_of_le_not_le or something similar.) Once you have b < a you have b ≤ a by definition (since x < y implies x ≤ y). You can also simplify the branching by directly rewriting the definition of myMin.
+
+A skeleton fix might look like this:
+
+------------------------------------------------------------
+import Mathlib
+import Aesop
+
+def myMin (a : Int) (b : Int) : Int :=
+  if a ≤ b then a else b
+
+def myMin_spec (a : Int) (b : Int) (result : Int) : Prop :=
+  (result ≤ a ∧ result ≤ b) ∧ (result = a ∨ result = b)
+
+theorem myMin_spec_satisfied (a : Int) (b : Int) :
+  myMin_spec a b (myMin a b) := by
+  unfold myMin myMin_spec
+  by_cases h : a ≤ b
+  · -- case: a ≤ b, so myMin a b = a
+    rw [if_pos h]
+    split
+    · split
+      · exact le_refl a
+      · exact h
+    · left; rfl
+  · -- case: ¬ (a ≤ b), so myMin a b = b
+    rw [if_neg h]
+    split
+    · split
+      -- Here, because a ≤ b is false, we have b < a (by int.trichotomy, for example)
+      · have ltb : b < a := by
+            -- This proof uses the fact that the integers are totally ordered.
+            apply lt_of_not_ge
+            exact h
+        exact le_of_lt ltb
+      · exact le_refl b
+    · right; rfl
+------------------------------------------------------------
+
+The key changes are:
+
+• In the negative case, we show that b < a (using an appropriate lemma such as lt_of_not_ge or a similar fact) and then note that b < a implies b ≤ a.
+• We guarantee that every branch is finished so that there are no unsolved goals.
+
+Thus, the root cause of your error is the incorrect and unsupported tactic step in the negative branch (as well as the subsequent bullet/indentation issue due to an incomplete proof), and the remedy is to correctly prove b ≤ a using the order properties of ℤ.

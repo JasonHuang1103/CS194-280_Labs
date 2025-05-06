@@ -1,0 +1,5 @@
+```lean
+if a <= b ∧ a <= c then a
+else if b <= c then b
+else c
+```

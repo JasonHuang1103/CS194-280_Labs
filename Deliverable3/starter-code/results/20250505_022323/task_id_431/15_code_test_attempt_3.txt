@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:9:82: error: unexpected token 'def'; expected 'in'
+lean_playground/TempTest.lean:19:8: warning: declaration uses 'sorry'

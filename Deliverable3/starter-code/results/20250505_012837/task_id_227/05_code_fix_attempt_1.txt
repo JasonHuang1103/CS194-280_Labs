@@ -1,0 +1,7 @@
+The error occurs because Lean 4 does not provide an "Int.min" function as used. Instead, we can define the minimum of two integers with an if-then-else construct and then use it to compute the minimum of three. Here’s the fixed version of the function implementation:
+
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  if a ≤ b then
+    if a ≤ c then a else c
+  else
+    if b ≤ c then b else c

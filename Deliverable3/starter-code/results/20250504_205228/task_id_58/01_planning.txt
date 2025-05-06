@@ -1,0 +1,101 @@
+Below is a detailed plan that explains how to implement the function, write its specification, and prove that the implementation meets the specification.
+
+──────────────────────────────
+Step 1. Understand the Task
+
+• We need a Lean 4 function, hasOppositeSign, that takes two integers a and b and returns a Boolean.
+• It should return true exactly when one of the integers is positive and the other is negative. In particular, if either integer is zero or if they are both non-negative or both non-positive, it returns false.
+• The specification is given by the proposition:
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+
+──────────────────────────────
+Step 2. Implementation Strategy
+
+There are two standard ways to implement such a function in Lean 4:
+
+A. Use an if-then-else:
+  def hasOppositeSign (a : Int) (b : Int) : Bool :=
+   if ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) then true else false
+  This directly mirrors the specification.
+
+B. Use the built-in decision procedure:
+  Since the condition ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) is decidable (Lean has built-in decision procedures for comparisons on Int), we can use the decide keyword:
+  def hasOppositeSign (a : Int) (b : Int) : Bool :=
+   decide ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+  This version is more concise, and later, when proving the specification, we can simply appeal to decide_spec.
+
+Plan Choice: Option B is elegant and minimal. It uses the fact that Lean can convert a decidable proposition to a Bool.
+
+──────────────────────────────
+Step 3. Specification
+
+The specification is given as follows:
+ def hasOppositeSign_spec (a : Int) (b : Int) (result : Bool) : Prop :=
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+
+This means that the condition that “a and b have opposite signs” is equivalent to the Boolean result computed by hasOppositeSign.
+
+──────────────────────────────
+Step 4. Proving the Implementation Meets the Specification
+
+We need to prove a theorem:
+
+ theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b)
+
+Proof Strategy:
+1. Unfold the definitions of hasOppositeSign and hasOppositeSign_spec.
+2. The implementation using decide gives a result with the property that the returned Boolean is exactly the truth value of the condition ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)). Lean’s library (through decide_spec) guarantees that:
+  decide p = true ↔ p
+3. So the proof will be as simple as unfolding the definitions and then applying decide_spec on the condition.
+
+Thus the proof outline is:
+ • Unfold hasOppositeSign and hasOppositeSign_spec.
+ • Apply decide_spec to close the proof.
+
+──────────────────────────────
+Step 5. Summarize the Plan
+
+1. Implementation:
+ • Define hasOppositeSign using decide on the proposition ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)).
+2. Specification:
+ • Write the proposition hasOppositeSign_spec as “(a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result”.
+3. Proof:
+ • Unfold both definitions.
+ • Use decide_spec on the decidable proposition to prove the equivalence.
+
+──────────────────────────────
+Example Code Sketch
+
+(Although the final answer does not include the complete code with markdown formatting, here is what the Lean code would look like based on the plan.)
+
+--------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasOppositeSign (a : Int) (b : Int) : Bool :=
+  -- Use the decide keyword to convert the decidable proposition to Bool.
+  decide ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0))
+
+-- Theorem: The result is true if a and b have opposite signs
+def hasOppositeSign_spec (a : Int) (b : Int) (result : Bool) : Prop :=
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  -- Unfold the definitions.
+  unfold hasOppositeSign hasOppositeSign_spec
+  -- Use the decision procedure's specification property.
+  apply decide_spec
+--------------------------------------------------
+
+──────────────────────────────
+Conclusion
+
+The key steps are to:
+ • Implement the function by directly testing the condition that one integer is less than zero and the other is greater than zero (in either order), and returning true only in that case.
+ • Write the specification as an equivalence between that condition (as a Prop) and the Boolean result.
+ • Prove the theorem by unfolding the definitions and using the properties of "decide," which ensures that the Boolean produced by decide corresponds exactly to the truth of the proposition.
+
+This plan, when implemented in Lean 4, demonstrates that the function hasOppositeSign exactly meets the specifications provided.

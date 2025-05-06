@@ -1,0 +1,13 @@
+```lean
+apply Iff.intro
+focus
+  intro ⟨i, j, h₁, h₂, h₃⟩
+  apply Array.any_of_mem
+  exact ⟨a[i]!, Array.get_mem ⟨i, h₁⟩, b.contains_iff.mpr ⟨j, h₂, h₃⟩⟩
+focus
+  intro h
+  let ⟨x, hx₁, hx₂⟩ := Array.mem_of_any h
+  obtain ⟨j, hj₁, hj₂⟩ := b.contains_iff.mp hx₂
+  obtain ⟨i, hi⟩ := Array.exists_of_mem hx₁
+  exact ⟨i, j, hi, hj₁, hj₂⟩
+```

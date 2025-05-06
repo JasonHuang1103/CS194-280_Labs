@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:7:2: error: invalid field 'fold', the environment does not contain 'Array.fold'
+  a
+has type
+  Array ℤ
+lean_playground/TempTest.lean:17:8: warning: declaration uses 'sorry'

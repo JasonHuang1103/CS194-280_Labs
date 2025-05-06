@@ -1,0 +1,1 @@
+exact ⟨⟨Nat.zero_le (n % 10), Nat.mod_lt n (by decide)⟩, rfl⟩

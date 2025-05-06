@@ -1,0 +1,29 @@
+Below is an informal explanation of the problem. The proof attempts to “split” the goal into two conjuncts (one for the inequality part and one for the disjunction part) and then “split_ifs” on both—but doing so causes the if‐analysis to appear in two separate places, and it ends up leaving some goals unsolved. In other words, the proof is mis‐structured: after unfolding “myMin” (which becomes an if–then–else), the tactic “split_ifs” is used in each branch of a manually “split” on the conjunction. This causes Lean to generate cases (one for “if a ≤ b” and one for “else”) where some of the goals are only partially addressed (and thus “unsolved”), and also the use of bullet markers (the “·” symbols) becomes ambiguous because Lean sees them in unexpected places after an unhandled if‐case.
+
+More concretely, when you write
+
+  unfold myMin myMin_spec
+  split
+  · split_ifs
+    · exact ⟨le_refl a, h⟩
+    · exact ⟨not_le.mp h, le_refl b⟩
+  · split_ifs
+    · left; rfl
+    · right; rfl
+
+what happens is:
+1. The “unfold” expands myMin to “if a ≤ b then a else b” and the spec to a conjunction.
+2. The “split” tactic creates two subgoals (one for each conjunct).
+3. In each subgoal you then run “split_ifs” so that the if–expression is analyzed into two cases. The first subgoal then splits into two further cases (one when a ≤ b holds and one when it does not). However, in one or both of these cases the goal isn’t fully discharged by your tactic (some subgoals remain “unsolved”).
+4. Moreover, the bullets (·) you placed after “split_ifs” are not parsed in the expected way once Lean is still waiting for the remaining proofs.
+
+Thus, the “unsolved goals” error (and the “unexpected token ‘·’” message) indicate that the tactic invocations are not covering all the cases created by the if–split and that the bullet structure is mis‐aligned.
+
+A way to fix the issue is to restructure the proof so that the if–analysis is performed at a single level. For example, you might “unfold” and then immediately apply “split_ifs,” so that the entire goal is split into two cases (the if-true case and the if-false case), and in each case you prove both parts of the specification at once. Alternatively, you may “by_cases” on (a ≤ b) and then, in each branch, use the appropriate simplifications (using, for example, dif_pos and dif_neg). That way you won’t have to try to split the conjunction separately from the if–analysis.
+
+In summary, the root issues are:
+• The misuse of “split_ifs” inside an already “split” (conjunction split) leads to extra unsolved cases.
+• The bullet markers end up “floating” in a context where Lean isn’t expecting them after an incomplete if–split.
+• The tactic structure does not cover all cases produced by the if–analysis.
+
+To fix the proof, restructure so that you perform the if–case analysis first (or in one unified block) and then prove in each branch that the definition and spec match; this will avoid both the unsolved subgoals and the unexpected token error.

@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then \n  if a \u2264 c then a else c \nelse \n  if b \u2264 c then b else c",
+  "proof": "split_ifs with h\u2081 h\u2082 h\u2083 h\u2084\ncase inl.inl =>\n  constructor\n  \u00b7 exact h\u2081\n  \u00b7 constructor\n    \u00b7 exact le_trans h\u2081 h\u2082\n    \u00b7 exact le_trans h\u2081 h\u2083\n  left\n  rfl\ncase inl.inr =>\n  constructor\n  \u00b7 exact le_of_not_le h\u2082\n  \u00b7 constructor\n    \u00b7 exact le_trans h\u2081 h\u2083\n    \u00b7 exact le_refl c\n  right\n  right\n  rfl\ncase inr.inl =>\n  constructor\n  \u00b7 exact h\u2082\n  \u00b7 constructor\n    \u00b7 exact le_trans (le_of_not_le h\u2081) h\u2082\n    \u00b7 exact le_trans h\u2082 h\u2083\n  right\n  left\n  rfl\ncase inr.inr =>\n  constructor\n  \u00b7 exact le_of_not_le h\u2083\n  \u00b7 constructor\n    \u00b7 exact le_of_not_le (le_trans h\u2082 h\u2081)\n    \u00b7 exact le_refl c\n  right\n  right\n  rfl"
+}

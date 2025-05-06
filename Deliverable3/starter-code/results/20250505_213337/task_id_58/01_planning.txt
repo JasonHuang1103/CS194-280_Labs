@@ -1,0 +1,125 @@
+We want to write a function that, given integers a and b, returns true exactly when one of them is negative and the other positive (with zero never counting as “positive” or “negative”). In other words, the boolean answer should be true if and only if
+
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0).
+
+Because we want to “compute” a Bool from comparisons (and int comparisons in Lean are defined as propositions), we will use the decision procedure via the decide function in Lean. (Lean’s decide mechanism automatically converts decidable propositions into booleans.) With that in mind, a straightforward definition is
+
+  hasOppositeSign a b = (decide (a < 0) && decide (b > 0)) || (decide (a > 0) && decide (b < 0))
+
+—and note that if a or b is zero then none of these conditions hold.
+
+Let’s now walk through our reasoning process step-by-step.
+
+──────────────────────────────
+Step 1. Understand what the function should do
+
+• The description tells us we must check whether one integer is positive and the other is negative.
+• We must be careful with zero because it is neither positive nor negative.
+• Our specification is expressed as the logical equivalence
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result,
+   where result will eventually be computed by our lean function.
+
+──────────────────────────────
+Step 2. Break down the problem into parts
+
+(a) Write the function:
+ • We need to compute a Bool from the properties a < 0, b > 0, etc.
+ • Since a < 0 and b > 0 are propositions (of type Prop) we must use a conversion to Bool. In Lean (and Lean 4 especially) we can use decide, which is available when the proposition is decidable. (Comparisons on integers are decidable by default.)
+ • We combine the two parts with boolean operations: the “and” (&&) and “or” (||).
+
+(b) Prove the specification:
+ • The theorem states that our function meets the spec; that is the computed Bool is true exactly when
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)
+   is true.
+ • The proof basically “unfolds” the definition on both sides. Because decide has the property that
+  decide P = true ↔ P
+   (when P is a decidable Prop), the equivalence is almost immediate.
+ • We may use tactics such as “decide” or “rfl” once everything is unfolded.
+
+──────────────────────────────
+Step 3. Consider the input types, edge cases, and expected behavior
+
+• Our inputs are integers, so the comparisons a < 0, a > 0, etc., are all available.
+• Edge cases:
+  – If either a or b is 0 then neither (a < 0 ∧ b > 0) nor (a > 0 ∧ b < 0) can hold.
+  – When both are negative or both are positive the result should be false.
+• There is no trouble with pattern matching or recursion since we are doing simple comparisons.
+
+──────────────────────────────
+Step 4. Proof technique
+
+• We need to prove an “if and only if” (↔) statement. In proving an iff, one usually splits the proof into two implications.
+• In this case, once the definitions are unfolded, the statement will state that
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ ((decide (a < 0) && decide (b > 0)) || (decide (a > 0) && decide (b < 0))).
+• We can use the meta-property of decide that tells us “decide (P) = true if and only if P” (where P is decidable).
+• In Lean, the tactic “decide” might even automatically solve the goal. Otherwise it is a matter of applying the appropriate lemmas.
+
+──────────────────────────────
+Step 5. Similar patterns and final plan
+
+• A typical pattern is to use decide to bridge computations on Bool and logical propositions.
+• Once we “unfold” the definitions (using the unfold tactic) we obtain identical structures on both sides.
+• Therefore the plan for the proof is to simply “unfold” the definitions and then conclude either directly (with a reflexivity lemma like rfl) or using the “decide” tactic, which handles all the necessary decision procedures and equivalences.
+
+──────────────────────────────
+Detailed Plan
+
+Implementation:
+1. Define the function hasOppositeSign as
+  def hasOppositeSign (a : Int) (b : Int) : Bool :=
+    (decide (a < 0) && decide (b > 0)) || (decide (a > 0) && decide (b < 0))
+ • This uses the decide function to turn the decidable propositions into Bools.
+ • The boolean operations (&&, ||) combine the results as required.
+
+Specification:
+2. The specification is given by
+  def hasOppositeSign_spec (a : Int) (b : Int) (result : Bool) : Prop :=
+    ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result
+
+Proof:
+3. Prove the theorem hasOppositeSign_spec_satisfied:
+  theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+    hasOppositeSign_spec a b (hasOppositeSign a b) :=
+   by
+    unfold hasOppositeSign hasOppositeSign_spec
+    /-- At this point the goal is
+     ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ ((decide (a < 0) && decide (b > 0)) || (decide (a > 0) && decide (b < 0))).
+     Using the fact that decide P = true ↔ P for any decidable P, we see that both sides are equivalent.
+     Thus, the proof can be finished by the “decide” tactic. –/
+    decide
+
+This “decide” tactic works because Lean’s automation checks the decidability of the comparisons and the boolean operations, and it is well known that for any decidable proposition P, decide P returns true if and only if P holds.
+
+──────────────────────────────
+Conclusion
+
+We have broken down the problem into:
+ 1. A specification reading “one must detect opposite signs among two given integers.”
+ 2. An implementation that uses decide to convert proposition comparisons to booleans and then combines them.
+ 3. A proof that simply unfolds the definitions and uses the properties of decide.
+ 
+Below is the complete Lean 4 plan:
+
+-----------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasOppositeSign (a : Int) (b : Int) : Bool :=
+  -- We convert the comparisons to Bool using decide.
+  (decide (a < 0) && decide (b > 0)) || (decide (a > 0) && decide (b < 0))
+
+-- Specification: exactly when a and b have opposite signs.
+def hasOppositeSign_spec (a : Int) (b : Int) (result : Bool) : Prop :=
+  ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ result
+
+-- The proof that the implementation meets the spec.
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  -- Unfold definitions to see that both sides are equivalent.
+  unfold hasOppositeSign hasOppositeSign_spec
+  -- Use Lean's decision procedure to complete the proof.
+  decide
+-----------------------------------------------------
+
+This plan meets all the problem specifications and completes both the implementation and the proof.

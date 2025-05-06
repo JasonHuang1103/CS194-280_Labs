@@ -1,0 +1,83 @@
+Below is our detailed reasoning and plan to solve the problem.
+
+──────────────────────────────
+Step 1. Understanding the Function Requirement
+
+• The task is to implement a function that computes the surface area of a cube.  
+• The input is an integer called size (the length of an edge).  
+• The formula for a cube’s surface area is 6 times the square of its edge length, i.e., 6 * size * size.
+
+──────────────────────────────
+Step 2. Breaking Down the Problem
+
+• We need a function cubeSurfaceArea that:
+  - Accepts an integer size.
+  - Computes and returns 6 * size * size.
+• We will later prove that this function satisfies a given specification cubeSurfaceArea_spec, which exactly states that the result must equal 6 * size * size.
+• There is no need to handle negative values because the problem statement assumes size > 0.
+
+──────────────────────────────
+Step 3. Inputs, Edge Cases, and Expected Behavior
+
+• Input Type: The function is given an Int.
+• Edge Cases:  
+  - Technically, if a negative number or zero is given, the function will compute a number, but since the note says the input is > 0, we do not need extra checks.
+• Expected Behavior:  
+  - For a positive size, compute and return 6 * size * size.
+
+──────────────────────────────
+Step 4. Proof Technique
+
+• The specification cubeSurfaceArea_spec is defined as “result = 6 * size * size”.  
+• In our theorem cubeSurfaceArea_spec_satisfied, after unfolding the definitions of cubeSurfaceArea and cubeSurfaceArea_spec, the goal becomes an equality between identical expressions.
+• Therefore, the proof can be completed by reflexivity (“rfl”), which is sufficient since both sides are definitionally equal.
+
+──────────────────────────────
+Step 5. Recognizing Similar Patterns
+
+• This problem follows a standard pattern of:
+  - Implementing a simple arithmetic function.
+  - Proving the function’s output satisfies a given equality.
+• The use of "unfold" shows the connection between our function and its specification, and then using “rfl” is a common tactic in Lean proofs for such straightforward equalities.
+
+──────────────────────────────
+Final Plan for Implementation and Proof
+
+Implementation:
+1. Define function cubeSurfaceArea to calculate 6 * size * size.
+   - Write the body as: 6 * size * size.
+
+Proof:
+1. State the theorem cubeSurfaceArea_spec_satisfied for any integer size.
+2. Unfold the definitions (using “unfold cubeSurfaceArea cubeSurfaceArea_spec”).
+3. The goal will be identical on both sides, so use “rfl” (which means “reflexivity”) to complete the proof.
+
+──────────────────────────────
+Below is the complete Lean 4 code following this plan:
+
+--------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def cubeSurfaceArea (size : Int) : Int :=
+  -- << CODE START >>
+  6 * size * size
+  -- << CODE END >>
+
+-- Theorem: The surface area of the cube is calculated correctly
+def cubeSurfaceArea_spec (size : Int) (result : Int) : Prop :=
+  -- << SPEC START >>
+  result = 6 * size * size
+  -- << SPEC END >>
+
+theorem cubeSurfaceArea_spec_satisfied (size : Int):
+  cubeSurfaceArea_spec size (cubeSurfaceArea size) := by
+  -- << PROOF START >>
+  unfold cubeSurfaceArea cubeSurfaceArea_spec
+  rfl
+  -- << PROOF END >>
+
+--------------------------------
+
+This implementation and proof clearly satisfy the requirements of the problem.

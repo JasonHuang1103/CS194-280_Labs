@@ -1,0 +1,11 @@
+```lean
+by_cases h : a ≤ b
+· split
+  · exact ⟨le_refl a, h⟩
+  · exact Or.inl rfl
+· split
+  · split
+    · exact le_of_lt (lt_of_not_ge h)
+    · exact le_refl b
+  · exact Or.inr rfl
+```

@@ -1,0 +1,6 @@
+```
+constructor
+· exact Array.map_length _
+· intro i hi
+  simp [Array.get_map]
+```

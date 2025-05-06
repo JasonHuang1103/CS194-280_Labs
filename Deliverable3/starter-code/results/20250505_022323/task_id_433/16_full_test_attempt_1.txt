@@ -1,0 +1,6 @@
+Lean Error: lean_playground/TempTest.lean:21:6: error: unknown constant 'Array.size_eq_length'
+lean_playground/TempTest.lean:18:40: error: unsolved goals
+n : ℤ
+a : Array ℤ
+⊢ (∀ i < a.size, n > a[i]!) ↔ (a.toList.all fun x => decide (n > x)) = true
+lean_playground/TempTest.lean:21:59: error: unexpected token ','; expected command

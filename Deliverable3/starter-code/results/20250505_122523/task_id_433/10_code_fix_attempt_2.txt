@@ -1,0 +1,22 @@
+The problem is that Lean is parsing
+
+  a.toList.all (fun x => n > x)
+
+as
+
+  a.toList.all fun x => n > x
+
+instead of applying .all to the list returned by a.toList. In Lean 4 the dot notation and application precedence make it necessary to parenthesize the a.toList call. In other words, writing
+
+  (a.toList).all (fun x => n > x)
+
+fixes the error.
+
+Below is the fixed version of the function implementation only:
+
+-------------------------------------------------------
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  (a.toList).all (fun x => n > x)
+-------------------------------------------------------
+
+This change should eliminate the error you encountered.

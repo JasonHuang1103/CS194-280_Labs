@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:7:2: error: unknown constant 'Int.min'
+lean_playground/TempTest.lean:18:8: warning: declaration uses 'sorry'

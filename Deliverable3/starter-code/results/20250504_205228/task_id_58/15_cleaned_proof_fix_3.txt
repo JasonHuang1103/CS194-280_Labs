@@ -1,0 +1,9 @@
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  unfold hasOppositeSign hasOppositeSign_spec
+  apply Iff.intro
+  · intro h
+    simp only [Bool.of_decide_eq_true, decide_eq_true_iff, *]
+  · intro h
+    rw [Bool.of_decide_eq_true]
+    exact h

@@ -1,0 +1,24 @@
+To fix the errors in the proof, we need to correct the misuse of theorem declaration and simplify the proof to correctly handle the conditions based on the result of `myMin`. Here's the fixed proof content:
+
+```lean
+theorem myMin_spec_satisfied (a : Int) (b : Int) :
+  myMin_spec a b (myMin a b) := by
+  unfold myMin myMin_spec
+  by_cases h : a ≤ b
+  · -- Case where a ≤ b
+    simp [h]
+    constructor
+    · exact ⟨le_refl a, le_trans h (le_refl b)⟩
+    · left
+      rfl
+  · -- Case where ¬ (a ≤ b), i.e., a > b
+    simp [h]
+    constructor
+    · exact ⟨le_of_lt (not_le.mp h), le_refl b⟩
+    · right
+      rfl
+```
+
+Notes on corrections:
+- The duplicate theorem declaration error was caused by defining `myMin_spec_satisfied` twice. Make sure to only have one definition of the theorem.
+- The condition `le_of_not_le h` was incorrect. It's now using `le_of_lt (not_le.mp h)` to correctly derive `b ≤ a` from `a > b`.

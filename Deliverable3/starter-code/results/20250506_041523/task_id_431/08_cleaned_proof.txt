@@ -1,0 +1,10 @@
+constructor
+· intro h
+  obtain ⟨i, hi, x⟩ := Array.exists_of_any h
+  obtain ⟨j, hj, hx⟩ := Array.exists_of_any x
+  exact ⟨i, j, hi, hj, hx⟩
+· intro ⟨i, j, hi, hj, h_eq⟩
+  apply Array.any_of_mem
+  use i
+  simp [Array.any]
+  use ⟨hi, j, hj, h_eq⟩

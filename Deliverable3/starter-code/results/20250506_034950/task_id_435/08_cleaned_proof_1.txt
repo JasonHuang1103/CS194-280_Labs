@@ -1,0 +1,5 @@
+split
+· split
+  · exact Nat.zero_le (n % 10)
+  · exact Nat.mod_lt n (by decide)
+· rfl

@@ -1,0 +1,58 @@
+Below is a high-level plan outlining the key steps to solve the problem:
+
+──────────────────────────────
+1. Implementation: Define the Function
+
+  a. Use an if-then-else expression in Lean. For example:
+     if a ≤ b then a else b
+
+  b. This definition immediately captures the specification:
+     – If a ≤ b is true then a is returned. Notice that a ≤ a holds by reflexivity and a ≤ b holds by the assumption.
+     – Otherwise, when a > b (equivalently ¬ (a ≤ b)), return b. In that branch b ≤ a holds from b < a (because ¬ (a ≤ b) implies b < a) and b ≤ b holds by reflexivity.
+
+──────────────────────────────
+2. Theorem Statement: Specifying the Properties
+
+  a. The specification predicate myMin_spec states two properties:
+     • The returned value (result) is less than or equal to both a and b.
+     • The returned value is either a or b (ensuring the result is one of the given inputs).
+
+──────────────────────────────
+3. Proof Strategy: Case Analysis on the if-expression
+
+  a. Begin the proof by unfolding the definitions of myMin and myMin_spec.
+
+  b. Use a case analysis on the condition “a ≤ b”.
+     – Case 1: Assume a ≤ b. Then the definition yields myMin a b = a.
+       i. Show that a ≤ a (by reflexivity) and a ≤ b (by the assumption).
+      ii. Conclude (a = a) to satisfy the “either a or b” clause.
+     
+     – Case 2: Assume ¬ (a ≤ b). Then we have a > b. In this branch the result is myMin a b = b.
+      i. Prove b ≤ a: Since a > b implies b < a and by order properties b ≤ a.
+      ii. Prove b ≤ b by reflexivity.
+      iii. Satisfy the disjunction by noting (b = b).
+  
+  c. Conclude that in both cases, the returned result satisfies the specification.
+
+──────────────────────────────
+4. Lean Tactics and Lemmas Suggestions
+
+  – Use a “by cases” or “if... then... else...” argument explicitly in the proof.
+  – Lean's standard library has reflexivity lemmas and order properties which can be used: for example, by using “le_refl”, “lt_of_not_ge”, etc.
+  – The proof should be split according to the branches of the “if” expression and then automatically resolve the needed inequalities.
+
+──────────────────────────────
+5. Wrap-up: Documenting and Testing
+
+  – Add comments and structure your Lean file so that the implementation and proof sections are clearly marked.
+  – Optionally, test the implemented function with a few examples or any unit tests if desired.
+
+──────────────────────────────
+By following the above plan step-by-step, you can implement the function myMin and prove that it satisfies the specification myMin_spec.
+
+This complete plan clarifies the main components:
+• Defining the function using an if-expression.
+• Unfolding and case-splitting in the proof.
+• Verifying the functional properties (inequalities and disjunctive equality).
+
+You now have a clear roadmap for writing both the function and its correctness proof in Lean 4.

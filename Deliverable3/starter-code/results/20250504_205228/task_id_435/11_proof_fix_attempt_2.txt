@@ -1,0 +1,11 @@
+```lean
+theorem lastDigit_spec_satisfied (n : Nat) :
+  lastDigit_spec n (lastDigit n) := by
+  unfold lastDigit lastDigit_spec
+  constructor
+  . constructor
+    . apply Nat.zero_le
+    . apply Nat.mod_lt
+      exact Nat.zero_lt_succ 9
+  . rfl
+```

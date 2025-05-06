@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:7:2: error: invalid field 'min', the environment does not contain 'Int.min'
+  a
+has type
+  ℤ
+lean_playground/TempTest.lean:18:8: warning: declaration uses 'sorry'

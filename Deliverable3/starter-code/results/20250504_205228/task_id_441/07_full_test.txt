@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:21:9: error: tactic 'unfold' failed to unfold 'cubeSurfaceArea' at
+  6 * size * size = 6 * size * size

@@ -1,0 +1,4 @@
+{
+  "code": "6 * size * size",
+  "proof": "rfl"
+}

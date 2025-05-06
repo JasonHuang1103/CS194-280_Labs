@@ -1,0 +1,4 @@
+let minAB := if a <= b then a else b
+  if minAB <= c then minAB else c
+
+This version computes the minimum of a and b, then compares it with c, thereby returning the minimum among the three integers.

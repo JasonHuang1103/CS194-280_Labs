@@ -1,0 +1,4 @@
+The issue is that Lean 4 does not have a constant named Int.min. Instead, you can use the built‐in min function, which works for Int. Here’s the corrected version of the function implementation:
+
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  min (min a b) c

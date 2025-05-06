@@ -1,0 +1,6 @@
+```
+apply And.intro
+· exact Array.size_map a (λ x => x * x * x)
+· intro i hi
+  exact Array.get_map _ _ i
+```

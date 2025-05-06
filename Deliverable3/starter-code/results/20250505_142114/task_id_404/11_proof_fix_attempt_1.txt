@@ -1,0 +1,17 @@
+```lean
+split
+case myMin_spec.left =>
+  by_cases h : a ≤ b
+  case isTrue =>
+    simp [myMin, h]
+  case isFalse =>
+    simp [myMin, h]
+    exact lt_of_not_ge h
+split
+case myMin_spec.right =>
+  by_cases h : a ≤ b
+  case isTrue =>
+    simp [myMin, h]
+  case isFalse =>
+    simp [myMin, h]
+```

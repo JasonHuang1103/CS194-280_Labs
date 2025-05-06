@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:19:32: error: unsolved goals
+a b : ℤ
+⊢ ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧
+    ((if a ≤ b then a else b) = a ∨ (if a ≤ b then a else b) = b)
+lean_playground/TempTest.lean:22:10: error: 'myMin_spec_satisfied' has already been declared

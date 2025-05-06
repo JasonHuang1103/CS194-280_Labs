@@ -1,0 +1,8 @@
+```lean
+  -- << CORRECTED PROOF START >>
+  unfold ident_spec
+  rfl
+  -- << CORRECTED PROOF END >>
+```
+
+In the original proof, the `unfold` tactic was used unnecessarily on `ident`, and used twice on `ident_spec`. You only need to unfold `ident_spec` to match the definition to the goal, and then complete the proof with `rfl`.

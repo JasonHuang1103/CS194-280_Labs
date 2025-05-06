@@ -1,0 +1,98 @@
+The error isn’t (yet) in your “semantic” proof but in the way the proof script is written (mostly its layout and use of tactic bullets). In other words, Lean is not getting confused about how the statements relate to each other logically but is complaining that, at one point, it sees a token (here the next definition or even just a tactic bullet) when it is still “inside” a block that hasn’t been closed. Let’s look at the two major issues:
+
+1. Bullet indentation and layout in tactic proofs
+
+  In Lean 4 the “by” block (or tactic mode) is quite sensitive to indentation. In your proof you use bullet tokens (the Unicode “·” characters) to start subproofs. When these bullets are not indented correctly relative to the parent block, Lean may think that the proof hasn’t ended or that tokens (such as a new ‘def’) are still part of the ongoing tactic block. That is why you see errors like
+
+  “unexpected token '·'; expected command"
+
+  or
+
+  “unexpected token 'def'; expected 'in'”
+
+  For example, the tactic block started by
+   theorem hasCommonElement_spec_satisfied … := by
+  needs its tactic lines indented so that Lean knows where the proof stops. If the bullets or the tactics inside are mis-indented (or if the “by” block is not ended properly), then when Lean reads the next top-level definition it complains because it is still “inside” a pending proof.
+
+2. Using Incomplete Proofs (with sorry)
+
+  The unsolved goals (where the error message mentions something like “⊢ (∃ i j, …) → sorry = true”) arise because you have left many parts as sorry. (That is acceptable while developing a rough outline but Lean does treat these as open goals.) However, these unsolved goals are not the root cause of the “unexpected token” errors. They are just a signal that the proof is not complete.
+
+How to Fix It
+
+• Make sure your tactic proof is delimited unambiguously. In Lean 4 you have two options:
+  – Use a begin … end block with standard tactic syntax, or
+  – Use the “by” keyword with proper indentation for every tactic and bullet.
+
+As an example, you could rewrite your theorem as follows:
+
+------------------------------------------------------------
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  hasCommonElement_spec a b (hasCommonElement a b) :=
+begin
+  unfold hasCommonElement hasCommonElement_spec,
+  apply Iff.intro,
+  { -- First direction
+    intro h,
+    induction a using List.induction_on with
+    | nil =>
+      simp at h
+    | cons x xs ih =>
+      simp at h,
+      cases h with
+      | inl h' => 
+          admit   -- replace with appropriate proof
+      | inr h' =>
+          apply List.any_eq_true.1,
+          admit   -- replace with appropriate proof
+  },
+  { -- Second direction
+    rintro ⟨i, j, hi, hj, h_eq⟩,
+    induction a using List.induction_on with
+    | nil =>
+       simp
+    | cons x xs ih =>
+       simp,
+       by_cases c : a.head = b[j]!,
+       { simp only [c],
+         apply List.any_eq_true.2,
+         admit  -- replace with appropriate proof
+       },
+       { admit }  -- replace with appropriate proof
+  }
+end
+------------------------------------------------------------
+
+Notice here that each bullet is inside a “begin … end” block and the syntax is standard. (Also note that I’ve replaced some “sorry”s with “admit” as placeholders, but the key is that the structure is clear.) 
+
+• Alternatively, if you want to keep using the “by” tactic mode with bullet symbols, check that every bullet is correctly indented relative to the “by” line. For instance:
+
+------------------------------------------------------------
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  hasCommonElement_spec a b (hasCommonElement a b) := by
+  unfold hasCommonElement hasCommonElement_spec
+  apply Iff.intro
+  · intro h
+    induction a using List.induction_on
+    · simp at h
+    · simp at h
+      cases h
+      · sorry
+      · apply List.any_eq_true.1; sorry
+  · intro ⟨i, j, hi, hj, h_eq⟩
+    induction a using List.induction_on
+    · simp
+    · simp
+      by_cases c : a.head = b[j]!
+      · simp only [c]
+        apply List.any_eq_true.2; sorry
+      · sorry
+------------------------------------------------------------
+
+Make sure that all the bullet lines (the ones starting with “·”) are indented appropriately so that Lean knows they’re part of the same “by” block. 
+
+Summary
+
+The root cause is that the tactic bullets and their indentation are not set up as Lean 4 expects. The parser ends up “inside” the proof when it finds a token that should be at the top level (like a new ‘def’) which makes it complain with messages such as “unexpected token 'def'; expected 'in'” or “unexpected token '·'; expected command.” Fixing the indentation (or switching to an explicit begin … end block) will allow Lean to correctly parse where the proof begins and ends.
+
+Also, once the syntactic problems are fixed, you’ll still need to replace the “sorry”s (or “admit” placeholders) with actual proofs to discharge the logical obligations.

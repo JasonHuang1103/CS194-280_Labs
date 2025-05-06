@@ -1,0 +1,4 @@
+{
+  "code": "a.map (fun x => x * x * x)",
+  "proof": "theorem cubeElements_spec_satisfied (a : Array Int) :\n  cubeElements_spec a (cubeElements a) := by\n  unfold cubeElements cubeElements_spec\n  constructor\n  case left =>\n    exact Array.size_map (fun x => x * x * x) a\n  case right =>\n    intro i hi\n    simp [Array.getElem, Array.map]\n    apply congrArg\n    apply Array.getElem_map\n    exact hi"
+}

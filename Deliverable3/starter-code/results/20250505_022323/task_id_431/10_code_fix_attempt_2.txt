@@ -1,0 +1,10 @@
+The problem is that the inner lambda returns a proposition (x = y) rather than a Boolean value. In Lean 4 the equality operator "=" produces a Prop, not a Bool. To fix the error, you need to use the boolean equality operator "==" (which compares two Int values and yields a Bool).
+
+Below is the fixed version of the function implementation only:
+
+--------------------------------------------------
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  Array.any a (fun x => Array.any b (fun y => x == y))
+--------------------------------------------------
+
+This change replaces "x = y" with "x == y", so that the lambdas return Boolean values as expected by Array.any.

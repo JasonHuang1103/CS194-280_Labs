@@ -1,0 +1,104 @@
+We need to write a function that returns true exactly when n is divisible by 11—that is, when n % 11 yields 0—and then prove that the returned Boolean “captures” the proposition (n % 11 = 0).
+
+Let’s go through our reasoning step-by-step:
+
+───────────────────────────── Step 1: Understanding the Problem
+
+• The objective is to define a function isDivisibleBy11 : Int → Bool so that for any integer n, the function returns true exactly when n mod 11 equals 0.
+• In Lean, the notation “n % 11” computes the remainder upon division by 11.
+• The specification is stated by the predicate isDivisibleBy11_spec n result, which is defined to mean that “n % 11 = 0 ↔ result”.
+• In other words, our Boolean result must “decide” the proposition n % 11 = 0.
+
+───────────────────────────── Step 2: Breaking Down the Problem
+
+(a) Implementation Subproblem:
+  – We need to produce a Boolean from the integer computation – that is, decide whether n % 11 = 0.
+  – One very straightforward way is to use a conditional: “if n % 11 = 0 then true else false.”
+  – (Alternatively you could use the “==” operator if the decidable equality is set up for Int. However, using the if-then-else is more explicit and works perfectly.)
+
+(b) Proof Subproblem:
+  – The theorem isDivisibleBy11_spec_satisfied must show that isDivisibleBy11_spec n (isDivisibleBy11 n) holds.
+  – After unfolding the definitions, the goal will be to prove that:
+    
+       (n % 11 = 0) ↔ (if n % 11 = 0 then true else false)
+    
+  – We can prove this by a case analysis on the condition “n % 11 = 0.” (In Lean you can automatically split such if–then–else definitions with the tactic split_ifs.)
+  – In the case when n % 11 = 0 holds, the conditional returns true and the equivalence becomes “(n % 11 = 0) ↔ true” which is true since we already assumed the left side.
+  – In the opposite case, when n % 11 ≠ 0, the conditional returns false so the equivalence becomes “(n % 11 = 0) ↔ false.” This clearly holds because by assumption the left side is false.
+  – Thus, a “split_ifs” tactic will do the work for us after we “unfold” our definitions.
+
+───────────────────────────── Step 3: Input Types, Edge Cases, and Expected Behavior
+
+• Our input is an integer (Int) in Lean. The modulo operation “n % 11” is defined for negative numbers as well, so our definition will handle all cases.
+• Edge cases include n = 0 (divisible by every integer except 0) and negative numbers. Our definition works uniformly because it directly tests the condition n % 11 = 0.
+
+───────────────────────────── Step 4: Proof Techniques
+
+• For the proof we plan to use:
+  – Unfolding definitions “unfold isDivisibleBy11 isDivisibleBy11_spec”
+  – The “split_ifs” tactic to split the conditional provided by the function.
+  – “simp” or “rfl” to close the remaining trivial equivalences in each branch.
+• This is a typical case analysis proof that mirrors how one would “compute” with an if–then–else.
+
+───────────────────────────── Step 5: Similar Patterns from Examples
+
+• In the provided documentation there are many examples of using split_ifs and case splitting for functions defined by if–then–else.
+• The technique is similar to the “tauto” examples: break the goal into cases (the “if” branch and the “else” branch) and then solve each side of the equivalence.
+• This pattern is standard in Lean for decision procedures or functions that “decide” a given property.
+
+───────────────────────────── Final Detailed Plan
+
+1. Implementation:
+   • Define isDivisibleBy11 by writing:
+   
+       def isDivisibleBy11 (n : Int) : Bool :=
+         if n % 11 = 0 then true else false
+
+   • (This function checks the condition “n % 11 = 0” and returns true when it holds.)
+
+2. Proof:
+   • Write the theorem isDivisibleBy11_spec_satisfied which states that
+
+         isDivisibleBy11_spec n (isDivisibleBy11 n)
+    
+     unfolds to “n % 11 = 0 ↔ (if n % 11 = 0 then true else false)”.
+     
+   • In the proof script, first “unfold” the definitions.
+   • Use the tactic “split_ifs” to separate the two branches.
+   • In the first branch (when n % 11 = 0), the goal becomes “n % 11 = 0 ↔ true”; this is immediately solved (by simp or reflexivity) because under the assumption the statement is true.
+   • In the second branch (when n % 11 ≠ 0), the goal becomes “n % 11 = 0 ↔ false.” Again, this holds by definition since the left-hand side is false.
+   • Close the proof in each branch by a simple “rfl” or “simp.”
+
+───────────────────────────── Sample Final Lean Code
+
+Below is the complete design in Lean 4:
+
+---------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def isDivisibleBy11 (n : Int) : Bool :=
+  if n % 11 = 0 then true else false
+
+-- Theorem specification: The result is true if and only if n is divisible by 11
+def isDivisibleBy11_spec (n : Int) (result : Bool) : Prop :=
+  n % 11 = 0 ↔ result
+
+-- Theorem proving that our implementation satisfies the spec
+theorem isDivisibleBy11_spec_satisfied (n : Int) :
+  isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  split_ifs
+  · -- branch where n % 11 = 0 holds, so we need to show: n % 11 = 0 ↔ true
+    simp
+  · -- branch where n % 11 ≠ 0 holds, so we need to show: n % 11 = 0 ↔ false
+    simp
+
+---------------------------------------------------
+
+This plan meets the requirements:
+• The function returns true exactly when n is divisible by 11.
+• The proof breaks down the if–then–else into cases and shows the required equivalence.
+
+You can now implement the above code in Lean 4.

@@ -1,0 +1,4 @@
+{
+  "code": "a.any (\u03bb x => b.any (\u03bb y => x = y))",
+  "proof": "Iff.intro\n  (fun \u27e8i, j, hi, hj, h_eq\u27e9 =>\n    Array.any_eq_true.mpr \u27e8i, hi, Array.any_eq_true.mpr \u27e8j, hj, by rw [h_eq]\u27e9\u27e9)\n  (fun h =>\n    let \u27e8i, hi, h_any\u27e9 := Array.any_eq_true.mp h\n    let \u27e8j, hj, h_eq\u27e9 := Array.any_eq_true.mp h_any\n    \u27e8i, j, hi, hj, by rw [h_eq]\u27e9)"
+}

@@ -1,0 +1,59 @@
+Below is a step‐by‐step analysis of the error and its underlying cause:
+
+─────────────────────────────────────────────  
+1. Tactic Failing and Why  
+─────────────────────────────────────────────  
+• The error message “unsolved goals  
+  n : ℕ  
+  ⊢ n % 10 < 10”  
+indicates that after unfolding the definitions, the proof is left with the goal of proving n % 10 < 10. In your proof you use  
+  apply And.intro  
+with two bullet blocks. The first bullet uses “apply Nat.mod_nonneg; exact Nat.zero_lt_succ 9” – but that only proves the left part of the inner conjunction (i.e. 0 ≤ n % 10). The remaining part (n % 10 < 10) is never handled.
+
+─────────────────────────────────────────────  
+2. The Proof State at That Point  
+─────────────────────────────────────────────  
+After unfolding the definitions with  
+  unfold lastDigit lastDigit_spec  
+and simplifying by “simp”, the goal becomes:  
+  ((0 ≤ n % 10) ∧ (n % 10 < 10)) ∧ (n % 10 = n % 10)  
+When you “apply And.intro”, you are creating two sub-goals:  
+  Sub-goal 1: (0 ≤ n % 10) ∧ (n % 10 < 10)  
+  Sub-goal 2: (n % 10 = n % 10)  
+In sub-goal 1 you have a conjunction itself. However, your proof only provides one proof (of n % 10 ≥ 0) leaving the “n % 10 < 10” part unsolved.
+
+─────────────────────────────────────────────  
+3. Proof Approach vs. Specification  
+─────────────────────────────────────────────  
+The specification lastDigit_spec requires both that:  
+  a) the result is non-negative and less than 10, and  
+  b) the result equals n % 10.  
+Your current proof splits the overall goal into the two conjuncts, but inside the first conjunct you must further split it into proving both “0 ≤ n % 10” and “n % 10 < 10”. You only address the non-negativity with Nat.mod_nonneg; you do not address the “< 10” inequality. Remember that Nat.mod_lt is available (with the assumption 0 < 10) to prove this inequality.
+
+─────────────────────────────────────────────  
+4. Type Mismatches or Incorrect Assumptions  
+─────────────────────────────────────────────  
+There is no type mismatch here—the operations and propositions are well-typed. The problem is that you assumed that “apply Nat.mod_nonneg …” would be enough to cover the whole inner conjunction, but in fact it only proves one half of the desired property. In addition, you are using bullet markers (·) for structuring that may have confused Lean when it later encountered an unexpected identifier, as it still has an unsolved sub-goal.
+
+─────────────────────────────────────────────  
+5. Alternative Proof Strategies  
+─────────────────────────────────────────────  
+A common and clear approach is to use the “split” or “constructor” tactic explicitly twice to handle the nested conjunctions. For instance, you can first split the outer conjunction, then split the inner one. Moreover, you can use Nat.mod_lt with the fact that 10 is positive (via, e.g., Nat.zero_lt_succ 9 or norm_num) to handle the “n % 10 < 10” part. A revised version would look like this:
+
+--------------------------------------------------
+theorem lastDigit_spec_satisfied (n : ℕ) :
+  lastDigit_spec n (lastDigit n) := by
+  simp [lastDigit, lastDigit_spec]
+  constructor  -- splits the outer ∧
+  · constructor  -- splits (0 ≤ n % 10) ∧ (n % 10 < 10)
+    · exact Nat.mod_nonneg n 10  -- proves 0 ≤ n % 10
+    · exact Nat.mod_lt n 10 (by norm_num)  -- proves n % 10 < 10  
+  · rfl  -- proves n % 10 = n % 10
+--------------------------------------------------
+
+─────────────────────────────────────────────  
+Conclusion and Root Cause  
+─────────────────────────────────────────────  
+The root of the error is that your proof does not supply a proof for “n % 10 < 10”. You only prove part of the conjunction (the non-negativity) and leave the “less than 10” part unaddressed. This leads Lean to report an unsolved goal, and eventually, when it encounters structure (or bullet markers) following the incomplete proof, it issues an “unexpected identifier” error.  
+
+To fix the error, you need to split the conjunction properly and apply a tactic like Nat.mod_lt (with the proof 0 < 10) for the inequality part. This approach matches the specification and resolves the incomplete proof.

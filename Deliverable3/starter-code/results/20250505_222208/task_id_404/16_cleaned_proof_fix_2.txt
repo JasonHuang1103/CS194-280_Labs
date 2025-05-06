@@ -1,0 +1,6 @@
+by_cases h : a ≤ b
+rw [if_pos h]
+exact ⟨⟨le_refl a, h⟩, Or.inl rfl⟩
+rw [if_neg h]
+have : b < a := lt_of_not_le h
+exact ⟨⟨le_of_lt this, le_refl b⟩, Or.inr rfl⟩

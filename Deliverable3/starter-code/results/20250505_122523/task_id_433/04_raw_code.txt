@@ -1,0 +1,3 @@
+```lean
+a.all? (fun x ↦ n > x)
+```

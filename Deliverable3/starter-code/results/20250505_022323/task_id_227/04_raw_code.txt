@@ -1,0 +1,3 @@
+```lean
+Int.min (Int.min a b) c
+```

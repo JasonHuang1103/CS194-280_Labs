@@ -1,0 +1,24 @@
+The problem isn’t in your logic at all—it’s a parsing issue due to the way Lean parses function applications.
+
+In your definition of isGreater you wrote:
+
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    List.all (fun x => decide (n > x)) a.toList
+
+Because function application in Lean is left-associative, Lean reads that line as if you had written:
+
+  ((List.all (fun x => decide (n > x)) a).toList)
+
+Here, List.all (fun x => decide (n > x)) a is evaluated first. Since List.all returns a Bool, Lean is expecting to find a field or method named toList on a Bool, which it obviously does not have. That's why it complains with error messages like:
+
+  "function expected at List.all ?m.125 ?m.1380"
+  "term has type Bool"
+
+The fix is to ensure that a.toList is passed as the second argument to List.all. To do that you need to wrap a.toList in parentheses so that the correct grouping is clear. Change the definition to:
+
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    List.all (fun x => decide (n > x)) (a.toList)
+
+This makes it explicit that a.toList is the second argument to List.all.
+
+So, in summary, the root cause is that the missing parentheses cause Lean to misinterpret your application order, treating “a.toList” as if you were trying to call a method on a Boolean value rather than as an argument to List.all. Adding the parentheses will fix the error.

@@ -1,0 +1,4 @@
+{
+  "code": "a.map (fun x => x * x * x)",
+  "proof": "apply And.intro\n\u00b7 exact Array.size_map a (fun (x : Int) => x * x * x)\n\u00b7 intro i hi\n  rw [Array.size_map a (fun (x : Int) => x * x * x)] at hi\n  exact Array.getElem_map a (fun (x : Int) => x * x * x) i hi"
+}

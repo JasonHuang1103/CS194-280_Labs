@@ -1,0 +1,465 @@
+RAG components successfully imported.
+Starting test of 11 tasks: task_id_0, task_id_58, task_id_77, task_id_127, task_id_227, task_id_404, task_id_431, task_id_433, task_id_435, task_id_441, task_id_447
+
+==================================================
+Processing task task_id_0...
+Reading problem description and code template from tasks/task_id_0...
+Problem description length: 310 characters
+Reading unit tests...
+Unit tests length: 69 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213215
+Processing task: task_id_0 (Task index: 0)
+Retrieving relevant examples for function 'ident'...
+RAG setup failed: Error code: 401 - {'error': {'message': 'You do not have access to the project tied to the API key.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_project'}}. Continuing without RAG.
+RAG components successfully imported.
+Starting test of 11 tasks: task_id_0, task_id_58, task_id_77, task_id_127, task_id_227, task_id_404, task_id_431, task_id_433, task_id_435, task_id_441, task_id_447
+
+==================================================
+Processing task task_id_0...
+Reading problem description and code template from tasks/task_id_0...
+Problem description length: 310 characters
+Reading unit tests...
+Unit tests length: 69 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_0 (Task index: 0)
+Retrieving relevant examples for function 'ident'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_0/01_planning.txt
+Response saved to results/20250505_213337/task_id_0/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_0/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_0/04_code_test.txt
+Response saved to results/20250505_213337/task_id_0/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_0/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_0/07_full_test.txt
+Response saved to results/20250505_213337/task_id_0/08_final_solution.txt
+Solution generated in 104.37 seconds
+Generated code length: 1 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_58...
+Reading problem description and code template from tasks/task_id_58...
+Problem description length: 700 characters
+Reading unit tests...
+Unit tests length: 462 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_58 (Task index: 1)
+Retrieving relevant examples for function 'hasOppositeSign'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_58/01_planning.txt
+Response saved to results/20250505_213337/task_id_58/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_58/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_58/04_code_test.txt
+Response saved to results/20250505_213337/task_id_58/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_58/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_58/07_full_test.txt
+Response saved to results/20250505_213337/task_id_58/08_proof_error_analysis_1.txt
+Response saved to results/20250505_213337/task_id_58/09_proof_fix_attempt_1.txt
+Response saved to results/20250505_213337/task_id_58/10_cleaned_proof_fix_1.txt
+Response saved to results/20250505_213337/task_id_58/11_full_test_attempt_1.txt
+Response saved to results/20250505_213337/task_id_58/12_final_solution.txt
+Solution generated in 161.50 seconds
+Generated code length: 72 characters
+Generated proof length: 348 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:22:0: error: unexpected identifier; expected command...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_77...
+Reading problem description and code template from tasks/task_id_77...
+Problem description length: 456 characters
+Reading unit tests...
+Unit tests length: 449 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_77 (Task index: 2)
+Retrieving relevant examples for function 'isDivisibleBy11'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_77/01_planning.txt
+Response saved to results/20250505_213337/task_id_77/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_77/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_77/04_code_test.txt
+Response saved to results/20250505_213337/task_id_77/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_77/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_77/07_full_test.txt
+Response saved to results/20250505_213337/task_id_77/08_final_solution.txt
+Solution generated in 32.84 seconds
+Generated code length: 10 characters
+Generated proof length: 4 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_127...
+Reading problem description and code template from tasks/task_id_127...
+Problem description length: 342 characters
+Reading unit tests...
+Unit tests length: 219 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_127 (Task index: 3)
+Retrieving relevant examples for function 'multiply'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_127/01_planning.txt
+Response saved to results/20250505_213337/task_id_127/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_127/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_127/04_code_test.txt
+Response saved to results/20250505_213337/task_id_127/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_127/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_127/07_full_test.txt
+Response saved to results/20250505_213337/task_id_127/08_final_solution.txt
+Solution generated in 69.17 seconds
+Generated code length: 5 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_227...
+Reading problem description and code template from tasks/task_id_227...
+Problem description length: 608 characters
+Reading unit tests...
+Unit tests length: 339 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_227 (Task index: 4)
+Retrieving relevant examples for function 'minOfThree'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_227/01_planning.txt
+Response saved to results/20250505_213337/task_id_227/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_227/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_227/04_code_test.txt
+Response saved to results/20250505_213337/task_id_227/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_227/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_227/07_full_test.txt
+Response saved to results/20250505_213337/task_id_227/08_proof_error_analysis_1.txt
+Response saved to results/20250505_213337/task_id_227/09_proof_fix_attempt_1.txt
+Response saved to results/20250505_213337/task_id_227/10_cleaned_proof_fix_1.txt
+Response saved to results/20250505_213337/task_id_227/11_full_test_attempt_1.txt
+Response saved to results/20250505_213337/task_id_227/12_final_solution.txt
+Solution generated in 134.54 seconds
+Generated code length: 54 characters
+Generated proof length: 402 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:24:23: warning: unused name: h₃
+lean_playground/TempTest.lean:21:46: error: unsolved goals
+case pos
+a b c : ℤ
+h₁ : a ≤ b...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_404...
+Reading problem description and code template from tasks/task_id_404...
+Problem description length: 483 characters
+Reading unit tests...
+Unit tests length: 228 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_404 (Task index: 5)
+Retrieving relevant examples for function 'myMin'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_404/01_planning.txt
+Response saved to results/20250505_213337/task_id_404/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_404/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_404/04_code_test.txt
+Response saved to results/20250505_213337/task_id_404/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_404/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_404/07_full_test.txt
+Response saved to results/20250505_213337/task_id_404/08_proof_error_analysis_1.txt
+Response saved to results/20250505_213337/task_id_404/09_proof_fix_attempt_1.txt
+Response saved to results/20250505_213337/task_id_404/10_cleaned_proof_fix_1.txt
+Response saved to results/20250505_213337/task_id_404/11_full_test_attempt_1.txt
+Response saved to results/20250505_213337/task_id_404/12_final_solution.txt
+Solution generated in 84.18 seconds
+Generated code length: 22 characters
+Generated proof length: 158 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:19:32: error: unsolved goals
+case isTrue
+a b : ℤ
+h✝ : a ≤ b
+⊢ (a ≤ a ∧ a ≤ b) ∧ (a = a ∨ a = b)
+
+case isFalse
+a b : ℤ
+h✝...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_431...
+Reading problem description and code template from tasks/task_id_431...
+Problem description length: 597 characters
+Reading unit tests...
+Unit tests length: 465 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_431 (Task index: 6)
+Retrieving relevant examples for function 'hasCommonElement'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_431/01_planning.txt
+Response saved to results/20250505_213337/task_id_431/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_431/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_431/04_code_test.txt
+Response saved to results/20250505_213337/task_id_431/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_431/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_431/07_full_test.txt
+Response saved to results/20250505_213337/task_id_431/08_proof_error_analysis_1.txt
+Response saved to results/20250505_213337/task_id_431/09_proof_fix_attempt_1.txt
+Response saved to results/20250505_213337/task_id_431/10_cleaned_proof_fix_1.txt
+Response saved to results/20250505_213337/task_id_431/11_full_test_attempt_1.txt
+Response saved to results/20250505_213337/task_id_431/12_final_solution.txt
+Solution generated in 123.78 seconds
+Generated code length: 27 characters
+Generated proof length: 252 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:21:6: error: unknown constant 'Array.any_iff_mem'
+lean_playground/TempTest.lean:18:54: error: unsolved goals
+a b : Array...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_433...
+Reading problem description and code template from tasks/task_id_433...
+Problem description length: 646 characters
+Reading unit tests...
+Unit tests length: 367 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_433 (Task index: 7)
+Retrieving relevant examples for function 'isGreater'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_433/01_planning.txt
+Response saved to results/20250505_213337/task_id_433/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_433/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_433/04_code_test.txt
+Response saved to results/20250505_213337/task_id_433/05_code_fix_attempt_1.txt
+Response saved to results/20250505_213337/task_id_433/06_cleaned_code_fix_1.txt
+Response saved to results/20250505_213337/task_id_433/07_code_test_attempt_1.txt
+Response saved to results/20250505_213337/task_id_433/08_raw_proof.txt
+Response saved to results/20250505_213337/task_id_433/09_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_433/10_full_test.txt
+Response saved to results/20250505_213337/task_id_433/11_proof_error_analysis_1.txt
+Response saved to results/20250505_213337/task_id_433/12_proof_fix_attempt_1.txt
+Response saved to results/20250505_213337/task_id_433/13_cleaned_proof_fix_1.txt
+Response saved to results/20250505_213337/task_id_433/14_full_test_attempt_1.txt
+Response saved to results/20250505_213337/task_id_433/15_final_solution.txt
+Solution generated in 141.95 seconds
+Generated code length: 180 characters
+Generated proof length: 465 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: FAIL
+Implementation error: lean_playground/TempTest.lean:9:0: error: unknown identifier 'This'
+lean_playground/TempTest.lean:9:5: error: unknown identifier 'change'
+lean_playgro...
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:9:0: error: unknown identifier 'This'
+lean_playground/TempTest.lean:9:5: error: unknown identifier 'change'
+lean_playgro...
+❌ Implementation fails unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_435...
+Reading problem description and code template from tasks/task_id_435...
+Problem description length: 596 characters
+Reading unit tests...
+Unit tests length: 231 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_435 (Task index: 8)
+Retrieving relevant examples for function 'lastDigit'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_435/01_planning.txt
+Response saved to results/20250505_213337/task_id_435/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_435/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_435/04_code_test.txt
+Response saved to results/20250505_213337/task_id_435/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_435/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_435/07_full_test.txt
+Response saved to results/20250505_213337/task_id_435/08_proof_error_analysis_1.txt
+Response saved to results/20250505_213337/task_id_435/09_proof_fix_attempt_1.txt
+Response saved to results/20250505_213337/task_id_435/10_cleaned_proof_fix_1.txt
+Response saved to results/20250505_213337/task_id_435/11_full_test_attempt_1.txt
+Response saved to results/20250505_213337/task_id_435/12_final_solution.txt
+Solution generated in 121.96 seconds
+Generated code length: 6 characters
+Generated proof length: 105 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:19:36: error: unsolved goals
+n : ℕ
+⊢ n % 10 < 10
+lean_playground/TempTest.lean:23:0: error: unexpected identifier; expec...
+✅ Implementation passes unit tests
+❌ Proof has errors
+
+==================================================
+Processing task task_id_441...
+Reading problem description and code template from tasks/task_id_441...
+Problem description length: 489 characters
+Reading unit tests...
+Unit tests length: 171 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_441 (Task index: 9)
+Retrieving relevant examples for function 'cubeSurfaceArea'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_441/01_planning.txt
+Response saved to results/20250505_213337/task_id_441/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_441/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_441/04_code_test.txt
+Response saved to results/20250505_213337/task_id_441/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_441/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_441/07_full_test.txt
+Response saved to results/20250505_213337/task_id_441/08_final_solution.txt
+Solution generated in 51.62 seconds
+Generated code length: 15 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_447...
+Reading problem description and code template from tasks/task_id_447...
+Problem description length: 691 characters
+Reading unit tests...
+Unit tests length: 234 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_213337
+Processing task: task_id_447 (Task index: 10)
+Retrieving relevant examples for function 'cubeElements'...
+RAG setup failed: shapes (1536,) and (384,) not aligned: 1536 (dim 0) != 384 (dim 0). Continuing without RAG.
+Response saved to results/20250505_213337/task_id_447/01_planning.txt
+Response saved to results/20250505_213337/task_id_447/02_raw_code.txt
+Response saved to results/20250505_213337/task_id_447/03_cleaned_code.txt
+Response saved to results/20250505_213337/task_id_447/04_code_test.txt
+Response saved to results/20250505_213337/task_id_447/05_raw_proof.txt
+Response saved to results/20250505_213337/task_id_447/06_cleaned_proof.txt
+Response saved to results/20250505_213337/task_id_447/07_full_test.txt
+Response saved to results/20250505_213337/task_id_447/08_proof_error_analysis_1.txt
+Response saved to results/20250505_213337/task_id_447/09_proof_fix_attempt_1.txt
+Response saved to results/20250505_213337/task_id_447/10_cleaned_proof_fix_1.txt
+Response saved to results/20250505_213337/task_id_447/11_full_test_attempt_1.txt
+Response saved to results/20250505_213337/task_id_447/12_final_solution.txt
+Solution generated in 138.27 seconds
+Generated code length: 26 characters
+Generated proof length: 56 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: FAIL
+Proof error: lean_playground/TempTest.lean:19:42: error: unsolved goals
+a : Array ℤ
+⊢ ∀ i < a.size, (Array.map (fun x => x * x * x) a)[i]! = a[i]! * a[i]! * a[i]!
+...
+✅ Implementation passes unit tests
+❌ Proof has errors
+Testing Summary:
+Task task_id_0:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 104.37232327461243 seconds
+---
+Task task_id_58:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 161.49555087089539 seconds
+---
+Task task_id_77:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 32.836424827575684 seconds
+---
+Task task_id_127:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 69.17196321487427 seconds
+---
+Task task_id_227:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 134.54271507263184 seconds
+---
+Task task_id_404:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 84.18127107620239 seconds
+---
+Task task_id_431:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 123.77732610702515 seconds
+---
+Task task_id_433:
+  Passes Unit Tests: False
+  Proof is Correct: False
+  Runtime: 141.94914507865906 seconds
+---
+Task task_id_435:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 121.96274590492249 seconds
+---
+Task task_id_441:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 51.617876052856445 seconds
+---
+Task task_id_447:
+  Passes Unit Tests: True
+  Proof is Correct: False
+  Runtime: 138.26518297195435 seconds
+---

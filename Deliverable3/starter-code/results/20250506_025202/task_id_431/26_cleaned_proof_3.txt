@@ -1,0 +1,11 @@
+constructor
+· intro ⟨i, j, hi, hj, h_eq⟩
+  have hb : b.any (fun y => a[i]! = y) = true := by
+    apply (array_any_iff b (fun y => a[i]! = y)).mpr
+    exact ⟨j, hj, h_eq⟩
+  apply (array_any_iff a (fun x => b.any (fun y => x = y))).mpr
+  exact ⟨i, hi, hb⟩
+· intro H
+  rcases (array_any_iff a (fun x => b.any (fun y => x = y))).mp H with ⟨i, hi, h_inner⟩
+  rcases (array_any_iff b (fun y => a[i]! = y)).mp h_inner with ⟨j, hj, h_eq⟩
+  exact ⟨i, j, hi, hj, h_eq⟩

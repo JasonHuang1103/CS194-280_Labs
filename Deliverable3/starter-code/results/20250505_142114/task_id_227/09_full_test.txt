@@ -1,0 +1,30 @@
+Lean Error: lean_playground/TempTest.lean:25:2: warning: aesop: failed to prove the goal after exhaustive search.
+lean_playground/TempTest.lean:22:46: error: unsolved goals
+case left
+a b c : ℤ
+h : a ≤ b
+h_1 : c < a
+⊢ c ≤ a
+
+case right
+a b c : ℤ
+h : a ≤ b
+h_1 : c < a
+⊢ c ≤ b
+
+a b c : ℤ
+h : b < a
+h_1 : b ≤ c
+⊢ b ≤ a
+
+case left
+a b c : ℤ
+h : b < a
+h_1 : c < b
+⊢ c ≤ a
+
+case right
+a b c : ℤ
+h : b < a
+h_1 : c < b
+⊢ c ≤ b

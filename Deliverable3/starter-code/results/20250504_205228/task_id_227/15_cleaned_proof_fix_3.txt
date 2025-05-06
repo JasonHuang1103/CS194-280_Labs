@@ -1,0 +1,46 @@
+theorem minOfThree_spec_satisfied (a : Int) (b : Int) (c : Int) :
+  minOfThree_spec a b c (minOfThree a b c) := by
+  unfold minOfThree minOfThree_spec
+  split
+  · -- Prove result <= a ∧ result <= b ∧ result <= c
+    split
+    · -- Prove result <= a
+      by_cases h₁ : a <= b
+      · by_cases h₂ : a <= c
+        · simp [h₁, h₂] -- result = a
+        · simp [h₁, h₂] -- result = c
+          exact le_of_not_ge h₂
+      · by_cases h₂ : b <= c
+        · simp [h₁, h₂] -- result = b
+        · simp [h₁, h₂] -- result = c
+          exact le_of_not_ge h₂
+    · split
+      · -- Prove result <= b
+        by_cases h₁ : a <= b
+        · by_cases h₂ : a <= c
+          · simp [h₁, h₂] -- result = a
+            exact h₁
+          · simp [h₁, h₂] -- result = c
+            exact le_trans (le_of_not_ge h₂) h₁
+        · by_cases h₂ : b <= c
+          · simp [h₁, h₂] -- result = b
+          · simp [h₁, h₂] -- result = c
+            exact le_of_not_ge h₂
+      · -- Prove result <= c
+        by_cases h₁ : a <= b
+        · by_cases h₂ : a <= c
+          · simp [h₁, h₂] -- result = a
+            exact h₂
+          · simp [h₁, h₂] -- result = c
+        · by_cases h₂ : b <= c
+          · simp [h₁, h₂] -- result = b
+            exact h₂
+          · simp [h₁, h₂] -- result = c
+  · -- Prove result = a ∨ result = b ∨ result = c
+    by_cases h₁ : a <= b
+    · by_cases h₂ : a <= c
+      · simp [h₁, h₂] -- result = a
+      · simp [h₁, h₂] -- result = c
+    · by_cases h₂ : b <= c
+      · simp [h₁, h₂] -- result = b
+      · simp [h₁, h₂] -- result = c

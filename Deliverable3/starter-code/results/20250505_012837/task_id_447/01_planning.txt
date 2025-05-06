@@ -1,0 +1,47 @@
+We can break the problem into two parts: implementing the function and proving that its output satisfies the specification. Below is a detailed plan that outlines the key steps for both parts.
+
+──────────────────────────────
+1. Implementation
+
+• Our function needs to replace each element x in an input array with its cube: x * x * x.
+
+• Lean’s Array type comes with a map function. Using map will automatically guarantee that the new array has the same size as the input, because map is defined as “for every element in the input, apply the function” and it preserves the size.
+
+• Thus, the implementation is simply:
+
+  cubeElements a = a.map (fun x => x * x * x)
+
+──────────────────────────────
+2. Proof that the implementation meets the specification
+
+The specification (cubeElements_spec) has two parts:
+ a. The size of the output array equals the size of the input array.
+ b. For every valid index i, the element at that index in the output array equals the cube of the element at the same index in the input.
+
+Key steps in the proof:
+
+Step 1. Unfold Definitions:
+ – Begin the proof by unfolding the definitions for cubeElements and cubeElements_spec. This will expose the structure of the proof (i.e. the conjunction of the two properties).
+
+Step 2. Prove the Length Equality:
+ – Because we defined cubeElements using a.map and because map preserves the length of an array, you will need to either refer to a known lemma about Array.map (if available in Mathlib) or perform a brief induction on the structure of arrays showing that (a.map f).size = a.size.
+
+Step 3. Prove the Element-wise Property:
+ – For every index i such that i < a.size, you must show that (a.map (fun x => x * x * x))[i]! equals a[i]! * a[i]! * a[i]!.
+ – Use the definition of map. Typically, map is defined so that for an index i, you have the equality: (Array.map f a)[i]! = f (a[i]!).
+ – Apply that to your function f (which is fun x => x * x * x).
+
+Step 4. Combine the two parts:
+ – After showing both the length preservation and the element-wise property, combine them using the ∧ connective.
+
+──────────────────────────────
+3. Implementation plan summary:
+
+• Write the function cubeElements using Array.map.
+• In the proof, start by “unfolding” the definitions (cubeElements and cubeElements_spec) so that the goal is exactly the conjunction (result.size = a.size) ∧ (∀ i, …).
+• Establish that the array produced by a.map has the same size as a.
+• For any index i, use the property of map to deduce that the i-th element equals (a[i]! * a[i]! * a[i]!).
+• Conclude the proof by combining the two established facts.
+
+──────────────────────────────
+By following these steps, you will have both an efficient Lean 4 implementation of the cubeElements function and a complete proof that its output meets the specified properties.

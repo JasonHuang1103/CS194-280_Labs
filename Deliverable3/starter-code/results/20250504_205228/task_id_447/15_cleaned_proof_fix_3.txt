@@ -1,0 +1,12 @@
+theorem cubeElements_spec_satisfied (a : Array Int) :
+  cubeElements_spec a (cubeElements a) := by
+  unfold cubeElements cubeElements_spec
+  constructor
+  case left =>
+    exact Array.size_map (fun x => x * x * x) a
+  case right =>
+    intro i hi
+    simp [Array.getElem, Array.map]
+    apply congrArg
+    apply Array.getElem_map
+    exact hi

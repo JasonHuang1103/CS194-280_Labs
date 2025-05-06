@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:25:2: error: dsimp made no progress
+lean_playground/TempTest.lean:26:0: error: unexpected identifier; expected command

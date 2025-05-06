@@ -1,0 +1,26 @@
+Lean Error: lean_playground/TempTest.lean:8:41: error: function expected at
+  c
+term has type
+  ℤ
+lean_playground/TempTest.lean:10:67: error: unexpected token 'using'; expected command
+lean_playground/TempTest.lean:22:46: error: unsolved goals
+a b c : ℤ
+⊢ ((if decide ((if decide (a ≤ b) = true then a else b) ≤ c) = true then if decide (a ≤ b) = true then a else b
+        else sorry) ≤
+        a ∧
+      (if decide ((if decide (a ≤ b) = true then a else b) ≤ c) = true then if decide (a ≤ b) = true then a else b
+          else sorry) ≤
+          b ∧
+        (if decide ((if decide (a ≤ b) = true then a else b) ≤ c) = true then if decide (a ≤ b) = true then a else b
+          else sorry) ≤
+          c) ∧
+    ((if decide ((if decide (a ≤ b) = true then a else b) ≤ c) = true then if decide (a ≤ b) = true then a else b
+        else sorry) =
+        a ∨
+      (if decide ((if decide (a ≤ b) = true then a else b) ≤ c) = true then if decide (a ≤ b) = true then a else b
+          else sorry) =
+          b ∨
+        (if decide ((if decide (a ≤ b) = true then a else b) ≤ c) = true then if decide (a ≤ b) = true then a else b
+          else sorry) =
+          c)
+lean_playground/TempTest.lean:26:0: error: unexpected identifier; expected command

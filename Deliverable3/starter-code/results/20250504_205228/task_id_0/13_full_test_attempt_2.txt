@@ -1,0 +1,3 @@
+Lean Error: lean_playground/TempTest.lean:20:9: error: tactic 'unfold' failed to unfold 'ident' at
+  x = x
+lean_playground/TempTest.lean:21:0: error: unexpected identifier; expected command

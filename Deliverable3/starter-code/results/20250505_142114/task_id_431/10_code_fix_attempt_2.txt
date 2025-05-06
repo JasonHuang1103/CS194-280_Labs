@@ -1,0 +1,42 @@
+We’re getting errors pointing at the lambda expression. In our case the error messages
+
+  • “missing end of character literal”  
+  • “unexpected token '.'; expected ':'”
+
+indicate that the lambda was originally written using a period instead of using Lean 4’s required arrow syntax. In other words, the original code was written like
+
+  a.any (λ x. b.contains x)
+
+so that the parser interpreted the “.” after x as starting a character literal (and then not finding its end) instead of being the separator between the parameter and body.
+
+Let’s walk through the analysis step by step:
+
+1. Identify the specific part of the code causing the error  
+  The lambda expression in the definition of hasCommonElement is at fault. In the original code it must have been written as  
+    a.any (λ x. b.contains x)  
+  and the period “.” is flagged by the parser.
+
+2. Explain why this is causing an issue  
+  In Lean 4 the syntax for lambda expressions changed: instead of writing “λ x. …” now you need to write “λ x => …” (or equivalently, “fun x => …”). The parser sees the period “.” after x and mistakenly treats it as the beginning of a character literal that isn’t closed.
+
+3. Consider the type system and Lean 4 requirements  
+  The expected type for a.any is (Int → Bool), and using the proper lambda syntax “λ x => …” provides a valid function of that type. The misuse of the period disrupts the parsing of the lambda and causes the reported errors.
+
+4. Think through potential solutions  
+  We just need to update the lambda so that it uses the “=>” arrow. That is, we delete the “.” and replace it with “=>”. (Alternatively, we could write “fun x => …”.)
+
+5. Test each solution in your head  
+  If we write  
+    a.any (λ x => b.contains x)  
+  or  
+    a.any (fun x => b.contains x)  
+  Lean 4 is happy with the lambda-defining syntax. This will compile correctly.
+
+Thus, the fixed version of the function implementation is as follows:
+
+-------------------------------------------------
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  a.any (λ x => b.contains x)
+-------------------------------------------------
+
+This change satisfies Lean 4’s lambda expression syntax requirements and resolves the errors.

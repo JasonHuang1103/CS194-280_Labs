@@ -1,0 +1,4 @@
+{
+  "code": "n % 10",
+  "proof": "apply And.intro\n\u00b7 exact Nat.zero_le (n % 10)\n\u00b7 exact Nat.mod_lt n 10 (by decide)"
+}

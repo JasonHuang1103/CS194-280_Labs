@@ -1,0 +1,5 @@
+apply Iff.intro
+· intro h
+  sorry -- Complete this proof
+· intro ⟨i, j, hi, hj, h_eq⟩
+  sorry -- Complete this proof

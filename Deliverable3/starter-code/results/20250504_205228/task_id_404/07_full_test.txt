@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:22:9: error: tactic 'unfold' failed to unfold 'myMin' at
+  ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧
+    ((if a ≤ b then a else b) = a ∨ (if a ≤ b then a else b) = b)
+lean_playground/TempTest.lean:23:0: error: unexpected identifier; expected command

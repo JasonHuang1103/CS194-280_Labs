@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:24:29: error: invalid constructor ⟨...⟩, expected type must be an inductive type 
+  ?m.488
+lean_playground/TempTest.lean:25:29: error: invalid constructor ⟨...⟩, expected type must be an inductive type 
+  ?m.508
+lean_playground/TempTest.lean:28:4: error: invalid alternative name 'inl', expected 'refl'

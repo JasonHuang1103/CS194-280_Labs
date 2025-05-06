@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:9:82: error: unexpected token 'def'; expected 'in'
+lean_playground/TempTest.lean:20:54: error: unsolved goals
+a b : Array ℤ
+⊢ (∃ i < a.size, ∃ x < b.size, a[i]! = b[x]!) ↔ sorry () = true
+lean_playground/TempTest.lean:24:0: error: unexpected identifier; expected command

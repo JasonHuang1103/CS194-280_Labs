@@ -1,0 +1,4 @@
+{
+  "code": "(a > 0 && b < 0) || (a < 0 && b > 0)",
+  "proof": "simp [Bool.and_eq_true, Bool.or_eq_true, or_comm]"
+}

@@ -1,0 +1,95 @@
+Below is a step-by-step explanation of the reasoning process along with a detailed plan for both the implementation and the accompanying proof.
+
+──────────────────────────────
+Step 1. Understanding the Function
+
+• The function, hasOppositeSign, takes two integers a and b.
+• It must return true if one integer is positive and the other is negative.
+• Zero does not count as positive or negative. In other words, if either integer is zero, the function should return false.
+• This naturally leads us to checking if (a > 0 ∧ b < 0) or (a < 0 ∧ b > 0).
+
+──────────────────────────────
+Step 2. Breaking Down the Problem
+
+Sub-problems include:
+• Implementing the Boolean check:
+  – Check if a is positive and b negative.
+  – Check if a is negative and b positive.
+• Combining both cases with a logical “or” operator.
+• Guaranteeing that when either a or b is zero, both conditions fail.
+
+──────────────────────────────
+Step 3. Considering Input Types, Edge Cases, and Expected Behavior
+
+• Input Type: Both a and b are of type Int.
+• Edge Cases:
+  – When a = 0 or b = 0, neither condition is satisfied so the result is false.
+  – When both are positive or both are negative, similarly false.
+• Expected Behavior: The function returns true if and only if one integer is positive and the other is negative.
+
+──────────────────────────────
+Step 4. Choosing the Proof Technique
+
+• The specification expressed by hasOppositeSign_spec is:
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+• Since our implementation will match that Boolean expression exactly (the order of the disjuncts is immaterial), the proof can be done by simply unfolding the definitions and using reflexivity (rfl).
+• The proof technique is to unfold both the implementation and the spec and then see that they are definitionally equal—the algebraic structure of the Boolean expression is identical.
+
+──────────────────────────────
+Step 5. Similar Patterns and Examples
+
+• Lean examples where one unfolds definitions and uses rfl for proofs show that if the implementation mirrors the specification exactly, one may finish the proof by reflexivity.
+• The given Lean 4 template is structured to allow unfolding the definitions and then closing the goal with rfl.
+
+──────────────────────────────
+Final Detailed Plan
+
+1. Implementation:
+  – Define hasOppositeSign such that it returns the Boolean expression:
+   (a > 0 && b < 0) || (a < 0 && b > 0).
+  – This implementation directly mirrors our understanding of checking for opposite signs without extra complications.
+
+2. Proof:
+  – Unfold the definitions of hasOppositeSign and hasOppositeSign_spec.
+  – Observe that the specification becomes:
+   ((a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)) ↔ ((a > 0 && b < 0) || (a < 0 && b > 0))
+  – Since the Boolean operators and the logical connectives correspond in our setting, the goal is met by applying rfl.
+
+──────────────────────────────
+Final Lean 4 Code
+
+Below is the completed Lean 4 code that follows the plan:
+
+------------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasOppositeSign (a : Int) (b : Int) : Bool :=
+  -- The function returns true if one number is positive and the other negative.
+  (a > 0 && b < 0) || (a < 0 && b > 0)
+
+
+-- Theorem Specification: The result is true if a and b have opposite signs
+def hasOppositeSign_spec (a : Int) (b : Int) (result : Bool) : Prop :=
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+
+-- Theorem: Prove that the implementation satisfies the specification
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  -- Unfold the definitions.
+  unfold hasOppositeSign hasOppositeSign_spec
+  -- The two sides are definitionally equal.
+  rfl
+------------------------------------------------------------
+
+──────────────────────────────
+Conclusion
+
+The reasoning involved:
+ • Correctly understanding the requirements.
+ • Breaking the problem into implementing the Boolean check and handling edge cases.
+ • Designing the proof by unfolding definitions.
+ • Recognizing that the implementation and specification are structurally identical so rfl completes the proof.
+
+This completes both the implementation and the proof plan in Lean 4.

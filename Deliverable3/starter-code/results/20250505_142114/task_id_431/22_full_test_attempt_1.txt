@@ -1,0 +1,10 @@
+Lean Error: lean_playground/TempTest.lean:9:0: error: expected token
+lean_playground/TempTest.lean:21:54: error: unsolved goals
+case mp
+a b : Array ℤ
+⊢ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) → (a.any fun x => b.contains x) = true
+
+case mpr
+a b : Array ℤ
+⊢ (a.any fun x => b.contains x) = true → ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!
+lean_playground/TempTest.lean:25:0: error: unexpected token '·'; expected command

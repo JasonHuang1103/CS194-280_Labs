@@ -1,0 +1,4 @@
+by_cases h : a <= b
+· exact ⟨⟨le_refl a, h⟩, Or.inl rfl⟩
+· have : b < a := lt_of_not_le h
+  exact ⟨⟨le_of_lt this, le_refl b⟩, Or.inr rfl⟩

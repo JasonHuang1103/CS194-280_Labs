@@ -1,0 +1,44 @@
+Below is an explanation of what’s going wrong and one idea for how to fix it.
+
+Let’s look at the structure of your theorem. You state
+
+  myMin_spec a b (myMin a b)
+
+where the spec is
+  (result ≤ a ∧ result ≤ b) ∧ (result = a ∨ result = b)
+
+and myMin is defined by
+  if a ≤ b then a else b.
+
+When you “unfold” the definitions and then “simp [myMin]”, Lean reduces your goal to a conjunction whose first part is itself a conjunction and whose second part is a disjunction—but the simplification of the “if” does not reduce everything to a “trivial” equality using rfl. In particular, after simp the second conjunct no longer looks like (result = a ∨ result = b) but rather something like
+  (b < a → b = a) ∨ (a ≤ b → a = b)
+(this is how the if–then–else shows up when you haven’t done any further case analysis).
+
+Your proof then uses a single split followed by four bullet branches. What is happening is that split only “unzips” the top-level conjunction into two subgoals. (One for the left conjunct, one for the right.) However, your bullet list is written as if there were four subgoals. In effect, you assumed (or hoped) the structure would be something like “split; split” (first splitting the top-level conjunction and then splitting the left conjunct), and then two extra cases for the disjunction on the right. But the way Lean has simplified your goal does not directly match that structure.
+
+In summary, there are two interrelated issues:
+
+1. The if–then–else term myMin a b does not simplify “by itself” to either a or b. Instead, after simp it remains conditional – the equality part in the spec ends up “wrapped” in implications (b < a → b = a) ∨ (a ≤ b → a = b) rather than the plain (a = result) or (b = result). As a result, your intended bullet proofs using Or.inl rfl and Or.inr rfl do not match the goal.
+
+2. Your tactic script uses four bullet branches as if there were four subgoals. In fact, splitting the top-level conjunction produces two subgoals (one for the pair of inequalities and one for the equality/disjunction), and if you need to split further you must explicitly do so. Otherwise, some goals remain unsolved.
+
+A way to fix the proof would be to do a case analysis on whether a ≤ b holds. For example, you could structure the proof something like this:
+
+  theorem myMin_spec_satisfied (a b : Int) :
+    myMin_spec a b (myMin a b) := by
+    unfold myMin myMin_spec
+    by_cases h : a ≤ b
+    · rw [if_pos h]
+      split
+      · split; simp [h]  -- Prove a ≤ a and a ≤ b (using h for the second inequality)
+      · left; rfl
+    · rw [if_neg h]
+      split
+      · split; simp [h]  -- Prove b ≤ a and b ≤ b
+      · right; rfl
+
+In this structure you explicitly do the case distinction on a ≤ b. In each branch you know which of a or b is returned by myMin and the equalities become definitionally true (by rfl), while the inequalities can be deduced by simp or by standard lemmas.
+
+To summarize, the root cause of the error is that your proof script incorrectly assumes the goal has four subgoals (two for the left conjunction and two for the right disjunction), while in reality the “if” has not been reduced by simp into the expected “direct” equalities. This mismatch leaves some goals unsolved. The remedy is to break the proof into cases (using by_cases, for example) so that the if–then–else is reduced to one of its branches and the desired equalities become definitionally trivial.
+
+Hope this helps clarify the issue and suggests one direction toward a correct proof!

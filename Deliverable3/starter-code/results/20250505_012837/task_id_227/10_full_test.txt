@@ -1,0 +1,102 @@
+Lean Error: lean_playground/TempTest.lean:31:8: error: tactic 'apply' failed, failed to unify
+  a ≤ b
+with
+  (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ a
+case inl.inl.left.left
+a b c : ℤ
+h₁ : a < b
+h₂ : a < c
+⊢ (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ a
+lean_playground/TempTest.lean:32:8: error: tactic 'apply' failed, failed to unify
+  a ≤ c
+with
+  (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ b ∧
+    (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ c
+case inl.inl.left.right
+a b c : ℤ
+h₁ : a < b
+h₂ : a < c
+⊢ (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ b ∧
+    (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ c
+lean_playground/TempTest.lean:33:12: error: tactic 'rfl' failed, the left-hand side
+  if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c
+is not definitionally equal to the right-hand side
+  a
+case inl.inl.right.h
+a b c : ℤ
+h₁ : a < b
+h₂ : a < c
+⊢ (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) = a
+lean_playground/TempTest.lean:37:8: error: tactic 'apply' failed, failed to unify
+  a ≤ b
+with
+  (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ a
+case inl.inr.left.left
+a b c : ℤ
+h₁ : a < b
+h₂ : c ≤ a
+⊢ (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ a
+lean_playground/TempTest.lean:38:8: error: type mismatch
+  h₂
+has type
+  c ≤ a : Prop
+but is expected to have type
+  (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ b ∧
+    (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ c : Prop
+lean_playground/TempTest.lean:39:20: error: tactic 'rfl' failed, the left-hand side
+  if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c
+is not definitionally equal to the right-hand side
+  c
+case inl.inr.right.h.h
+a b c : ℤ
+h₁ : a < b
+h₂ : c ≤ a
+⊢ (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) = c
+lean_playground/TempTest.lean:45:8: error: type mismatch
+  h₁
+has type
+  b ≤ a : Prop
+but is expected to have type
+  (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ a : Prop
+lean_playground/TempTest.lean:46:8: error: tactic 'apply' failed, failed to unify
+  b ≤ c
+with
+  (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ b ∧
+    (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ c
+case inr.inl.left.right
+a b c : ℤ
+h₁ : b ≤ a
+h₂ : b < c
+⊢ (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ b ∧
+    (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ c
+lean_playground/TempTest.lean:47:19: error: tactic 'rfl' failed, the left-hand side
+  if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c
+is not definitionally equal to the right-hand side
+  b
+case inr.inl.right.h.h
+a b c : ℤ
+h₁ : b ≤ a
+h₂ : b < c
+⊢ (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) = b
+lean_playground/TempTest.lean:51:8: error: type mismatch
+  h₁
+has type
+  b ≤ a : Prop
+but is expected to have type
+  (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ a : Prop
+lean_playground/TempTest.lean:52:8: error: type mismatch
+  h₂
+has type
+  c ≤ b : Prop
+but is expected to have type
+  (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ b ∧
+    (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ c : Prop
+lean_playground/TempTest.lean:53:20: error: tactic 'rfl' failed, the left-hand side
+  if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c
+is not definitionally equal to the right-hand side
+  c
+case inr.inr.right.h.h
+a b c : ℤ
+h₁ : b ≤ a
+h₂ : c ≤ b
+⊢ (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) = c

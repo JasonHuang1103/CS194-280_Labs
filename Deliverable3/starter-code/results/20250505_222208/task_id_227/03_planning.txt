@@ -1,0 +1,111 @@
+We want to define a function that, given three integers a, b, and c, returns the smallest of the three. In addition, we have to prove that the returned value satisfies two properties:
+
+1. It is less than or equal to each of a, b, and c.
+2. It is exactly one of a, b, or c.
+
+Below is a step‐by‐step explanation of how we can attack this problem and a detailed plan for both writing the code and giving the proof.
+
+───────────────────────────── 
+Step 1. Understanding the requirements
+
+• The function must take three integers. In Lean 4 (using Mathlib’s Int type) we already have a built‐in “min” function that given two Int’s returns the smaller one.
+• The “specification” requires that the returned result (call it result) is:
+  (result ≤ a) ∧ (result ≤ b) ∧ (result ≤ c)
+  and also that
+  (result = a) ∨ (result = b) ∨ (result = c).
+
+───────────────────────────── 
+Step 2. Breaking down the problem
+
+For the implementation:
+– We can obtain the minimum of three numbers by computing the minimum of a and b first, then taking the minimum of that result and c.
+  That is, define
+   minOfThree a b c := min (min a b) c.
+– (We assume that “min” for Int is available in Mathlib; it comes with the properties such as “min_le_left” and “min_le_right”.)
+
+For the proof (minOfThree_spec_satisfied):
+• We must show both parts of the specification.
+
+For the inequality part:
+1. Use the fact that for any two integers x and y, min x y ≤ x and min x y ≤ y.
+2. Then, since
+  r := min (min a b) c,
+  we argue:
+   min (min a b) c ≤ (min a b) and min a b ≤ a (and similarly for b);
+  also min (min a b) c ≤ c.
+3. By applying transitivity we deduce r ≤ a, r ≤ b, and r ≤ c.
+
+For the “witness” (disjunctive) part:
+1. Write d := min a b. Then by the properties of two‐argument min we have that either d = a or d = b.
+2. Next consider r = min d c. Now, again either d ≤ c (in which case r = d) or c < d (in which case r = c).
+3. In the first subcase, if d = a then r = a; if d = b then r = b.
+4. In the second subcase, regardless of the value of d, if c < d then r = c.
+5. Thus one of r = a, r = b, or r = c must hold.
+
+This case‐analysis gives the disjunctive part of the specification.
+
+───────────────────────────── 
+Step 3. Considering inputs and edge cases
+
+• All three inputs are of type Int. There is no “corner” case outside of the usual arithmetic properties because “min” is well‐defined on integers.
+• Even when some are equal, the property “result = a ∨ result = b ∨ result = c” still holds because if, say, a = b then both are acceptable.
+• We use the built‐in min function; its behavior is already proven in Mathlib.
+
+───────────────────────────── 
+Step 4. What proof techniques will be used
+
+• We will “unfold” the definition of minOfThree so that the goal becomes “min (min a b) c”.
+• To prove the inequalities, we use known theorems like “min_le_left” and “min_le_right” (which say that for any two numbers, min x y ≤ x and min x y ≤ y) plus transitivity of ≤.
+• For the disjunctive part (result = a ∨ result = b ∨ result = c), we perform a case analysis on the order relation between a and b (to show min a b equals one of them) and then on the order between (min a b) and c.
+• Tactics like “cases” on the disjunction or “by_cases” (using the decidability of ≤ on Int) will be helpful.
+• The calculational style used in the examples from the Lean documentation (using “rw” and “transitivity”) offers good symmetry to our proof.
+
+───────────────────────────── 
+Step 5. Referencing similar patterns
+
+• Similar examples use the approach “min (min a b) c” to define the minimum of three numbers.
+• Many examples in the documentation work with “min” and prove properties such as “min_le_left” and “min_le_right.” We will mimic that style.
+• Case splitting (by using a disjunction from properties of min for two numbers) is similar to how one might show “if a ≤ b then … else …”. 
+
+───────────────────────────── 
+Final Plan for Implementation and Proof
+
+A. Implementation
+
+1. Define the function as:
+  def minOfThree (a b c : Int) : Int := min (min a b) c
+
+B. Specification and Proof
+
+1. Define the specification predicate:
+  def minOfThree_spec (a b c : Int) (result : Int) : Prop :=
+   (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c)
+
+2. Prove the theorem minOfThree_spec_satisfied as follows:
+
+• Unfold the definition of minOfThree.
+• For the inequality part:
+ ◦ Apply “min_le_left” and “min_le_right” twice:
+  – First show min (min a b) c ≤ min a b (by “min_le_left” or “min_le_right”).
+  – Then, knowing min a b ≤ a and min a b ≤ b, deduce the overall inequalities.
+  – Also deduce min (min a b) c ≤ c.
+• For the disjunctive part:
+ ◦ Let d = min a b.
+ ◦ Use the property for two numbers: either d = a or d = b.
+ ◦ Then, consider min d c: either d ≤ c (so r = d) or c < d (so r = c).
+ ◦ Combine the cases to conclude that r = a or r = b or r = c.
+• Use tactics like “cases” or “by_cases” to handle the disjunction.
+
+C. Concluding the Proof
+
+• After establishing both parts, use “constructor” to combine the inequality and disjunction proofs.
+
+───────────────────────────── 
+Summary
+
+1. The function will be implemented using the built-in “min” function in a nested way.
+2. The proof is divided into two main parts: showing the result does not exceed any argument and that it equals one of them.
+3. The proof employs standard lemmas about “min” and straightforward case analysis.
+4. Similar patterns were found in examples from Mathlib documentation, such as calculational proofs using “rw” and case split on disjunctions.
+
+This completes our detailed plan. You can now implement the Lean code accordingly and prove the theorem step‐by‐step.

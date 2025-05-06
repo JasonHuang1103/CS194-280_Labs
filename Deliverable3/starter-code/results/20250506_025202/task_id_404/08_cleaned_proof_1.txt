@@ -1,0 +1,8 @@
+split
+· split_ifs with h
+  · exact ⟨le_refl a, h⟩
+  · have : b ≤ a := Int.le_of_lt (Int.lt_of_not_ge h)
+    exact ⟨this, le_refl b⟩
+· split_ifs
+  · exact Or.inl rfl
+  · exact Or.inr rfl

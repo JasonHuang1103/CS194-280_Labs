@@ -1,0 +1,73 @@
+Below is one example of how a mistaken “proof” of ¬(p ↔ ¬p) might be written and then rejected by Lean. In many such cases the proof writer tries something like:
+
+  theorem not_iff_not_self (p : Prop) : ¬ (p ↔ ¬p) :=
+  begin
+    intro h,
+    -- Here h : (p → ¬p) ∧ (¬p → p)
+    by_cases hp : p,
+    { -- If p holds then by the first half of h we get ¬p,
+      -- so we have both p and ¬p.
+      have np := h.left hp,
+      exact np hp },
+    { -- Otherwise, if ¬p holds then by the second half of h we get p,
+      have p' := h.right hp,
+      exact hp p' }
+  end
+
+At first glance the idea is the usual “case‐split” on p: if p then p → ¬p gives a contradiction, and if ¬p then ¬p → p again gives a contradiction. Unfortunately, Lean (without extra assumptions such as decidability of p) does not allow a case split on an arbitrary proposition p. (In Lean the “by_cases” tactic requires that the proposition have a decidable instance, and the “cases” method on p won’t work constructively.) Even though the informal “split into cases” is a classical move that is perfectly acceptable with the Law of Excluded Middle, the problem asked that we “prove … without using classical logic.”
+
+Let’s analyze step‐by‐step what is going wrong when one writes a proof in this style:
+
+──────────────────────────── Step 1: Tactic Failure
+
+• The proof tries to “split” on whether p holds by writing “by_cases hp : p”.  
+• In Lean the by_cases tactic (or a case analysis on p) automatically requires that p be decidable. Since p is an arbitrary proposition and no decidability instance is assumed, the tactic fails.
+
+──────────────────────────── Step 2: The Proof State
+
+• At the point where “by_cases hp : p” is invoked the context is
+  h : p ↔ ¬p
+and there is no information to decide whether p or ¬p holds.
+• The proof writer’s plan was to produce one branch assuming p and another assuming ¬p. But Lean cannot “choose a branch” for an arbitrary p without a designated decision procedure.
+
+──────────────────────────── Step 3: Matching the Specification
+
+• The statement to be proved is ¬(p ↔ ¬p), i.e. “there is no proof of the equivalence p ↔ ¬p.”  
+• The usual “contradiction by case analysis” argument is a classical argument. For each branch one uses that
+  if p holds, then by h.left we get ¬p and so p ∧ ¬p, and
+  if ¬p holds, then h.right tells you p holds,
+which would yield a contradiction in either case.
+• However, without using the Law of Excluded Middle or some other form of decidability, you cannot “split” on p; so the approach does not match the specification if you are not allowed to assume classical logic.
+
+──────────────────────────── Step 4: Type Mismatches and Incorrect Assumptions
+
+• There is no type error in the definitions themselves—the problem is not a type mismatch but a misuse of tactics.
+• More precisely, writing “by_cases hp : p” pretends that p is decidable. Lean reports errors (or “unsolved goals”) because it “expects” a decidable instance for the proposition p.
+• In our “case” branches the proofs use “hp” as if it were an inhabitant of p or a proof of ¬p. When p is not decidable, these two cases cannot be set up constructively.
+
+──────────────────────────── Step 5: Alternative Proof Strategies
+
+• One possibility is to add a decidability instance for p (for example, by assuming [Decidable p]) so that by_cases works. However, that would amount to using classical reasoning since p would become decidable by extra assumptions.
+• Alternatively, one might try to “avoid” an explicit split and derive a contradiction directly from h. But there is a well-known fact: “p ↔ ¬p” is “absurd” only if one can tell whether p holds or not—in other words, its impossibility is equivalent to excluded middle.
+• In many logical frameworks it turns out that the statement ¬(p ↔ ¬p) is essentially a “nonconstructive” theorem. (In fact, one may show that p ∨ ¬p follows if one can prove that for every proposition, p ↔ ¬p implies a contradiction.) Hence, proving ¬(p ↔ ¬p) without any classical principle is very hard or even impossible in a constructive setting.
+
+──────────────────────────── Root Cause and Suggestion for Fixing
+
+The root cause of the error is that the “proof” is trying to split on an arbitrary proposition p using a tactic (by_cases) that requires a decision procedure. In constructive Lean (or any constructive logic) one may not assume p is decidable unless it is given. In other words, the intended case analysis is a classical proof strategy that is not available if one wishes to avoid using classical logic.
+
+To fix the issue one would have to either:
+ • (a) Allow classical reasoning by importing or assuming a decidability instance for p (or the Law of Excluded Middle), thereby justifying the case split, or
+ • (b) Change the proof strategy so that it does not rely on case-splitting on p. (In this particular instance it turns out that a direct constructive proof of ¬(p ↔ ¬p) is not available; indeed the impossibility of an object witnessing p ↔ ¬p is equivalent to a weak form of excluded middle.)
+
+Thus, the error tells us that the proof’s approach does not match the specification “without using classical logic” and a better plan is needed. One suggestion is to reconsider the overall goal. Since a constructive proof of ¬(p ↔ ¬p) would give you “p ∨ ¬p” as a by‐product (by “testing” p in the two directions of the equivalence), one may suspect that ¬(p ↔ ¬p) is not provable constructively unless one already assumes a decidability principle.
+
+──────────────────────────── Conclusion
+
+The detailed analysis shows that:
+ • The tactic that fails is the use of “by_cases” (or a similar case split on p) because p is not assumed decidable.
+ • The proof state has h : (p → ¬p) ∧ (¬p → p) but no way to “choose” between p or ¬p.
+ • The proof approach follows a classical pattern (using case analysis) which is not allowed by the “without using classical logic” requirement.
+ • There is no type mismatch per se; it is rather an “unsolvable goals” issue.
+ • To “fix” it you would either have to allow classical reasoning (by providing a decidability instance) or change the overall plan—although in this example one may show that proving ¬(p ↔ ¬p) constructively implies a choice principle.
+
+A correct fix (if one is allowed classical reasoning) is to assume [Decidable p] and then proceed with the case analysis. Otherwise, one must acknowledge that the theorem is not provable constructively.

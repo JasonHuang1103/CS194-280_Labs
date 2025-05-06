@@ -1,0 +1,32 @@
+The mathematics in your proof isn’t wrong at all—the error comes from how the tactics are laid out. In Lean 4, all the tactics inside a tactic block (i.e. after the “by” in a proof) must be indented uniformly so that they are clearly understood to be part of the same block. In your code, the first couple of tactics (like
+
+  unfold isDivisibleBy11 isDivisibleBy11_spec  
+  simp
+
+) are indented properly, but then the following tactics
+
+rw [Int.ediv_eq_iff_eq_mul_right, mul_comm]  
+apply Int.ne_of_ne_zero  
+norm_num
+
+are not indented with respect to the “by” block. Because of that, Lean ends the proof early and sees the identifier “rw” at the top level (where it expects a command or declaration), which triggers the error:
+
+  error: unexpected identifier; expected command
+
+To fix this, simply indent all lines that are part of the proof block uniformly. For example:
+
+------------------------------------------------------------
+theorem isDivisibleBy11_spec_satisfied (n : Int) :
+  isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+  -- << PROOF START >>
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  simp
+  rw [Int.ediv_eq_iff_eq_mul_right, mul_comm]
+  apply Int.ne_of_ne_zero
+  norm_num
+  -- << PROOF END >>
+------------------------------------------------------------
+
+This way, Lean knows that “rw”, “apply”, and “norm_num” are all inside the same proof block, and it will parse them correctly.
+
+In summary, the error is due to inconsistent indentation in your tactic block. Uniformly indenting all of the tactics inside the “by” block resolves the issue.

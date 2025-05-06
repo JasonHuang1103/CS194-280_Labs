@@ -1,0 +1,29 @@
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  unfold hasOppositeSign hasOppositeSign_spec
+  apply Iff.intro
+  case mp =>
+    intro h
+    cases h
+    case inl h₁ =>
+      simp only [h₁.left, h₁.right, Bool.true_iff, Bool.or_true, and_self]
+    case inr h₂ =>
+      simp only [h₂.left, h₂.right, Bool.true_iff, Bool.true_or, and_self]
+  case mpr =>
+    intro h
+    simp only [Bool.or_eq_true] at h
+    cases h
+    case inl h₁ =>
+      left
+      apply And.intro
+      case left =>
+        exact of_decide_eq_true h₁.left
+      case right =>
+        exact of_decide_eq_true h₁.right
+    case inr h₂ =>
+      right
+      apply And.intro
+      case left =>
+        exact of_decide_eq_true h₂.left
+      case right =>
+        exact of_decide_eq_true h₂.right

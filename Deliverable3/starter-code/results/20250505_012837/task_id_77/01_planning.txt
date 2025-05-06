@@ -1,0 +1,49 @@
+Below is a plan that breaks down the implementation and its accompanying proof into clear, discrete steps.
+
+──────────────────────────────
+Step 1. Implementation of isDivisibleBy11  
+──────────────────────────────
+• The goal is to write a function that returns true if an integer n is divisible by 11 and false otherwise.
+• The mathematical statement “n is divisible by 11” is equivalent to n % 11 = 0.
+• In Lean 4, since equality on integers is decidable, you can write a conditional check:
+  if n % 11 = 0 then true else false.
+• This directly implements the required logic in a Boolean-valued function.
+
+──────────────────────────────
+Step 2. Specification Definition  
+──────────────────────────────
+• The provided specification is:
+  n % 11 = 0 ↔ result.
+• This means that the Boolean result should be true exactly when n % 11 = 0, and false otherwise.
+• Our implementation from Step 1 already mirrors this behavior.
+
+──────────────────────────────
+Step 3. Proof of the Specification  
+──────────────────────────────
+• The theorem is: 
+  isDivisibleBy11_spec n (isDivisibleBy11 n),
+  which unfolds to proving:
+  n % 11 = 0 ↔ (if n % 11 = 0 then true else false).
+• To prove this, one may proceed as follows:
+  1. Unfold the definitions of isDivisibleBy11 and isDivisibleBy11_spec.
+  2. Do a case analysis or simple “if” simplification based on the decision procedure for n % 11 = 0.
+   a. If n % 11 = 0, then the if-condition yields true. Therefore, the equivalence becomes (n % 11 = 0 ↔ true), which holds since the left-hand side is our assumption.
+   b. If n % 11 ≠ 0, then the function yields false. Now the equivalence reduces to (n % 11 = 0 ↔ false). Since n % 11 ≠ 0, the left-hand side is false and false ↔ false holds.
+  3. Use built-in simplification tactics (for instance, simp or split followed by assumption) to complete the proof.
+• The structure of the proof is very straightforward once the condition is analyzed.
+
+──────────────────────────────
+Step 4. Writing Up the Lean Code  
+──────────────────────────────
+• You will place the code for isDivisibleBy11 between the provided markers.
+• Then, fill in the proof between the corresponding proof markers.
+• The final file will import Mathlib and Aesop, define the function and specification, and then state and prove that the implementation satisfies the specification.
+  
+──────────────────────────────
+Summary  
+──────────────────────────────
+1. Define isDivisibleBy11 as a function that returns if n % 11 is 0 through a simple if-then-else.
+2. The spec is precisely that n % 11 = 0 if and only if the result is true.
+3. The proof will simply unfold the definitions and does a case analysis on the condition (n % 11 = 0) to show the equivalence holds.
+  
+Following these steps will lead to a correct Lean 4 implementation and its associated proof.

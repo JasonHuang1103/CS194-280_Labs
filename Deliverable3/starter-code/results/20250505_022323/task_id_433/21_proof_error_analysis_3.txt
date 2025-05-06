@@ -1,0 +1,54 @@
+Below is a detailed explanation of what went wrong.
+
+1. Mismatch in how the quantifiers are written
+
+Your specification is written as
+
+  (∀ i, i < a.size → n > a[i]!) ↔ result
+
+but during simplification Lean “sees” something like
+
+  (∀ (i : ℕ) (H : i < a.size), n > a[i]!)
+
+That is, one side of the equivalence is written “arrow-style” (a function type over i, then the proof as an argument) while the other is “curried” (quantifying first over i and then over the proof that i < a.size). Although these two versions are logically equivalent, Lean’s definitional equality (or how its simp tactic unfolds things) is sensitive to the exact form. So the goal ends up being
+
+  (∀ i, i < a.size → n > a[i]!) ↔ (∀ (i : ℕ) (x : i < a.size), n > a[i]!)
+
+and Lean complains that it cannot “bridge the gap” between these two formulations. (Sometimes you’ll see errors like “unsolved goals …” that point exactly to this mismatch.)
+
+2. Extra comma in the tactic block
+
+The error message also says:
+
+  error: unexpected token ','; expected command
+
+This is coming from a line in your second branch:
+  rw [← hj.2, Array.getElem_eq_data_get ⟨j, by rwa ← hj.1⟩],
+
+In tactic mode, each “step” (or command) must be on its own line (or clearly separated by the proper separator). That trailing comma causes Lean to think that there is a token that does not belong. (It’s not that the “rw” command itself is wrong; rather, the way you’re ending that line confuses the parser.) Make sure to use either a new line or the proper separator (like a semicolon or period) to separate tactic commands.
+
+3. How to fix this
+
+A good direction for fixing the proof is as follows:
+
+• Decide on one style for writing your statement. One way is to change the spec so that it uses the curried version:
+  def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+   (∀ (i : ℕ) (H : i < a.size), n > a[i]!) ↔ result
+
+Then update your proof accordingly. With the quantifiers exactly matching, Lean won’t get “confused” as it simplifies the definitions.
+
+• Alternatively, if you want to keep the “arrow-style” quantified statement, then you need to add an extra conversion in your proof to turn one form into the other.
+
+• Also, remove the extra comma at the end of the rw line so that Lean parses the tactic script correctly.
+
+4. In summary
+
+The root cause of the error is twofold:
+
+• The statement “∀ i, i < a.size → n > a[i]!” is not definitionally identical to “∀ (i : ℕ) (x : i < a.size), n > a[i]!.” Because Lean’s simplifier does not know how to treat these as “the same” without help, it cannot solve the goal.
+
+• There is an extra comma that makes Lean expect a new (complete) command instead of a continuation, thus causing a parsing error.
+
+By rewriting the spec (or adapting the proof) so that your quantifiers are expressed uniformly and by cleaning up the tactic block syntax, the proof should go through.
+
+I hope this helps clarify the issue and points you in the right direction for a fix!

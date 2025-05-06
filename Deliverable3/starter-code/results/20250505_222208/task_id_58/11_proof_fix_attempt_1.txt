@@ -1,0 +1,11 @@
+```lean
+constructor
+· intro h
+  rcases h with (⟨ha, hb⟩ | ⟨hc, hd⟩)
+  · exact (a > 0) && (b < 0)
+  · exact (a < 0) && (b > 0)
+· intro h
+  cases h
+  · exact Or.inl ⟨h.1.1, h.1.2⟩
+  · exact Or.inr ⟨h.2.1, h.2.2⟩
+```

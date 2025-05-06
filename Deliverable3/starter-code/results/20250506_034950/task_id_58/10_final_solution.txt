@@ -1,0 +1,4 @@
+{
+  "code": "if ((a < 0 \u2227 b > 0) \u2228 (a > 0 \u2227 b < 0)) then true else false",
+  "proof": "by_cases h : ((a < 0 \u2227 b > 0) \u2228 (a > 0 \u2227 b < 0))\n\u00b7 simp [h]\n\u00b7 simp [h]"
+}

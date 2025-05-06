@@ -1,0 +1,4 @@
+{
+  "code": "a.any (fun x => b.any (fun y => x = y))",
+  "proof": "intros\n  split\n  \u00b7 rintro \u27e8i, j, hi, hj, h_eq\u27e9\n    apply Array.any_iff_exists.mpr\n    use i\n    refine \u27e8hi, _\u27e9\n    apply Array.any_iff_exists.mpr\n    use j\n    exact \u27e8hj, h_eq\u27e9\n  \u00b7 intro h\n    apply Array.any_iff_exists.mp at h\n    obtain \u27e8i, hi, h\u27e9 := h\n    apply Array.any_iff_exists.mp at h\n    obtain \u27e8j, hj, h_eq\u27e9 := h\n    exact \u27e8i, j, hi, hj, h_eq\u27e9"
+}

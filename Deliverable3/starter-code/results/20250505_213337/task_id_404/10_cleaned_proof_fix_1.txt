@@ -1,0 +1,7 @@
+split
+· split_ifs
+  · exact ⟨le_refl a, le_of_lt (le_trans (le_of_not_le h) h)⟩
+  · exact ⟨le_of_not_le h, le_refl b⟩
+· split_ifs
+  · left; rfl
+  · right; rfl

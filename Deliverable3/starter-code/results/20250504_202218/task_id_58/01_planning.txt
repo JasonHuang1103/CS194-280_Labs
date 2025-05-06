@@ -1,0 +1,64 @@
+Below is a plan that explains the key steps for how to implement the function and prove that it meets its specification.
+
+──────────────────────────────
+Step 1. Implementation of hasOppositeSign
+
+• Use the problem statement: Return true exactly when one integer is positive and the other is negative. In other words, when either
+  a < 0 and b > 0  or  a > 0 and b < 0.
+• Note that if any number is zero it does not pass either condition. (Zero is neither positive nor negative.)
+• A straightforward implementation is to “combine” the two conditions using the Boolean or:
+  hasOppositeSign a b = (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0)
+• Since Lean typically distinguishes between Prop and Bool (and the “if … then … else” syntax requires Bool conditions) you must be sure that the comparisons a < 0 and a > 0 yield Bool values. 
+
+  – One approach is to use if-then-else:
+  if (a < 0 && b > 0) then true
+  else if (a > 0 && b < 0) then true
+  else false
+  – Alternatively, Lean’s Boolean operators (&&, ||) and conditions can be given instances of decidability automatically when importing Mathlib. So you might also write the implementation as:
+  def hasOppositeSign (a : Int) (b : Int) : Bool :=
+    (a < 0 && b > 0) || (a > 0 && b < 0)
+  
+  Choose the style that best fits the Lean 4 environment (and mathlib’s provided instances).
+
+──────────────────────────────
+Step 2. Stating the Specification
+
+• The specification is given as:
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+• Here result is the output of hasOppositeSign. Notice that both the left-hand side and right-hand side are “booleans” (or can be interpreted as such) once you give the right definition to hasOppositeSign.
+• In the theorem “hasOppositeSign_spec_satisfied”, you need to show that the computed value (from your definition) is logically equivalent (using the ↔) to the disjunction of the two cases.
+
+──────────────────────────────
+Step 3. Devising the Proof Strategy (for hasOppositeSign_spec_satisfied)
+
+• Unfold Definitions:
+  – Begin the proof by unfolding the definitions of hasOppositeSign and hasOppositeSign_spec.
+  – This will expose the if-then-else (or Boolean operators) in your implementation.
+    
+• Case Analysis or Rewriting:
+  – If you used the if-then-else construction, do a case split on the conditions.
+  – For example, prove the equivalence by considering the true branch (when the condition [(a < 0 && b > 0) || (a > 0 && b < 0)] holds) and the false branch separately.
+  – If you implemented hasOppositeSign as a direct Boolean combination, it is often the case that the result is definitionally equal to the condition, so the equivalence follows by reflexivity (rfl) or by a simple Boolean rewrite.
+    
+• Use Built-In Automation:
+  – Lean’s built-in tactics (and even Aesop) might simplify the Boolean expressions.
+  – You can use tactics like simp, exact, or rfl where applicable to complete the proof.
+
+──────────────────────────────
+Step 4. Wrap-up
+
+• Once the proof is complete, review that:
+  – All cases where one integer is zero automatically fall into “false”.
+  – The function and the specification match exactly.
+    
+• If any type conversion issues between propositions (Prop) and booleans (Bool) arise, consider using a helper lemma or the equivalence (of_bool or similar) provided by mathlib to bridge the gap.
+
+──────────────────────────────
+Summary
+
+1. Write the function so it returns true exactly when (a < 0 ∧ b > 0) or (a > 0 ∧ b < 0), and false otherwise.
+2. Express the specification as an equivalence between the disjunction and the result.
+3. In the proof, unfold the definitions and use case analysis or simplification tactics to show that the definition of hasOppositeSign exactly corresponds to the specification in all cases.
+4. Validate that the treatment of zeros is correct (since zero won’t satisfy a < 0 or a > 0).
+
+This plan outlines the key steps to implement and prove the function as required.

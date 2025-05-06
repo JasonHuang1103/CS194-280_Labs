@@ -1,0 +1,1 @@
+a.fold true (λ acc x => acc && (n > x))

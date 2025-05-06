@@ -1,0 +1,5 @@
+apply And.intro
+. apply Int.le_trans
+  . apply min_le
+  . apply min_le_right
+exact (Or.inl rfl)

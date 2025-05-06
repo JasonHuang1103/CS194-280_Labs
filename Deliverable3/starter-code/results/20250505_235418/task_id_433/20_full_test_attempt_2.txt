@@ -1,0 +1,9 @@
+Lean Error: lean_playground/TempTest.lean:21:35: error: unknown constant 'List.all_iff_forall'
+lean_playground/TempTest.lean:24:4: error: type mismatch
+  h i hi
+has type
+  a[i]! < n : Prop
+but is expected to have type
+  a[i] < n : Prop
+lean_playground/TempTest.lean:26:27: error: unknown constant 'List.mem_of_get_eq'
+lean_playground/TempTest.lean:26:11: error: rcases tactic failed: x✝ : ?m.12144 is not an inductive datatype

@@ -1,0 +1,4 @@
+{
+  "code": "6 * size * size",
+  "proof": "theorem cubeSurfaceArea_spec_satisfied (size : Int):\n  cubeSurfaceArea_spec size (cubeSurfaceArea size) := by\n  unfold cubeSurfaceArea cubeSurfaceArea_spec\n  rfl"
+}

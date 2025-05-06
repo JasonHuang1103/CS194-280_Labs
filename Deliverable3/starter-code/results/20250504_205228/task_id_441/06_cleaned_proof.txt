@@ -1,0 +1,2 @@
+unfold cubeSurfaceArea cubeSurfaceArea_spec
+  rfl

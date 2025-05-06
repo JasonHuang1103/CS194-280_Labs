@@ -1,0 +1,4 @@
+{
+  "code": "n % 10",
+  "proof": "simp [Nat.mod_lt, Nat.zero_le]"
+}

@@ -1,0 +1,34 @@
+The underlying problem is not with your definition of hasCommonElement at all but with the “bridge lemma” you are using in your proof. In your proof you write
+
+  obtain ⟨i, hi, j, hj, h_eq⟩ := Array.any_def.mp h
+
+and later
+
+  apply Array.any_def.mpr
+
+so that you are using some lemma called Array.any_def whose “mp” and “mpr” members should characterize the behavior of Array.any. In other words, you expect that
+
+  Array.any a (λ x, Array.any b (λ y, x == y)) = true ↔
+  (∃ i: Nat, i < a.size ∧ ∃ j: Nat, j < b.size ∧ a[i]! == b[j]!)
+
+But in your Lean code (or in the Mathlib version you have imported) no such lemma “Array.any_def” is provided. (In fact, no such lemma is defined at all in Mathlib; you would need to prove this equivalence yourself.) Because of this the tactic script does not actually “know” how to unfold what Array.any means; after the “simp” your goal is rewritten to an expression that involves a “sorry”, so Lean complains that it is trying to complete a proof in which a key step is missing.
+
+The fatal error message “unexpected token 'def'; expected 'in'” comes from the fact that the parser or elaborator is thrown off by the missing (or incomplete) definition of Array.any_def. In other words, the tactic invocation above “assumes” a definition that wasn’t given, so later when Lean is trying to piece together your proof it finds an “unfinished” proof term (that is, a “sorry”) where it was expecting a complete term, causing confusing parse errors.
+
+To fix the issue you need to supply the equivalence for Array.any. There are several directions you might take:
+
+1. Prove and state a lemma (or two) that relate the boolean function Array.any to the corresponding existential statement. For example, you might define a lemma such as
+
+  lemma Array.any_iff {α : Type} (a : Array α) (p : α → Bool)
+    [DecidablePred (λ x, p x)] : (Array.any a p = true) ↔ (∃ i, i < a.size ∧ p (a[i]!) = true) :=
+  begin
+    -- Proof goes here
+  end
+
+and then prove a second lemma for the nested call on b. With these lemmas in hand you can “unfold” the definition of hasCommonElement and deduce exactly the specification you want.
+
+2. Alternatively, roll your own proof (or tactic script) that does not rely on a missing Array.any_def. In your proof script you might replace the use of Array.any_def.mp and .mpr by an explicit induction on the arrays or by using an appropriate library lemma (if one exists).
+
+Thus, the error is not in the definition of hasCommonElement itself but in using a so‐called “shortcut” (Array.any_def) that Lean cannot resolve. In order to get your proof to compile, you need either to prove this equivalence (i.e. supply Array.any_def or its equivalent) or rewrite your proof so that you work directly with the semantics of Array.any.
+
+Once you fill in that gap the “unexpected token” error and the “unsolved goals” should go away.

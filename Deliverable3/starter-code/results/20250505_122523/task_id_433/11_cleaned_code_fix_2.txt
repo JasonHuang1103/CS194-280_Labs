@@ -1,0 +1,3 @@
+(a.toList).all (fun x => n > x)
+
+This change should eliminate the error you encountered.

@@ -1,0 +1,27 @@
+have h₁ : minAB = a ∨ minAB = b := by
+  simp only [minAB]
+  split_ifs 
+  · left; rfl
+  · right; rfl
+
+cases h₁ with
+| inl hminAB =>
+  cases decide (a <= c) with
+  | isTrue hac =>
+    constructor
+    · split; simp [hminAB, hac]
+    · left; exact hminAB
+  | isFalse hac =>
+    constructor
+    · split; simp [hminAB, not_le.mp hac]
+    · right; right; rfl
+| inr hminAB =>
+  cases decide (b <= c) with
+  | isTrue hbc =>
+    constructor
+    · split; simp [hminAB, hbc]
+    · right; left; exact hminAB
+  | isFalse hbc =>
+    constructor
+    · split; simp [hminAB, not_le.mp hbc]
+    · right; right; rfl

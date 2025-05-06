@@ -1,0 +1,87 @@
+Below is an explanation of the reasoning process, followed by a detailed plan for both implementing the function and proving that it meets the specification.
+
+──────────────────────────────
+Step-by-Step Reasoning
+
+1. Understanding the function:
+ • The function “lastDigit” should take a non‑negative integer n (a Nat) and return its last digit.
+ • To extract the last digit we use the modulo operation (n % 10) which, by construction, gives a result between 0 and 9.  
+ • Thus, lastDigit n is defined as n % 10.
+
+2. Breaking down the problem:
+ • Implementation: Define lastDigit (n : Nat) to be the result of the remainder when n is divided by 10.
+ • Specification: Prove that the returned result is between 0 and 9 and that it equals n % 10.
+ • The spec is given as:
+   (0 ≤ result ∧ result < 10) ∧ (n % 10 = result)
+ • With our implementation, the second part (n % 10 = result) is trivial because result itself will be defined as n % 10.
+ • The first part follows from basic properties of modulo arithmetic.
+
+3. Considering input types, edge cases, and expected behavior:
+ • The input is of type Nat (non-negative integers), so we do not have to worry about negatives.
+ • An edge case is n = 0. In this case, 0 % 10 = 0, which satisfies the spec.
+ • For any n, the modulo operation naturally gives a remainder in the expected range when the divisor (10) is positive.
+
+4. Proof techniques:
+ • We will use definition unfolding to expose the definition of lastDigit and lastDigit_spec.
+ • For the fact that n % 10 < 10, one can either appeal to the theorem nat.mod_lt (which states that for any n and a positive m, n % m < m) or argue directly from the definition of modulo.
+ • The equality n % 10 = n % 10 is immediate by reflexivity.
+ • The proof will use basic tactics such as unfold, split, and applying the known lemma.
+
+5. Similar patterns and patterns from examples:
+ • Similar modulo properties are often proven using the library lemma nat.mod_lt.
+ • Our theorem is a simple “by definition” proof combined with the property of mod, making it straightforward.
+
+──────────────────────────────
+Detailed Plan for Implementation and Proof
+
+Implementation Plan:
+ • Define lastDigit (n : Nat) to be n % 10.
+ • This is a direct implementation since Lean's % operator computes the remainder, and by definition:
+   ∀ n, (n % 10) is between 0 (inclusive) and 10 (exclusive).
+
+Proof Plan:
+ • Unfold the definitions of lastDigit and lastDigit_spec.
+ • Split the conjunction into two parts.
+  – For the first part, prove that (0 ≤ n % 10) ∧ (n % 10 < 10):
+   * 0 ≤ n % 10 follows from the fact that a remainder of a division of non-negative numbers is non-negative.
+   * n % 10 < 10 is proven by applying the lemma nat.mod_lt n (dec_trivial)
+  – For the second part (n % 10 = n % 10), conclude by reflexivity.
+ • Combine these results to complete the theorem proof.
+
+──────────────────────────────
+Final Lean Template with Comments (Plan Outline)
+
+Below is the final plan in Lean code:
+
+----------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def lastDigit (n : Nat) : Nat :=
+  -- The last digit is obtained by computing n % 10.
+  n % 10
+
+-- Theorem: The returned digit d should be between 0 and 9; 
+-- d should be the last digit of the input number n
+def lastDigit_spec (n : Nat) (result : Nat) : Prop :=
+  (0 ≤ result ∧ result < 10) ∧ (n % 10 = result)
+
+theorem lastDigit_spec_satisfied (n : Nat) :
+  lastDigit_spec n (lastDigit n) := by
+  -- Unfold definitions of lastDigit and lastDigit_spec
+  unfold lastDigit lastDigit_spec
+  -- Split the conjunction into two parts.
+  constructor
+  { -- Show that 0 ≤ n % 10 ∧ n % 10 < 10
+    constructor
+    { -- Prove 0 ≤ n % 10
+      exact Nat.zero_le (n % 10) },
+    { -- Prove n % 10 < 10 using the library lemma; note that 10 > 0
+      exact Nat.mod_lt n (by decide) } },
+  { -- Prove that n % 10 equals itself (reflexivity)
+    rfl }
+
+----------------------------------------------------------
+
+This plan outlines both the implementation of the function and the detailed proof steps ensuring that lastDigit meets the provided specification.

@@ -1,0 +1,65 @@
+Below is an analysis of what’s going wrong in your proof. I’ll walk through the reasoning step‐by‐step.
+
+──────────────────────────────
+1. Identifying the Failing Tactic
+
+The error messages arise from using the conversion lemmas “array_any_iff … .mp” and “.mpr” inside your proof. In both cases Lean complains about unsolved goals when you try to apply one of these “if-and-only-if” conversions. (In addition, Lean later complains about an “unexpected token ‘·’” which is a symptom of awkward bullet–indentation but is likely triggered by the unsolved subgoals.) That is, when you write
+
+  apply (array_any_iff b (fun y => a[i]! = y)).mpr
+  exact ⟨j, hj, h_eq⟩
+
+Lean expects that the conversion lemma completely reduces the boolean equality to an existential–statement, but it leaves behind some obligations that are not discharged.
+
+──────────────────────────────
+2. Analyzing the Proof State at the Failing Point
+
+At the moment you use (array_any_iff b …).mpr, the goal (for example in the first bullet) looks like
+
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) → (a.any (fun x => b.any (fun y => decide (x = y)))) = true
+
+The conversion lemma “array_any_iff” is supposed to turn “b.any p = true” into “∃ j, j < b.size ∧ p (b[j]!)”, but in your inner application the predicate is “fun y => a[i]! = y”. Notice that Lean “sees” the test as “decide (a[i]! = y)” (because how Bool–predicates are usually defined in such settings) and the equivalence it has available is exactly for the boolean value coming from “decide (… )”. Because of this extra unfolding (and the fact that the lemma may introduce extra parameters or decidability arguments) there remain unsolved proof obligations. In other words, the “.mpr” (and similarly “.mp”) conversion isn’t “fire‐and‐forget” here—it leaves behind side goals about the interplay of decidability and the predicate on Array elements.
+
+──────────────────────────────
+3. Checking the Overall Proof Approach
+
+Your theorem states that
+
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ hasCommonElement a b
+
+and your proof plan is to “unfold” both definitions and then use two conversion lemmas (one for each Array.any) to tie the Boolean computation with the existential quantifiers. In principle this is a fine approach. However, the conversion lemma “array_any_iff” (which you are using for the “if and only if”) must be applied with care. You need to ensure that the predicate used in the call exactly matches the one that the lemma expects. Here the inner predicate “fun y => a[i]! = y” is wrapped—by the definition of Array.any—in a “decide” call. That is why the error message shows “decide (x = y)” in its statement of the unsolved goal.
+
+──────────────────────────────
+4. Looking for Type Mismatches or Incorrect Assumptions
+
+There are two things to check here:
+ • The predicate in hasCommonElement is written as
+  a.any (fun x => b.any (fun y => x = y))
+but the spec (and the conversion lemma) deal with the Boolean value produced by “decide (x = y)”. (Lean automatically uses “decide” when a Bool is expected, but the conversion lemma “array_any_iff” may be formulated for a predicate of type (Int → Bool) that produces “decide (x = y)”.)
+ • The use of “array_any_iff” in two nested levels may require that the predicate in the inner call have a decidable equality instance and that all the extra “decide‐wrappings” be matched exactly. Even though Int does have decidable equality, the way the proof unfolds may force Lean to generate extra goals regarding the decidability arguments.
+
+Thus the core difficulty is that the equivalence “array_any_iff” is not “transparent enough” in this context; what you feed it (and what it unfolds to) does not match one‐to‐one with the “a.any” or “b.any” computations because of the hidden “decide” wrappers.
+
+──────────────────────────────
+5. Considering Alternative Proof Strategies
+
+One approach is to “massage” the goal so that the predicate is exactly in the form expected by the conversion lemma. For example, you might want to explicitly rewrite the inner “b.any (fun y => x = y)” to something like “b.any (fun y => decide (x = y))”. If the conversion lemma is phrased in terms of “decide (x = y)” then bringing your definition in line with that by using “simp” or a lemma about “decide_eq_true” may help.
+
+Another strategy is to prove your spec by a direct argument that avoids using “array_any_iff” altogether. For instance, you could:
+ • First prove a lemma showing that for any Array p and predicate P, “a.any P = true” is equivalent to “∃ i, i < a.size ∧ P (a[i]!) = true”
+ • Then specialize this lemma to your case (taking care with the inner predicate) rather than calling “array_any_iff” directly.
+
+A careful check of your bullet–indentation is also in order. Notice that the error “unexpected token ‘·’” may indicate that Lean did not expect a bullet because the previous tactic did not properly finish its block (due to the unsolved goals). Fixing the proof so that there are no open obligations (or refactoring into separate “begin … end” blocks) can often remove such misleading messages.
+
+──────────────────────────────
+Conclusion: Root Cause and Direction for a Fix
+
+The root issue in your proof is that the conversion lemmas “array_any_iff … .mp” and “.mpr” are being applied to expressions whose predicates are not exactly in the form the lemmas expect. In particular, the inner predicate “fun y => a[i]! = y” is implicitly wrapped in “decide (…)” when used by Array.any, so that the lemma’s equivalence (which talks about decide (x = y)) does not match up exactly. This mismatch leaves Lean with “unsolved goals” when you invoke the conversion lemmas.
+
+To fix the problem you might:
+ • Explicitly rewrite or simplify the Boolean expressions so that the predicates appear as “fun y => decide (a[i]! = y)” (or whatever the conversion lemma requires).
+ • Prove auxiliary lemmas that capture the link between “a.any (fun x => …)” and the corresponding existential statement, ensuring that all extra “decide” wrappers are handled.
+ • Alternatively, restructure the proof (for example, by first obtaining the existential witness for the inner array’s any predicate and then proceeding) so that you do not need to call the “array_any_iff” conversion twice in a nested way.
+
+This careful “unfolding” of the definitions and alignment of the predicate forms is the direction in which you should move to resolve the errors.
+
+By addressing the mismatch between the predicate forms (and ensuring the bullet–indentation matches Lean’s expectations), you should be able to clear the unsolved goals and the “unexpected token” error.

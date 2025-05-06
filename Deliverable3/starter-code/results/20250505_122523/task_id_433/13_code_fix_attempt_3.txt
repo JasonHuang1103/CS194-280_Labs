@@ -1,0 +1,12 @@
+The error is caused by how Lean parses the lambda argument when it’s not explicitly parenthesized. In your code the lambda is written without its own set of parentheses:
+  
+  (a.toList).all fun x => decide (n > x)
+
+Lean ends up trying to interpret (a.toList).all fun x as a single function, and then applying it to decide (n > x), which is just a Bool. To fix the error you should add parentheses around the lambda function, like so:
+
+------------------------------------------------
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  (a.toList).all (fun x => decide (n > x))
+------------------------------------------------
+
+This tells Lean that the argument to .all is the entire lambda (fun x => decide (n > x)), and then it works as intended.

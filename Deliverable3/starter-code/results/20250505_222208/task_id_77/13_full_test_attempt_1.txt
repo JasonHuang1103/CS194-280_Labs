@@ -1,0 +1,6 @@
+Lean Error: lean_playground/TempTest.lean:21:2: error: type mismatch
+  Iff.refl
+has type
+  ∀ (a : Prop), a ↔ a : Prop
+but is expected to have type
+  n % 11 = 0 ↔ (if n % 11 = 0 then true else false) = true : Prop

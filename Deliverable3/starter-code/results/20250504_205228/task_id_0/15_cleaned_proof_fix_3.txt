@@ -1,0 +1,4 @@
+theorem ident_spec_satisfied (x : Nat) :
+  ident_spec x (ident x) := by
+  unfold ident_spec
+  rfl

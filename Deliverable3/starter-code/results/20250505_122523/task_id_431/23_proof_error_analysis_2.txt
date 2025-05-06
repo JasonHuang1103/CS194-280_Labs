@@ -1,0 +1,37 @@
+The underlying problem isn’t in your “idea” (or even the mathematics) but in how Lean’s parser reads your function‐application notation. In your definition
+
+  def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+    (a.toList).any (fun x => (b.toList).contains x)
+
+Lean complains that “function expected” at a.toList.any fun x => b.toList.contains x. What happens is that Lean’s parser “gets confused” by the dot‐notation and the following lambda: it is interpreting the expression in a way you did not intend.
+
+Let’s break down the issue in detail:
+
+1. In Lean 4 (and Lean 3 too) function application is “juxtaposition” (left‐associative). When you write
+  (a.toList).any (fun x => (b.toList).contains x)
+Lean needs to know that .any is to be used as a method on the list a.toList and that the lambda (fun x => (b.toList).contains x) is the argument to any. However, due to the way dot‐notation and function application interact, the parser may “think” that (a.toList).any is not being fully applied as a function to that lambda—in other words, it is confused about what “any” is being applied to. (In the error message it says that a.toList.any has type Bool, not something of type (Int → Bool) → Bool, so Lean is expecting a function but it sees a Bool.)
+
+2. A nearly identical alternative version
+  def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+    List.any a.toList (fun x => List.contains (b.toList) x)
+also produces a parsing error (“unexpected token ','”) because without additional parentheses Lean sees “List.any a.toList” as a single “chunk” and then doesn’t know what to do with the following lambda.
+
+3. What is really happening is that, when you use dot-notation with arguments right after, Lean sometimes “eats” the parentheses in an unexpected way. The expression is not grouped the way you intend. (In other words, Lean is not recognizing that you mean (a.toList).any (fun x => …) as the call of the .any method on a.toList.)
+
+How can you fix this?
+
+One common remedy is to insert extra parentheses to “pin down” the intended grouping. For example, writing:
+
+  def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+    ((a.toList).any) (fun x => (b.toList).contains x)
+
+makes it crystal clear: First take a.toList, then get its any method, and then apply that method to the lambda. Alternatively, if you prefer the “raw function” style you can write:
+
+  def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+    List.any (a.toList) (fun x => List.contains (b.toList) x)
+
+Notice here that we have parentheses around a.toList so that List.any is applied to the correct argument.
+
+To summarize, the root cause of your error is a parsing issue resulting from ambiguous application when mixing dot notation with lambda abstractions. Lean ends up treating (a.toList).any as a value (of type Bool) rather than a function expecting an argument. The error “function expected” refers to this misinterpretation. By grouping the method call and its arguments with extra parentheses, or by writing the application in prefix form with proper grouping, you provide the parser with the clear structure you intend.
+
+Once you fix this, the compiler should move past that stage of the code. (Note that later in your file there might be further issues regarding mixing Bool and Prop in your specification, but the error messages you showed come from this very grouping problem in the implementation.)

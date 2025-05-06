@@ -1,0 +1,4 @@
+{
+  "code": "if n % 11 = 0 then true else false",
+  "proof": "theorem isDivisibleBy11_spec_satisfied (n : Int) :\n  isDivisibleBy11_spec n (isDivisibleBy11 n) := by\n  unfold isDivisibleBy11 isDivisibleBy11_spec\n  split_ifs\n  case _ h\u2081 =>\n    constructor\n    . intro; exact h\u2081\n    . intro; rfl\n  case _ h\u2082 =>\n    constructor\n    . intro h; contradiction\n    . intro h; exact h\u2082 h"
+}

@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:21:9: error: tactic 'unfold' failed to unfold 'hasOppositeSign' at
+  a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 ↔ decide (a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0) = true

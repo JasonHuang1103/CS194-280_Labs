@@ -1,0 +1,210 @@
+Below is a step‐by‐step explanation of our reasoning and a detailed plan to implement and prove the function. We must write a function that returns the minimum among three integers and then prove that the result satisfies two properties:
+
+• It is less than or equal to each of a, b, and c.
+• It is equal to one of the three input integers.
+
+──────────────────────────────
+Step 1. Understanding the Function Specification
+
+• The function, called minOfThree, takes three Int values a, b, and c.
+• It must return a value that is the minimum of the three numbers.
+• In short, we must show that the returned value is ≤ a, and ≤ b, and ≤ c. Also, the result is exactly one of a, b, or c.
+
+──────────────────────────────
+Step 2. Breaking Down the Implementation
+
+A standard way to write the minimum of three values is to use the binary min operator twice. In Lean (and in Mathlib) there is a function called min on integers which is usually defined as
+
+  min x y := if x ≤ y then x else y
+
+So one natural definition is either:
+  minOfThree a b c = min a (min b c)
+or
+  minOfThree a b c = min (min a b) c
+
+Either works equally well. We choose the first option.
+
+──────────────────────────────
+Step 3. Consider Input Types and Edge Cases
+
+• We work with Int and not Nat—so negative numbers are allowed.
+• The definition “min a (min b c)” works even if two or all three of the inputs are equal because the if-test in the definition will select one of the equal inputs.
+
+──────────────────────────────
+Step 4. Choosing Proof Techniques
+
+For the theorem, we have to show
+  (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c),
+where result is minOfThree a b c. Notice that our definition unfolds to an if‐expression:
+  if a ≤ min b c then a else min b c.
+
+The overall proof strategy will proceed by a case split on the condition (a ≤ min b c):
+
+1. Case 1 (when a ≤ min b c):
+  • In this branch, the function returns a.
+  • Then it is immediate that a ≤ a.
+  • We use the property that for any b and c, min b c is ≤ b and min b c is ≤ c (usually available as Int.min_le_left and Int.min_le_right). Then, by transitivity of ≤ (using our hypothesis a ≤ min b c), we deduce a ≤ b and a ≤ c.
+  • In addition, we have result = a so that the predicate (result = a ∨ result = b ∨ result = c) holds by the left disjunct.
+
+2. Case 2 (when a > min b c):
+  • Here the function returns min b c.
+  • Next we perform a secondary case split on b ≤ c. Recall that:
+   o If b ≤ c then min b c = b.
+   o Otherwise (i.e. if b > c) then min b c = c.
+  • In the subcase where b ≤ c:
+   o We know a > min b c = b so that b < a and hence b ≤ a (by the properties of total order on ℤ).
+   o We also use the fact that by definition of min, b ≤ b is trivial and b ≤ c is given.
+   o Finally, result = b, so the second conjunct (result = a ∨ result = b ∨ result = c) holds.
+  • In the subcase where b > c:
+   o Then min b c = c.
+   o Using a > min b c = c, we obtain c < a so c ≤ a.
+   o And similarly, since b > c, we have c ≤ b.
+   o With result = c, the disjunction (result = a ∨ result = b ∨ result = c) again holds via the third disjunct.
+
+In each case, the inequalities required in the first part and the identity required in the second part are established. For some parts of the proofs (especially for the chain of inequalities), we can use the linarith tactic to simplify the work.
+
+──────────────────────────────
+Step 5. Similar Patterns from Documentation
+
+Note that:
+ • The definition of “min” through if-then-else and using by_cases splits closely mimics examples in Lean’s documentation.
+ • The tactic linarith is perfect for handling linear inequalities, as seen in provided examples.
+ • The use of lemmas like Int.min_le_left and Int.min_le_right (or their general order theory analogues) will help us prove the directional inequalities.
+
+──────────────────────────────
+Detailed Implementation and Proof Plan
+
+1. Implementation
+
+Define minOfThree as follows:
+  def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+   if a ≤ min b c then a else min b c
+
+This returns a when a is less than or equal to both b and c (since a ≤ min b c means a ≤ b and a ≤ c thanks to min_le_left and min_le_right). Otherwise, it returns the minimum of b and c.
+
+2. Proof
+
+We need to prove:
+  minOfThree_spec a b c (minOfThree a b c)
+where
+  minOfThree_spec a b c result :=
+   (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c).
+
+The proof plan is:
+
+• Unfold the definitions of minOfThree and minOfThree_spec.
+• Start a by_cases on the condition (a ≤ min b c).
+
+• Case 1: Assume h: a ≤ min b c.
+  – Rewrite minOfThree to get result = a using if_pos.
+  – For the first conjunct (inequalities), show:
+   a ≤ a (trivial),
+   a ≤ b using the fact that a ≤ min b c and min_le_left,
+   a ≤ c similarly using min_le_right.
+  – For the second conjunct (equality), choose “result = a” because result is a.
+  – Conclude for the case.
+
+• Case 2: Assume ¬ (a ≤ min b c), so a > min b c.
+  – Rewrite minOfThree to get result = min b c using if_neg.
+  – Perform a secondary by_cases on (b ≤ c).
+
+   Subcase 2.1: b ≤ c:
+    – Then, min b c = b.
+    – Show:
+     result = b,
+     b ≤ a: since a > b (because a > min b c = b), we have b < a so b ≤ a,
+     b ≤ b (trivial),
+     b ≤ c (by assumption).
+    – The second conjunct is satisfied by “result = b.”
+
+   Subcase 2.2: ¬ (b ≤ c) (i.e. b > c):
+    – Then, min b c = c.
+    – Show:
+     result = c,
+     c ≤ a: since a > c (because a > min b c = c),
+     c ≤ b: from b > c,
+     c ≤ c (trivial).
+    – The second conjunct is satisfied by “result = c.”
+
+• In each subcase, both parts of the specification are proved. Tactics like linarith can often help combine inequalities automatically.
+
+──────────────────────────────
+Conclusion
+
+The final plan is to define minOfThree using a nested min (implemented with an if-then-else) and then prove the specification via a structured case analysis:
+ 1. A first by_cases on (a ≤ min b c).
+ 2. In the false branch, a further by_cases on (b ≤ c).
+ 3. In each of the four branches (one in Case 1, two subcases in Case 2), establish:
+  – The inequalities (using transitivity and the properties of min).
+  – Which input the result equals.
+ 4. Use tactics like exact, apply, and linarith to streamline the proof.
+
+This plan meets all the requirements stated by the problem description.
+
+A complete Lean implementation would look like this:
+
+-----------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def minOfThree (a : Int) (b : Int) (c : Int) : Int :=
+  if a ≤ min b c then a else min b c
+
+-- Specification Predicate
+def minOfThree_spec (a : Int) (b : Int) (c : Int) (result : Int) : Prop :=
+  (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧
+  (result = a ∨ result = b ∨ result = c)
+
+-- Theorem: The returned value is the minimum of the three input numbers
+theorem minOfThree_spec_satisfied (a : Int) (b : Int) (c : Int) :
+  minOfThree_spec a b c (minOfThree a b c) := by
+  unfold minOfThree minOfThree_spec
+  by_cases h₁ : a ≤ min b c
+  · -- Case 1: a ≤ min b c, so result = a
+    rw [if_pos h₁]
+    split
+    · -- Prove a ≤ a, a ≤ b, and a ≤ c
+      constructor
+      · exact le_refl a
+      constructor
+      · -- a ≤ b: using a ≤ min b c and min_le_left
+        exact le_trans h₁ (Int.min_le_left b c)
+      · -- a ≤ c: using a ≤ min b c and min_le_right
+        exact le_trans h₁ (Int.min_le_right b c)
+    · -- Prove result is one of the inputs; here result = a
+      left; rfl
+  · -- Case 2: ¬(a ≤ min b c), so result = min b c
+    rw [if_neg h₁]
+    by_cases h₂ : b ≤ c
+    · -- Subcase 2.1: b ≤ c, then min b c = b
+      rw [if_pos h₂]
+      split
+      · -- Prove b ≤ a, b ≤ b, and b ≤ c
+        constructor
+        · -- b ≤ a since a > b (because a > min b c = b)
+          have : b < a := lt_of_not_ge h₁  -- using that ¬(a ≤ b) yields b < a
+          exact le_of_lt this
+        constructor
+        · exact le_refl b
+        · exact h₂
+      · -- Prove result is one of the inputs; here result = b
+        right; left; rfl
+    · -- Subcase 2.2: ¬(b ≤ c), then min b c = c
+      rw [if_neg h₂]
+      split
+      · -- Prove c ≤ a, c ≤ b, and c ≤ c
+        constructor
+        · -- c ≤ a since a > c (because a > min b c = c)
+          have : c < a := lt_of_not_ge h₁  -- a > c
+          exact le_of_lt this
+        constructor
+        · -- c ≤ b since b > c
+          have : c < b := lt_of_not_ge h₂
+          exact le_of_lt this
+        · exact le_refl c
+      · -- Prove result is one of the inputs; here result = c
+        right; right; rfl
+-----------------------------------------------------------
+
+This complete plan and the accompanying code fulfill the problem requirements.

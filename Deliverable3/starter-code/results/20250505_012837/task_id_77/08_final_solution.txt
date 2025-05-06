@@ -1,0 +1,4 @@
+{
+  "code": "if n % 11 = 0 then true else false",
+  "proof": "simp"
+}

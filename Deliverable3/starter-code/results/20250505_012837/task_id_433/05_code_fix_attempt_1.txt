@@ -1,0 +1,9 @@
+The error occurs because Array does not have a method called all?. One simple fix is to convert the array to a list (which does have all) and then use List.all. For example, you can change the implementation to:
+
+------------------------------------------------
+-- Fixed implementation
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  a.toList.all (fun x => n > x)
+------------------------------------------------
+
+This change converts the Array Int to a List Int and then checks that n is greater than every element using List.all.

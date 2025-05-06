@@ -1,0 +1,57 @@
+Lean Error: Try this:
+  split
+  next h =>
+    simp_all only [ite_eq_left_iff, not_le, ite_eq_right_iff]
+    split
+    next h_1 => simp_all only [le_refl, and_self, isEmpty_Prop, not_lt, IsEmpty.forall_iff, forall_const, true_or]
+    next
+      h_1 =>
+      simp_all only [not_le, le_refl, and_true, forall_const, isEmpty_Prop, IsEmpty.forall_iff, or_true]
+      apply And.intro
+      · sorry
+      · sorry
+  next h =>
+    simp_all only [not_le, ite_eq_left_iff, ite_eq_right_iff]
+    split
+    next
+      h_1 =>
+      simp_all only [le_refl, and_self, and_true, isEmpty_Prop, not_lt, IsEmpty.forall_iff, forall_const, true_or,
+        or_true]
+      sorry
+    next
+      h_1 =>
+      simp_all only [not_le, le_refl, and_true, forall_const, isEmpty_Prop, IsEmpty.forall_iff, or_true]
+      apply And.intro
+      · sorry
+      · sorry
+lean_playground/TempTest.lean:25:2: warning: aesop: failed to prove the goal after exhaustive search.
+lean_playground/TempTest.lean:22:46: error: unsolved goals
+case left
+a b c : ℤ
+h : a ≤ b
+h_1 : c < a
+⊢ c ≤ a
+
+case right
+a b c : ℤ
+h : a ≤ b
+h_1 : c < a
+⊢ c ≤ b
+
+a b c : ℤ
+h : b < a
+h_1 : b ≤ c
+⊢ b ≤ a
+
+case left
+a b c : ℤ
+h : b < a
+h_1 : c < b
+⊢ c ≤ a
+
+case right
+a b c : ℤ
+h : b < a
+h_1 : c < b
+⊢ c ≤ b
+lean_playground/TempTest.lean:26:0: error: unexpected identifier; expected command

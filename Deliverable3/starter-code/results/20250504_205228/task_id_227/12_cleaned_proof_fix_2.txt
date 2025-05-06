@@ -1,0 +1,48 @@
+theorem minOfThree_spec_satisfied (a : Int) (b : Int) (c : Int) :
+  minOfThree_spec a b c (minOfThree a b c) := by
+  unfold minOfThree minOfThree_spec
+  split
+  · -- Prove result <= a ∧ result <= b ∧ result <= c
+    split
+    · -- Prove result <= a
+      by_cases h₁ : a <= b
+      · by_cases h₂ : a <= c
+        · simp [h₁, h₂]  -- a <= both b and c, hence result = a
+        · simp [h₁, h₂]  -- a <= b, but c < a, hence result = c
+          exact le_of_not_ge h₂
+      · by_cases h₂ : b <= c
+        · simp [h₁, h₂]  -- b < a and b <= c, hence result = b
+        · simp [h₁, h₂]  -- b < a, but c < b, hence result = c
+          exact le_of_not_ge h₂
+    · split
+      · -- Prove result <= b
+        by_cases h₁ : a <= b
+        · by_cases h₂ : a <= c
+          · simp [h₁, h₂] -- result = a, and a <= b by h₁
+            exact h₁
+          · simp [h₁, h₂] -- result = c, need to show c <= b
+            have : c <= b := le_of_not_ge h₂
+            assumption
+        · by_cases h₂ : b <= c
+          · simp [h₁, h₂] -- result = b
+          · simp [h₁, h₂] -- result = c, need to show c <= b
+            have : c <= b := le_of_not_ge h₂
+            assumption
+      · -- Prove result <= c
+        by_cases h₁ : a <= b
+        · by_cases h₂ : a <= c
+          · simp [h₁, h₂] -- result = a, and a <= c by h₂
+            assumption
+          · simp [h₁, h₂] -- result = c
+        · by_cases h₂ : b <= c
+          · simp [h₁, h₂] -- result = b, need to show b <= c
+            assumption
+          · simp [h₁, h₂] -- result = c
+  · -- Prove result = a ∨ result = b ∨ result = c
+    by_cases h₁ : a <= b
+    · by_cases h₂ : a <= c
+      · simp [h₁, h₂] -- result = a
+      · simp [h₁, h₂] -- result = c
+    · by_cases h₂ : b <= c
+      · simp [h₁, h₂] -- result = b
+      · simp [h₁, h₂] -- result = c

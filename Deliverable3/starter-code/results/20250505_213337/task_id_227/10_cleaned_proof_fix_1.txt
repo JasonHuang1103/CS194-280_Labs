@@ -1,0 +1,9 @@
+split_ifs with h₁ h₂ h₃
+· -- Case a <= b ∧ a <= c
+  exact ⟨⟨h₁.1, h₁.2, le_refl _⟩, Or.inl rfl⟩
+· -- Case ¬(a <= b ∧ a <= c) and b <= c
+  have : a > b := not_and_or.1 h₁ |>.resolve_left h₃
+  exact ⟨⟨this.le, le_refl _, h.h₁⟩, Or.inr <| Or.inl rfl⟩
+· -- Case ¬(a <= b ∧ a <= c) and ¬(b <= c)
+  have : a > c := not_and_or.1 h₁ |>.resolve_right h₃
+  exact ⟨⟨this.le, h_1, le_refl _⟩, Or.inr <| Or.inr rfl⟩

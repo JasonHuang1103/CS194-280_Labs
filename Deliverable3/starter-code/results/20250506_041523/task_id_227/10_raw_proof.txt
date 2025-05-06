@@ -1,0 +1,18 @@
+```
+intro
+split
+· split
+  · apply Int.le_trans _ (if_pos _)
+    · apply Int.le_trans _ (if_pos _)
+      · apply Int.le_trans _ (le_refl _)
+      · exact if_neg
+    · exact if_neg
+  · exact if_neg
+· cases if_pos_or_neg (a ≤ b)
+  · right; left
+  · cases if_pos_or_neg ((if a ≤ b then a else b) ≤ c)
+    · right; right
+    · cases if_pos_or_neg (a ≤ b)
+      · left
+      · right; left
+```

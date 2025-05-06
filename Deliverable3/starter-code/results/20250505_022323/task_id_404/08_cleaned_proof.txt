@@ -1,0 +1,6 @@
+simp [myMin]
+split
+· intro h; exact ⟨h, h.trans (Int.le_refl _)⟩
+· intro h; exact ⟨h.trans (Int.le_refl _), h⟩
+· exact Or.inl rfl
+· exact Or.inr rfl

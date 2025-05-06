@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:19:32: error: unsolved goals
+a b : ℤ
+⊢ ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧ ((b < a → b = a) ∨ (a ≤ b → a = b))
+lean_playground/TempTest.lean:23:0: error: unexpected identifier; expected command

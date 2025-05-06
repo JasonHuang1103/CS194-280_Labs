@@ -1,0 +1,9 @@
+constructor
+· intro h
+  rcases h with (⟨ha, hb⟩ | ⟨hc, hd⟩)
+  · exact Or.inr ⟨hc, hd⟩
+  · exact Or.inl ⟨ha, hb⟩
+· intro h
+  cases h
+  · exact (decide (a < 0) && decide (b > 0) = true)
+  · exact (decide (a > 0) && decide (b < 0) = true)

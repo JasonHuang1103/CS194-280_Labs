@@ -1,0 +1,5 @@
+simp
+split
+apply min_le
+apply min_le_left
+exact Or.inr (Or.inl rfl)

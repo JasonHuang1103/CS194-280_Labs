@@ -1,0 +1,75 @@
+The problem is not with your definition of minOfThree (or its specification) but with the way your proof script is written. In your proof you try to “unfold” the definitions and then “split” the goal using three bullet points. Let’s break down the two issues in detail:
+
+─────────────────────────────  
+1. Unfolding already‐reduced terms
+
+You start your proof with
+
+  unfold minOfThree minOfThree_spec
+  unfold minOfThree minOfThree_spec
+
+When Lean reports an error such as
+
+  tactic 'unfold' failed to unfold 'minOfThree' at …  
+
+it means that in the goal Lean is not seeing an occurrence of the constant minOfThree (or minOfThree_spec) in a form that it can simply replace by its definition. In our case, because minOfThree is defined by a (nested) if–then–else, it is already “inlined” (or reduced) in the goal. In other words, the goal already shows
+
+  (if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c) ≤ a ∧ … 
+
+so there isn’t any “top‐level” minOfThree to unfold. (The same goes for minOfThree_spec.) Trying to “unfold” a constant that has already been reduced produces an error.
+
+─────────────────────────────  
+2. Splitting the goal incorrectly
+
+Your specification minOfThree_spec has the form
+
+  (result ≤ a ∧ result ≤ b ∧ result ≤ c) ∧ (result = a ∨ result = b ∨ result = c)
+
+A single use of split will “decompose” the conjunction into exactly two subgoals:
+  • one for the conjunction (result ≤ a ∧ result ≤ b ∧ result ≤ c) and
+  • one for the disjunction (result = a ∨ result = b ∨ result = c).
+
+After that, your proof provides three bullet blocks (each starting with “·”). Lean then complains that there is an unexpected identifier because it finds more “bullet proofs” than there are subgoals. (In addition, even if you had more subgoals, the idea of “intro h” on a conjunction/disjunction is not going to work in a straightforward way.)
+
+─────────────────────────────  
+The Fix
+
+A better approach is to avoid trying to “unfold” minOfThree and its spec manually (especially since the if–then–else has already been reduced) and also adjust how you split the goal. For example, you could use simp or refine the proof by doing case analysis on the if‐expressions. One possible direction is:
+
+• Remove the redundant or failing “unfold” calls.
+• Use tactics that deal with the structure of the goal. For instance, since the spec is a conjunction, start with split (which gives two subgoals). Then for the disjunction part you might use “cases” (or “rcases”) to split into the individual cases corresponding to a, b, or c.
+
+So rather than writing:
+
+  unfold minOfThree minOfThree_spec
+  split
+  · intro h
+    simp [h]
+  · intro h
+    simp [h]
+  · intro h
+    simp [h]
+
+you might write something along the lines of:
+
+  theorem minOfThree_spec_satisfied (a : Int) (b : Int) (c : Int) :
+    minOfThree_spec a b c (minOfThree a b c) := by
+    -- No need to manually unfold; instead, let simp do the work
+    simp [minOfThree]
+    -- Now split the conjunction
+    split
+    · -- prove (minOfThree a b c) ≤ a ∧ (minOfThree a b c) ≤ b ∧ (minOfThree a b c) ≤ c
+      admit  -- fill in proof details
+    · -- And prove (minOfThree a b c) = a ∨ (minOfThree a b c) = b ∨ (minOfThree a b c) = c
+      admit  -- fill in proof details
+
+Of course, you’ll need to fill in the correct reasoning for each part rather than using admit. The important point is that the proof should match the structure of the goal.
+
+─────────────────────────────  
+Summary
+
+• The “unfold” tactic fails because Lean has already reduced minOfThree (and minOfThree_spec) to their defining if–then–else expressions.
+• You are trying to split the goal into three cases while the spec is just a conjunction of two parts.
+• The solution is to remove the redundant unfolds and structure your proof to match the actual shape of the goal (for example, splitting a conjunction into two parts and using case analysis on the disjunction).
+
+This should point you in the right direction to fix the proof.

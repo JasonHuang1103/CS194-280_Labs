@@ -1,0 +1,15 @@
+split
+case inl =>
+  split_ifs <;> simp only [and_self, not_le, and_true, ite_eq_right_iff, le_refl, or_true]
+  · constructor
+    · exact le_of_lt h_1
+    · simp
+  · simp
+case inr =>
+  split_ifs <;> simp only [and_self, not_le, and_true, ite_eq_right_iff, le_refl, or_true]
+  · constructor
+    · apply le_trans; assumption
+    · simp
+  · constructor
+    · apply le_trans; assumption
+    · simp

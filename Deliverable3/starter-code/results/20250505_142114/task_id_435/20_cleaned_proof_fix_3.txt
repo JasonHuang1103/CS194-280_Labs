@@ -1,0 +1,4 @@
+split
+· apply And.intro
+  · apply Nat.mod_lt n 10; decide
+  · rfl

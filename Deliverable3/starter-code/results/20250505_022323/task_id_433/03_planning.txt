@@ -1,0 +1,79 @@
+Below is a detailed plan for solving this problem. The goal is to implement the function isGreater so that it returns true exactly when n is strictly greater than every element of the array a; and then to prove that the specification—namely, that (∀ i, i < a.size → n > a[i]!) holds if and only if the returned Boolean is true—is satisfied.
+
+──────────────────────────────
+Step 1. Implementation of the Function
+
+• We need a function isGreater : Int → Array Int → Bool that checks that n > x for every x in a.
+  
+• Lean’s Array type usually comes with helper functions (such as all? or any?) in mathlib. One common approach is to use an “all‐” function that tests a predicate on every element.
+
+• For example, one can write:
+  
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    a.all? (fun x => n > x)
+
+  Here, a.all? takes a predicate of type Int → Bool and returns true if the predicate holds for every element in the array. (If you do not have all? available, one can instead write a recursive function that iterates over the array and returns false as soon as an element is not less than n, or true otherwise.)
+
+──────────────────────────────
+Step 2. Writing the Specification
+
+• The provided specification is that
+
+  (∀ i, i < a.size → n > a[i]!) ↔ result
+
+ with result = isGreater n a.
+
+• Since our implementation uses a built‐in all? function, its semantics should correspond to “all elements satisfy (n > x).” In other words, we must show that:
+
+  a.all? (fun x => n > x) = true iff (∀ i, i < a.size → n > a[i]!)
+
+  (Recall that a[i]! is the i‑th element of the array a, and we need to consider indices i such that i < a.size so that the access is valid.)
+
+──────────────────────────────
+Step 3. Planning the Proof
+
+• The proof will begin by unfolding the definitions of isGreater and isGreater_spec. In particular, we will substitute
+
+  isGreater n a  ≡ a.all? (fun x => n > x)
+
+• From here, the goal becomes:
+  
+  (∀ i, i < a.size → n > a[i]!) ↔ a.all? (fun x => n > x)
+
+• The typical strategy is to prove both directions:
+
+ 1. For the → direction: Assume a.all? (fun x => n > x) returns true. By the definition of all? (or by an appropriate lemma), conclude that for every x in the array (or equivalently for every valid index i), the predicate n > x holds. In other words:
+   ∀ i, i < a.size → n > a[i]!.
+
+ 2. For the ← direction: Assume that ∀ i, i < a.size → n > a[i]! holds. By the definition of all? (or a lemma relating the array predicate), conclude that a.all? (fun x => n > x) returns true.
+
+• It might be that mathlib already has a lemma like Array.all?_iff_forall which can be invoked directly to establish the equivalence. If not, you may need to perform induction on the array elements or use the available API for arrays to prove the desired equivalence.
+
+• Outline of the proof code:
+
+ theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :
+  isGreater_spec n a (isGreater n a) := by
+  unfold isGreater isGreater_spec
+  -- The goal is now (∀ i, i < a.size → n > a[i]!) ↔ a.all? (fun x => n > x)
+  -- Use a helper lemma or perform induction / analysis on a to show the equivalence.
+  ...
+  exact <appropriate lemma or construction>
+
+──────────────────────────────
+Step 4. Finalizing the Implementation and Proof
+
+• Replace the placeholders in the provided Lean template:
+ – In the CODE section, write the implementation using a.all? (fun x => n > x).
+ – In the PROOF section, complete the proof by unfolding the definitions and either citing an existing lemma relating all? to a universal quantification over the valid indices, or manually proving the implication in both directions (perhaps using induction on the array).
+
+• Make sure to verify that your proof script is accepted by Lean 4.
+
+──────────────────────────────
+Summary of Key Steps
+
+1. Write isGreater by iterating over the array with a predicate checking n > element.
+2. Unfold the definitions in the theorem so that the proof goal becomes an equivalence between the universal property and the Boolean predicate evaluated by all?.
+3. Prove both directions (→ and ←) either by citing an existing lemma (if available) or by induction on the array elements.
+4. Complete the Lean proof and ensure that it type-checks.
+
+Following this plan should lead you to implement the function correctly and prove that it satisfies the specification.

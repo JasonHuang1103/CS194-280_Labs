@@ -1,0 +1,4 @@
+{
+  "code": "a.all (\u03bb x => n > x)",
+  "proof": "let l := a.toList\n\nhave h_all: a.all (\u03bb x => n > x) = l.all (\u03bb x => n > x) := by\n  rfl\n\nrw [h_all]\n\nhave h_list := List.all_eq_forall l (\u03bb x => n > x)\nrw [h_list]\n\napply Iff.intro\n\u00b7 intro h i hi\n  have : a.toList.nthLe i hi = a[i]! := by\n    simp only [Array.get?_eq_nthLe]\n  rw [\u2190 this]\n  exact h (List.mem_nthLe l i hi)\n\n\u00b7 intros h x hx\n  obtain \u27e8i, hi, rfl\u27e9 := List.mem_nthLe.1 hx\n  exact h i hi"
+}

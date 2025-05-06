@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:22:2: error: tactic 'split' failed, consider using `set_option trace.split.failure true`
+a : Array ℤ
+⊢ (Array.map (fun x => x * x * x) a).size = a.size ∧
+    ∀ i < a.size, (Array.map (fun x => x * x * x) a)[i]! = a[i]! * a[i]! * a[i]!
+lean_playground/TempTest.lean:23:0: error: unexpected token '·'; expected command

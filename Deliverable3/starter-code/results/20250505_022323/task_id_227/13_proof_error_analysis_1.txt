@@ -1,0 +1,36 @@
+Below is a summary of what is going wrong and some ideas on how to fix it.
+
+1. Incorrect bullet management and indentation
+
+ • In your tactic script you mix the use of bullet markers (the “·” symbols) in a way that makes Lean “lose track” of which subgoal you’re working on. In Lean 4 the bullet markers (or “tactic blocks”) must be nested very precisely. In your proof the first application of “apply And.intro” produces two subgoals (one for the “left” of the ∧ and one for the “right”), and then you try to use more “·” lines without ensuring that each branch is completely finished.
+
+ • In particular, Lean complains at a line where it sees an unexpected “·” token because the indentation or bullet level is off. (The error “unexpected token '·'; expected command” is a clear sign that the bullet structure isn’t what Lean expects.)  
+
+2. Some subgoals remain unsolved
+
+ • The specification requires proving that min (min a b) c is simultaneously ≤ a, ≤ b, and ≤ c. (Note that min (min a b) c is printed as “a ⊓ b ⊓ c”.) However, your proof using “apply Int.le_min” does not fully address all three of these inequalities. In one branch you use a nested “And.intro” together with “apply Int.le_min” twice, but the result is that not all parts of the conjunction are actually discharged.
+
+ • Similarly, in the “right” conjunct you need to prove that the computed value is equal to one of a, b, or c. You try to appeal to “min_choice” and then split cases but the bullet structure causes ambiguity as to which case you’re finishing. The unsolved goals reported for “case left” and “case right” indicate that Lean never saw a complete proof for those parts.
+
+3. Direction for fixing the proof
+
+ • Reorganize the proof so that you explicitly split the goal into its two main conjuncts. For example, you can start with a “split” (or “apply And.intro”) and then further “split” any subgoals. Making the structure completely explicit (for example, using “split” repeatedly) will often avoid the misinterpretation of bullet markers.
+
+ • Ensure that you finish each branch before moving to the next bullet. In your current script the use of “·” sometimes occurs when a subgoal still needs work. One common remedy is to use explicit “split” statements and check the indentation.
+
+ • For the inequalities part, instead of directly “apply Int.le_min” you might begin by showing 
+   min (min a b) c ≤ min a b  and then show
+   min a b ≤ a  and  min a b ≤ b,
+  followed by separately showing
+   min (min a b) c ≤ c.
+  This can be structured as two “split” calls: one for proving “(min (min a b) c ≤ a ∧ min (min a b) c ≤ b)” and one for “min (min a b) c ≤ c.”
+
+ • In the second part (proving the disjunction about equality), you might also “split” the cases more explicitly so that the bullet markers do not conflict with each other.
+
+In summary, the error stems from two related problems:  
+ (1) The bullet (tactic block) structure is misarranged, causing Lean to get “lost” about which subgoals are finished, and  
+ (2) Some goals (for the three bounds in the left conjunct and the disjunction in the right conjunct) are not completely discharged by the provided tactics. 
+
+By restructuring the proof to use explicitly nested “split” or “apply And.intro” commands with correct indentation—and by ensuring that each individual inequality or case analysis is completely handled—you should be able to avoid the “unsolved goals” error and have a tactic proof that Lean accepts.
+
+Happy proving!

@@ -1,0 +1,3 @@
+```lean
+min (min a b) c
+```

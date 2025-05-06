@@ -1,0 +1,13 @@
+Lean Error: lean_playground/TempTest.lean:19:32: error: unsolved goals
+case inl
+a b : ℤ
+h : a < b
+⊢ ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧
+    ((if a ≤ b then a else b) = a ∨ (if a ≤ b then a else b) = b)
+
+case inr
+a b : ℤ
+h : a ≥ b
+⊢ ((if a ≤ b then a else b) ≤ a ∧ (if a ≤ b then a else b) ≤ b) ∧
+    ((if a ≤ b then a else b) = a ∨ (if a ≤ b then a else b) = b)
+lean_playground/TempTest.lean:23:0: error: unexpected token '·'; expected command

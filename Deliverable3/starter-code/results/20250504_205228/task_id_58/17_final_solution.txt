@@ -1,0 +1,4 @@
+{
+  "code": "decide ((a < 0 \u2227 b > 0) \u2228 (a > 0 \u2227 b < 0))",
+  "proof": "theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :\n  hasOppositeSign_spec a b (hasOppositeSign a b) := by\n  unfold hasOppositeSign hasOppositeSign_spec\n  apply Iff.intro\n  \u00b7 intro h\n    simp only [Bool.of_decide_eq_true, decide_eq_true_iff, *]\n  \u00b7 intro h\n    rw [Bool.of_decide_eq_true]\n    exact h"
+}

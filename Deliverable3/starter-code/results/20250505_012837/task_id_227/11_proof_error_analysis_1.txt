@@ -1,0 +1,27 @@
+The error comes from the fact that after you “unfold” minOfThree, the goals still contain a nested “if … then … else …” expression that has not been reduced to a concrete number (like a, b, or c). In other words, although you know by your case analysis that e.g. a < b and a < c hold, Lean does not know “by computation” that
+
+  if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c
+
+reduces to a. (Likewise for the inequalities.) When you later try to use tactics such as rfl or apply le_of_lt on a hypothesis like h₁ : a < b, Lean is trying to match the goal (which is an inequality involving the full “if …” term) with the hypothesis about a simple comparison like a ≤ b, and the two are not definitionally convertible.
+
+To explain in more detail:
+
+1. When you “unfold” minOfThree, you reveal the definition with its nested if‑expressions. Because the if‑conditions (i.e. a ≤ b and a ≤ c) are only propositions (or have decidable instances) and not “definitionally true” or “false” in the sense required for reduction, Lean does not automatically reduce the if‑expression to a concrete branch even if you have proven something like a < b.
+
+2. In each branch of your case analysis you know, for instance, that a < b and a < c. So morally the “if a ≤ b then …” should choose the “then” branch and similarly for the inner “if”. However, in the goal the “if” term remains “if a ≤ b then if a ≤ c then a else c else if b ≤ c then b else c”, and tactics like rfl fail because that term is not definitionally equal to a, b, or c even though it is propositionally equal. (The same problem occurs when you try to apply a lemma like le_of_lt.)
+
+3. As a result, when you write, for example, 
+  apply And.intro … 
+or 
+  rfl
+Lean tries to match the “if …” term with a simple number (a, b, or c) or a simple inequality (such as a ≤ b), and the conversion fails.
+
+A direction for a fix is as follows:
+
+• Instead of “unfolding” the whole definition and then doing case analysis on lt_or_le for a and b (and a and c), restructure the proof so that the “if” gets reduced. One common remedy is to use “dsimp” or “simp” (with lemmas for if‑reduction) so that after the case analysis, the if‑expression actually computes to the expected branch.
+
+• Alternatively, you might give minOfThree a definition by pattern‐matching (or using “if h : a ≤ b then …” style) so that the chosen branch is definitionally equal to a, b, or c. For example, rewriting minOfThree using pattern matching on the decidable comparisons can make the chosen branch “compute” properly.
+
+• You could also perform a case split on the decision procedure manually (or use the “by cases” tactic on the decidable instance of a ≤ b and a ≤ c) so as to force Lean to replace the “if” expression by its concrete branch.
+
+In summary, the root cause is that after unfolding, the goals involve if‑expressions that are not definitionally reduced even in the cases you consider, and as a result, simple tactics like rfl or apply with a simple inequality do not match. The fix is to help Lean “compute” (or simplify) the if‑expressions—either by restructuring the definition or by invoking tactics (like simp or dsimp) that perform the reduction.

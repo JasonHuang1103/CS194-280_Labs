@@ -1,0 +1,6 @@
+```lean
+-- << PROOF START >>
+unfold ident ident_spec
+rfl
+-- << PROOF END >>
+```

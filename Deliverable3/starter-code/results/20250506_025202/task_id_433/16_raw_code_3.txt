@@ -1,0 +1,3 @@
+```lean
+(a.toList.foldr (fun x acc => (n > x) && acc) true)
+```

@@ -1,0 +1,17 @@
+The issue arises from using `unfold` incorrectly, as the goal after `unfold` does not have the target structure for `cubeElements` directly in the context due to `cubeElements` being used immediately as an argument. Additionally, you incorrectly applied `simp` on `Array.getElem`, which was incorrect in this context. The solution involves using the simplification lemma for `Array.map` correctly.
+
+Here's the fixed version of the proof:
+
+```lean
+theorem cubeElements_spec_satisfied (a : Array Int) :
+  cubeElements_spec a (cubeElements a) := by
+  unfold cubeElements cubeElements_spec
+  constructor
+  case left =>
+    exact Array.size_map _ _
+  case right =>
+    intro i hi
+    simp [Array.getElem, Array.map]
+```
+
+This uses `simp` to handle mapping inside arrays, which correctly breaks down the array mapping inside the goal, allowing you to complete the proof effectively.

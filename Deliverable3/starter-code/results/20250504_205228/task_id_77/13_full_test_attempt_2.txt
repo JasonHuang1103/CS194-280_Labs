@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:18:48: error: unsolved goals
+n : ℤ
+⊢ n % 11 = 0 ↔ (if n % 11 = 0 then true else false) = true
+lean_playground/TempTest.lean:21:10: error: 'isDivisibleBy11_spec_satisfied' has already been declared

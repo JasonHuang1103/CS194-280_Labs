@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:21:2: error: tactic 'split' failed, consider using `set_option trace.split.failure true`
+n : ℤ
+a : Array ℤ
+⊢ (∀ i < a.size, n > a[i]!) ↔ (a.toList.all fun x => decide (n > x)) = true
+lean_playground/TempTest.lean:22:0: error: unexpected token '·'; expected command

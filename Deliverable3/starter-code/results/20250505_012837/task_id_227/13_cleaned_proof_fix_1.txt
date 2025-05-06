@@ -1,0 +1,20 @@
+dsimp
+split
+· split
+  · split
+    · exact le_refl a
+    · apply le_trans (le_of_lt h₁)
+      apply le_of_lt h₂
+  · left; rfl
+· split
+  · split
+    · exact le_refl b
+    · apply le_trans (le_of_lt h₂)
+      apply le_of_lt h₁
+  · right; left; rfl
+· split
+  · split
+    · exact le_refl c
+    · apply le_trans (le_of_lt h₂)
+      apply le_of_lt h₁
+  · right; right; rfl

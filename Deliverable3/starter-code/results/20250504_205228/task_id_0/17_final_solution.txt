@@ -1,0 +1,4 @@
+{
+  "code": "x",
+  "proof": "theorem ident_spec_satisfied (x : Nat) :\n  ident_spec x (ident x) := by\n  unfold ident_spec\n  rfl"
+}

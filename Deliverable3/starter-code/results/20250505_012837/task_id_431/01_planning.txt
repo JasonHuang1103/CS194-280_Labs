@@ -1,0 +1,101 @@
+Below is a high‐level plan outlining how to implement the function and prove its correctness. The plan is broken into two parts: implementing the function and then proving that its behavior exactly matches the specification.
+
+──────────────────────────────
+1. Implementation Plan
+
+• The goal of the function is to return true if there is some integer that appears in both arrays. Otherwise (or if either array is empty) it returns false.
+
+• One simple strategy is to “scan” the first array and for each element check whether it appears in the second array. In Lean, this can be done by writing
+  a.any (λ x => b.any (λ y => x = y))
+Here, Array.any takes a predicate and returns true if (and only if) there is some index i (with i < a.size) such that the predicate applied to a[i]! is true. Using nested any’s means we check that for some element x in a, there is (some) y in b such that x = y.
+
+• Note that if a is empty then a.any … is false, and if b is empty then for every x, b.any … is false. So the implementation automatically returns false for empty arrays—as required.
+
+──────────────────────────────
+2. Proof Plan
+
+We must prove that our implementation meets the following specification:
+
+ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ (hasCommonElement a b)
+
+Once we define
+ def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  a.any (λ x => b.any (λ y => x = y))
+the theorem becomes
+
+ (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ a.any (λ x => b.any (λ y => x = y))
+
+The plan for proving the above equivalence is to use the semantics of Array.any. In particular, the following key ideas will be used:
+
+• Show that for any array l and predicate f, we have a lemma of the form:
+  l.any f = true ↔ ∃ i, i < l.size ∧ f (l[i]!)
+This “unfolding” of the definition of “any” allows us to rephrase the truth value of a.any in terms of an existential quantifier.
+
+• For the forward direction:
+ Assume a.any (λ x => b.any (λ y => x = y)) = true.
+ Then by the lemma there exists an index i such that
+  i < a.size and b.any (λ y => a[i]! = y) = true.
+ Applying the lemma a second time to b.any, we obtain an index j with j < b.size such that a[i]! = b[j]!.
+ Thus we get ∃ i, j such that a[i]! = b[j]! (and i, j are within bounds).
+
+• For the backward direction:
+ Assume ∃ i, j with i < a.size, j < b.size, and a[i]! = b[j]!.
+ Then in particular, for the element x = a[i]! in array a, we know that b.any (λ y => x = y) = true (since a witness j in b exists).
+ Thus by the existential interpretation of a.any, it follows that a.any (λ x => b.any (λ y => x = y)) = true.
+
+• Tie the two directions together to conclude the equivalence.
+
+──────────────────────────────
+3. Outline of the Code Skeleton
+
+The final answer will have two main parts:
+ A. The function definition (using nested any’s).
+ B. The theorem proof, which will “unfold” the definitions and use the reasoning about the existentials mentioned above.
+
+A simplified sketch is as follows:
+
+-----------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  -- Using nested "any" to check for a common element.
+  a.any (λ x => b.any (λ y => x = y))
+
+-- Specification of the function (as a Prop)
+def hasCommonElement_spec (a : Array Int) (b : Array Int) (result : Bool) : Prop :=
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+-- Theorem: the spec is met by the implementation.
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  hasCommonElement_spec a b (hasCommonElement a b) := by
+  -- Unfold the definitions.
+  unfold hasCommonElement hasCommonElement_spec
+  -- Then proceed by splitting the ↔ and using the characterization of "any".
+  -- One possible approach is to use (or prove) lemmas like:
+  --   array.any_iff : a.any f = true ↔ ∃ i, i < a.size ∧ f (a[i]!) = true
+  -- and similarly for b.any.
+  --
+  -- The proof must show both directions:
+  -- (i) If a.any (λ x => b.any (λ y => x = y)) = true, then ∃ i j... holds.
+  -- (ii) Conversely, if ∃ i j... holds, then a.any (λ x => b.any (λ y => x = y)) = true.
+  --
+  -- Fill in the details here (possibly invoking or proving the lemmas mentioned).
+
+  -- << PROOF START >>
+  sorry -- (Replace with full proof steps as outlined above.)
+  -- << PROOF END >>
+
+-----------------------------------------------------
+
+──────────────────────────────
+4. Summary
+
+Key steps for this task are:
+1. Implementing the function by scanning the first array and for each element checking if it is in the second array (using nested calls to Array.any).
+2. Understanding the behavior of Array.any and using its existential semantics.
+3. Breaking the equivalence of the specification into two directions. In one direction, use the definition of “any” to retrieve witnesses from the existentials; in the opposite direction, use the recognized witness to assert the truth of “any.”
+4. Filling in (or applying) any useful helper lemmas that connect the Boolean functions with their corresponding existential properties.
+
+Once these steps are accomplished, one will have both a correct Lean 4 implementation and a proof that it meets the given specifications.

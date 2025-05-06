@@ -1,0 +1,23 @@
+Lean Error: lean_playground/TempTest.lean:24:43: error: application type mismatch
+  Int.le_trans ?m.1491 (min_le_left (a ⊓ b) c)
+argument
+  min_le_left (a ⊓ b) c
+has type
+  a ⊓ b ⊓ c ≤ a ⊓ b : Prop
+but is expected to have type
+  ?m.372 ≤ a : Prop
+lean_playground/TempTest.lean:25:44: error: application type mismatch
+  Int.le_trans (min_le_right a b) (min_le_left (a ⊓ b) c)
+argument
+  min_le_left (a ⊓ b) c
+has type
+  a ⊓ b ⊓ c ≤ a ⊓ b : Prop
+but is expected to have type
+  b ≤ ?m.4822 : Prop
+lean_playground/TempTest.lean:26:4: error: type mismatch
+  min_le_right (a ⊓ b) c
+has type
+  a ⊓ b ⊓ c ≤ c : Prop
+but is expected to have type
+  a ⊓ b ⊓ c = a ∨ a ⊓ b ⊓ c = b ∨ a ⊓ b ⊓ c = c : Prop
+lean_playground/TempTest.lean:27:2: error: no goals to be solved

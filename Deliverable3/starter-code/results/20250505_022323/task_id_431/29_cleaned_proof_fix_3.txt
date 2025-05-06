@@ -1,0 +1,7 @@
+apply Iff.intro
+· intro h
+  obtain ⟨i, h1, j, h2, hij⟩ := Array.any_eq_bex.mp h
+  exact ⟨i, j, h1, h2, hij⟩
+· intro ⟨i, j, hi, hj, h_eq⟩
+  apply Array.any_eq_bex.mpr
+  exact ⟨i, hi, j, hj, h_eq⟩

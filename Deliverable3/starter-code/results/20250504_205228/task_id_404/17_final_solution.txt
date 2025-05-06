@@ -1,0 +1,4 @@
+{
+  "code": "if a \u2264 b then a else b",
+  "proof": "theorem myMin_spec_satisfied (a : Int) (b : Int) :\n  myMin_spec a b (myMin a b) := by\n  unfold myMin myMin_spec\n  by_cases h : a \u2264 b\n  \u00b7 -- Case where a \u2264 b\n    simp [h]\n    constructor\n    \u00b7 exact \u27e8le_refl a, h\u27e9\n    \u00b7 left\n      rfl\n  \u00b7 -- Case where \u00ac(a \u2264 b), i.e., a > b\n    simp [h]\n    constructor\n    \u00b7 exact \u27e8not_le.mp h, le_refl b\u27e9\n    \u00b7 right\n      rfl"
+}

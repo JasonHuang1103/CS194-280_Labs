@@ -1,0 +1,3 @@
+by_cases h : a ≤ b
+· simp [h]
+· simp [h, not_le.mp h]

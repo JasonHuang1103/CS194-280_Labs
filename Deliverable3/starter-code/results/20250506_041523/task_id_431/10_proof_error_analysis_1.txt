@@ -1,0 +1,74 @@
+Below is a step‐by‐step analysis of the issues in the proof and some hints for how to fix it.
+
+──────────────────────────────
+1. Which tactic is failing and why
+
+The error message complains about two unsolved “cases” (named “mp” and “mpr”) of an iff. In your proof you write
+
+  constructor
+  · intro h
+    … 
+  · intro ⟨i, j, hi, hj, h_eq⟩
+    … 
+
+which “splits” proving an equivalence into two directions. The error “unsolved goals” means that after running these tactics Lean still finds that one or both of the two implications remain unproved. In our case the problem is not that you forgot to complete a direction but rather that you are using tactics named
+  Array.exists_of_any
+and
+  Array.any_of_mem
+to bridge between the Boolean computations (the definition of hasCommonElement) and the existential statement in your spec, and Lean does not know how to perform these conversions automatically.
+
+──────────────────────────────
+2. What does the proof state look like at that point
+
+After “unfold” the goal becomes
+
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ (a.any (λ x, b.any (λ y, decide (x = y))) = true).
+
+The tactic “constructor” splits the goal into two implications:
+ • mp: from (∃ i j, …) we must prove (a.any … = true);
+ • mpr: from (a.any … = true) we must prove (∃ i j, …).
+
+At the start of each bullet your proof uses “intro” to assume the antecedent, and then it tries to “obtain” the desired element by calling a lemma called Array.exists_of_any or, in the other direction, “apply Array.any_of_mem”. So the proof state in each branch is “stuck” because these conversion lemmas are not doing what you expect.
+
+──────────────────────────────
+3. Does the proof approach match the specification?
+
+Conceptually the proof approach is on the right track. You want to show that returning true from the function is equivalent to the existence of indices where the arrays match. However, the specification works with an existential statement (∃ i j, …) while the implementation returns a Bool. In Lean one must “connect” the Boolean world with the Prop world by a conversion lemma (for example, proving that for a decidable predicate p,
+  (a.any p = true) ↔ (∃ i, i < a.size ∧ p (a[i]!)).
+Your proof seems to assume that versions of these lemmas exist as Array.exists_of_any and Array.any_of_mem, but they aren’t provided by Mathlib by default (or at least not with these names and expected types). In other words, the proof assumes conversion lemmas that “magically” turn a.any = true into an existential statement and vice‐versa.
+
+──────────────────────────────
+4. Type mismatches or incorrect assumptions
+
+There are two kinds of mismatches in your code:
+ a. The critical issue arises from the fact that you are “unfolding” a Bool equality (e.g. a.any … = true) into an existential statement without proving that, for each element x, the decidable equality decide (x = y) is equivalent to the pure Prop “x = y”. To bridge the gap you need to use a lemma that says something like
+  (decide (x = y) = true) ↔ (x = y)
+which requires that equality is decidable (it is in Int, but you must invoke the proper conversion).
+ b. The use of Array.exists_of_any and Array.any_of_mem is “illegal” because (a) Lean does not know these lemmas (or they are not in scope) and (b) even if you had names for them, their types would need to convert a Boolean “any” into an existential statement. You are in effect treating a.bool-returning function as if it were a mere Prop, but Bool and Prop live in different universes in Lean. (Lean does not “unfold” decide automatically as you might hope.)
+
+──────────────────────────────
+5. Alternative proof strategies
+
+A more “Lean-friendly” approach would be either:
+ • Prove or import lemmas that relate a.any p = true to ∃ i, i < a.size ∧ p (a[i]!) = true. Then apply these lemmas twice – once for the outer any and once for the inner.
+ • Use a proof by induction on the array (or use library lemmas about Array) to “unroll” the definition of a.any and relate it back to a list membership statement. For example, if you had a lemma that connected “x ∈ a” with an existence of an index i such that a[i]! = x, then you could more easily deduce the existence of a common element.
+ • Alternatively, change the specification so that you directly compare Boolean values rather than converting from Bool to an existential statement. (Sometimes it is preferable in Lean to state “hasCommonElement a b = true ↔ …” instead of introducing a separate spec.)
+
+──────────────────────────────
+Conclusion: Root Cause and Next Steps
+
+The root cause is that you are trying to bridge between the Bool computed by your implementation and the existential Prop of your spec without proving the necessary conversion lemmas. In Lean, a Boolean value and a Prop are not directly interchangeable. In your proof you refer to tactics Array.exists_of_any and Array.any_of_mem that are assumed to perform the conversion, but no such conversion lemmas are provided or proved.
+
+To fix the issue you might consider proving helper lemmas such as:
+
+ lemma any_true_iff_exists_index (a : Array α) (p : α → Bool) [DecidablePred p] :
+   a.any p = true ↔ ∃ i, i < a.size ∧ p (a[i]!) = true
+
+and then using it (possibly twice, once for each array) to prove your main theorem. Alternatively, adjust your specification to work directly with Booleans rather than converting them into existentials.
+
+Once you have such lemmas in place (or change the spec), Lean will be able to discharge both “mp” and “mpr” goals, and the bullet notation should be accepted with no “unexpected token ‘·’” error provided the indentation and formatting match Lean 4’s expectations.
+
+──────────────────────────────
+Final Summary
+
+Your proof error arises because Lean is left with unsolved subgoals in the two directions of the iff statement. This is due to the use of conversion tactics (Array.exists_of_any and Array.any_of_mem) that are not available or do not supply the equivalence between “a.any … = true” (a Bool) and “∃ i j, …” (a Prop). The solution is to prove and/or import proper lemmas making that conversion valid, or else modify the spec/proof so that the Boolean implementation is handled directly.

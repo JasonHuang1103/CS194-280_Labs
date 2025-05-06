@@ -1,0 +1,13 @@
+```lean
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  split
+  case mp =>
+    intro h
+    rw [h]
+    decide
+  case mpr =>
+    intro h
+    split_ifs at h with hmod
+    . exact hmod
+    . contradiction
+```

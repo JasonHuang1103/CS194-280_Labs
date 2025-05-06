@@ -1,0 +1,16 @@
+theorem myMin_spec_satisfied (a : Int) (b : Int) :
+  myMin_spec a b (myMin a b) := by
+  unfold myMin myMin_spec
+  by_cases h : a ≤ b
+  · -- Case where a ≤ b
+    simp [h]
+    constructor
+    · exact ⟨le_refl a, h⟩
+    · left
+      rfl
+  · -- Case where ¬(a ≤ b), i.e., a > b
+    simp [h]
+    constructor
+    · exact ⟨not_le.mp h, le_refl b⟩
+    · right
+      rfl

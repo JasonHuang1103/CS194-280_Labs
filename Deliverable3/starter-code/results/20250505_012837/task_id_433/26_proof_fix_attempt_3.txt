@@ -1,0 +1,17 @@
+```lean
+  intro h
+  split
+  · intro h1 i h2
+    have h3 : a.toList.get? i = some (a[i]!) := List.get?_eq_get a.toList i h2
+    rw [← List.All_iff_forall_mem] at h1
+    specialize h1 a[i]!
+    rw [Array.getElem_eq_get] at h2 
+    have : decide (n > a[i]!) = true := h1 (List.mem_of_get_eq_some h3)
+    exact of_decide_eq_true this
+  · intro h1
+    rw [← List.All_iff_forall_mem]
+    intros x hx
+    obtain ⟨i, hi, rfl⟩ := List.exists_of_mem_get? hx
+    specialize h1 i hi
+    exact decide_eq_true h1
+```

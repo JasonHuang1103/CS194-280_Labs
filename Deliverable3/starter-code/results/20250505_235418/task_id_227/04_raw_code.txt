@@ -1,0 +1,3 @@
+```lean
+if a ≤ min b c then a else min b c
+```

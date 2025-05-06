@@ -1,0 +1,13 @@
+```lean
+simp
+constructor
+· intro h
+  cases h
+  · have : a * b > 0 := by apply mul_pos; assumption
+    contradiction
+  · have : a * b > 0 := by apply mul_pos; assumption
+    contradiction
+· intro h
+  apply lt_of_mul_neg
+  assumption
+```

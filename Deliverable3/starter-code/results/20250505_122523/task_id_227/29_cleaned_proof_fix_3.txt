@@ -1,0 +1,19 @@
+by_cases h1 : a ≤ b
+  · by_cases h2 : a ≤ c
+    · simp [h1, h2]
+      constructor
+      · exact ⟨le_rfl, h1, h2⟩
+      · exact Or.inl rfl
+    · simp [h1, h2]
+      constructor
+      · exact ⟨le_rfl, h1, le_of_not_le h2⟩
+      · exact Or.inr (Or.inr rfl)
+  · by_cases h2 : b ≤ c
+    · simp [h1, h2]
+      constructor
+      · exact ⟨le_of_not_le h1, le_rfl, h2⟩
+      · exact Or.inr (Or.inl rfl)
+    · simp [h1, h2]
+      constructor
+      · exact ⟨le_of_not_le h1, le_rfl, le_of_not_le h2⟩
+      · exact Or.inr (Or.inr rfl)

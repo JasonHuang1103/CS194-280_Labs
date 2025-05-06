@@ -1,0 +1,14 @@
+simp
+apply Iff.intro
+· intro ⟨i, j, hi, hj, h_eq⟩
+  rw [Array.any_eq_true]
+  use i
+  constructor
+  · exact hi
+  rw [Array.any_eq_true]
+  use j
+  exact ⟨hj, h_eq⟩
+· intro h
+  rw [Array.any_eq_true] at h
+  obtain ⟨i, hi, ⟨j, hj, h_eq⟩⟩ := h
+  exact ⟨i, j, hi, hj, h_eq⟩

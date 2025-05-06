@@ -1,0 +1,3 @@
+```lean
+6 * size * size
+```

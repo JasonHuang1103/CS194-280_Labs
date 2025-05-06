@@ -1,0 +1,32 @@
+The error isn’t some mysterious bug in Lean at all—it is caused by the way the proof is structured. In our theorem we are trying to prove an equivalence
+
+  (a < 0 ∧ b > 0) ∨ (a > 0 ∧ b < 0) ↔ result
+
+where result is computed by the function
+
+  hasOppositeSign : ℤ → ℤ → Bool
+
+which is defined by an if–then–else; that is,
+
+  hasOppositeSign a b =
+   if a < 0 then b > 0 else if a > 0 then b < 0 else false
+
+The proof “unfolds” both hasOppositeSign and the specification, but then it proceeds by doing a case analysis on the value of a (first by by_cases on “a < 0” and then by another by_cases on “a > 0”). In the branch where a < 0 is true (and similarly when a > 0) the proof uses simp together with the lemma decide_eq_true_iff to “translate” the Boolean value (that is, decide (b > 0) equals true) into the proposition b > 0.
+
+However, Lean is complaining that in some cases (for example, when a < 0 holds) it is left with unsolved goals of the form
+
+  a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 ↔ decide (b > 0) = true
+
+This happens because the case analysis and the simp calls are not “capturing” the full behavior of the if–then–else. In other words, the proof is “splitting” on a instead of directly “splitting” on the if-expression that appears in the definition of hasOppositeSign. (Moreover, the bullet “·” notation in the nested by_cases blocks is misaligned so that Lean sees an unexpected token at the end of the second branch.) 
+
+To summarize, the root causes are:
+
+1. We are proving an equivalence between a proposition (the two cases on a and b) and a Boolean equality (result = true), but we are not systematically converting the boolean if–then–else structure into the corresponding Prop. The use of decide_eq_true_iff is not enough to “cancel” the if–then–else when doing the case analysis, leaving unsolved goals in each branch.
+
+2. The nested by_cases (and the bullet notation) is not properly structured. When doing the by_cases on a’s sign, the proof does not also fully handle the case where neither a < 0 nor a > 0 holds (i.e. when a = 0) – the if–then–else does not “match” up with the cases in our equivalence.
+
+A good way to fix these issues is to avoid doing the case analysis on a “by_cases” and instead use tactics like split_ifs to perform case splitting on the if–then–else expression directly. Alternatively you might want to prove a version where hasOppositeSign returns a Prop, so you are dealing with propositions on both sides of the equivalence. Another approach is to add more explicit rewriting using the decide_eq_true lemmas so that every branch of the if–then–else is handled and all cases are proved.
+
+In short, the error comes from the fact that the proof leaves unsolved cases because the if–then–else structure inside hasOppositeSign does not line up with the case analysis in the proof. We must restructure the proof (or the definition/specification) so that the if–then–else is “split” or “rewritten” completely, ensuring that every case is handled and no goals remain.
+
+A good next step would be to switch from by_cases to split_ifs so that Lean can automatically generate the correct subgoals for the two branches of the if–then–else in hasOppositeSign.

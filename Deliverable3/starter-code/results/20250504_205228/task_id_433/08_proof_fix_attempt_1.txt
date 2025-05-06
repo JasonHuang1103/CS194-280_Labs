@@ -1,0 +1,47 @@
+The error in your proof arises from the attempt to use an incorrect tactic `apply Array.foldr_induction_on`, which does not exist in Lean. Instead, you should apply appropriate induction principles on the `Array` and use reasoning about lists, since arrays in Lean are built on top of lists. Let's rewrite the proof using induction directly on the list backing the array.
+
+Here is the corrected proof:
+
+```lean
+theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :
+  isGreater_spec n a (isGreater n a) := by
+  -- Unfold the definitions of `isGreater` and `isGreater_spec`.
+  unfold isGreater isGreater_spec
+
+  -- Induction on the underlying list of the array.
+  induction a.length with
+  | zero =>
+    -- Base case: the array is empty.
+    simp
+    -- Both sides of the implication are trivially true.
+  | succ len ih =>
+    -- Inductive step: assume the statement holds for arrays of length `len`.
+    rw [Array.foldl_eq_foldr_rev, List.foldr_eq_foldr, List.foldr_cons]
+    split
+    · -- Forward implication `(∀ i, n > a[i]) → fold result is true`.
+      intro H
+      simp only
+      split
+      · -- Show the first element of the list is less than `n`.
+        exact H 0 (Nat.lt_succ_self _)
+      · -- Show the inductive hypothesis holds for the rest of the array.
+        exact ih fun i ht => H (i + 1) (Nat.succ_lt_succ_iff.mp ht)
+    · -- Backward implication: `fold result is true → ∀ i, n > a[i]`.
+      intro ⟨h₀, hrest⟩ i hi
+      simp only
+      cases i using Nat.cases_on with
+      | zero => exact h₀
+      | succ i =>
+        -- `n` is greater than the `(i + 1)th` element of the array.
+        exact ih hrest i (Nat.lt_of_succ_lt_succ hi)
+```
+
+### Explanation:
+
+1. **Base Case**: When the array is empty (length 0), `∀ i, n > a[i]` is trivially true, so both sides of the implication are true.
+
+2. **Inductive Step**: For a non-empty array, `Array.foldl` and `Array.foldr` on non-empty arrays essentially reduce the problem to showing:
+   - The head of the list satisfies the condition (`n > a[0]`).
+   - The rest of the list satisfies the condition, which follows from the inductive hypothesis using the assumption.
+
+This proof fixes the erroneous tactic error by setting up the induction directly and working with the properties of lists that back arrays, including using `Nat` for indexing.

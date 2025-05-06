@@ -1,0 +1,25 @@
+theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :
+  isGreater_spec n a (isGreater n a) := by
+  unfold isGreater isGreater_spec
+
+  induction a.length with
+  | zero =>
+    simp
+  | succ len ih =>
+    rw [Array.foldl_eq_foldr_rev, List.foldr_eq_foldr, List.foldr_cons]
+    split
+    · -- Forward implication `(∀ i, n > a[i]) → fold result is true`.
+      intro H
+      simp only
+      split
+      · -- Show the first element of the list is less than `n`.
+        exact H 0 (Nat.lt_succ_self _)
+      · -- Show the inductive hypothesis holds for the rest of the array.
+        exact ih fun i ht => H (i + 1) (Nat.succ_lt_succ_iff.mp ht)
+    · -- Backward implication: `fold result is true → ∀ i, n > a[i]`.
+      intro ⟨h₀, hrest⟩ i hi
+      simp only
+      cases i using Nat.cases_on with
+      | zero => exact h₀
+      | succ i =>
+        exact ih hrest i (Nat.lt_of_succ_lt_succ hi)

@@ -1,0 +1,46 @@
+The error is not in your definitions for lastDigit or lastDigit_spec at all—it is in the way you’re constructing the proof term for lastDigit_spec_satisfied.
+
+Let’s take a closer look. After you write
+
+  unfold lastDigit lastDigit_spec
+  simp
+
+your goal becomes
+
+  ((0 ≤ n % 10 ∧ n % 10 < 10) ∧ (n % 10 = n % 10))
+
+That is a conjunction whose “outer” structure is a pair of two parts:
+  • The first part is a proof of (0 ≤ n % 10 ∧ n % 10 < 10)
+  • The second part is a proof of (n % 10 = n % 10)
+
+When you write
+
+  exact ⟨Nat.zero_le _, Nat.mod_lt _ (Nat.zero_lt_succ _), rfl⟩
+
+you are giving a triple. Lean sees three entries:
+  1. Nat.zero_le _ 
+  2. Nat.mod_lt _ (Nat.zero_lt_succ _)
+  3. rfl
+
+However, the constructor (for a conjunction) that you need to use is a pair: the first element should itself be a pair (or a two-tuple) proving (0 ≤ n % 10) and (n % 10 < 10), and the second element is rfl.
+
+In other words, the correct structure is:
+
+  ⟨⟨proof-of (0 ≤ n % 10), proof-of (n % 10 < 10)⟩, proof-of (n % 10 = n % 10)⟩
+
+Your current tuple is missing this nested structure. Moreover, by writing underscores in places where Lean needs to know the precise argument (for instance, in Nat.mod_lt _ (Nat.zero_lt_succ _)) the proof term is left partially unspecified. That is why you see an error message stating
+
+  n : ℕ ⊢ n % 10 < 10
+
+which means that the goal “n % 10 < 10” has not been fully solved.
+
+One direction to fix this is to explicitly supply the missing argument (namely n) and nest your tuple properly. For example, you could write:
+
+  exact ⟨⟨Nat.zero_le (n % 10), Nat.mod_lt n (by decide)⟩, rfl⟩
+
+Here’s what’s happening:
+ • Nat.zero_le (n % 10) shows 0 ≤ n % 10.
+ • Nat.mod_lt n (by decide) shows n % 10 < 10. (Notice that Nat.mod_lt requires a proof that 10 > 0. You can prove that by (Nat.zero_lt_succ 9) or using a tactic like “by decide”.)
+ • rfl proves n % 10 = n % 10.
+
+In summary, the root cause of the error is that the proof term you provided does not match the nested conjunction of your specification. You need to build a two‐tuple whose first component is itself a two‐tuple. Adjusting the syntax (and providing the actual argument instead of underscores) should fix the error.

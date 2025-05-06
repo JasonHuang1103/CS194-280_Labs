@@ -1,0 +1,5 @@
+split
+exact Array.map_length (fun x => x * x * x) a
+intros i hi
+rw Array.get_map
+refl

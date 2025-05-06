@@ -1,0 +1,10 @@
+```lean
+constructor
+· intros h i hi
+  specialize h i hi
+  rwa [Array.getElem_toList]
+
+· intros h x hx
+  obtain ⟨j, rfl⟩ := List.mem_toList.mp hx
+  exact h j (Array.toList_size a j)
+```

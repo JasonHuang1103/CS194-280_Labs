@@ -1,0 +1,5 @@
+```lean
+apply And.intro
+· exact Nat.zero_le (n % 10)
+· exact Nat.mod_lt n 10 (by decide)
+```

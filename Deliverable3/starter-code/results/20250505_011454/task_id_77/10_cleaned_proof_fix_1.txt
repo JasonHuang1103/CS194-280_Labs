@@ -1,0 +1,4 @@
+simp
+rw [Int.ediv_eq_iff_eq_mul_right, mul_comm]
+apply Int.ne_of_ne_zero
+norm_num

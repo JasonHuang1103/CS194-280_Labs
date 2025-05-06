@@ -1,0 +1,7 @@
+simp [Array.any_eq_true, Array.contains_eq_true]
+constructor
+· intro ⟨i, j, h₁, h₂, h₃⟩
+  exact ⟨_, h₁, h₃.symm ▸ Array.get_mem _ _ h₂⟩
+· intro ⟨i, h₁, h₂⟩
+  have ⟨j, h₃⟩ := Array.exists_index_of_mem h₂
+  exact ⟨i, j, h₁, h₃, rfl⟩

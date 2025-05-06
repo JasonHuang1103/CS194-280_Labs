@@ -1,0 +1,4 @@
+{
+  "code": "(a.toList).all (fun x => decide (n > x))\n\nThis tells Lean that the argument to .all is the entire lambda (fun x => decide (n > x)), and then it works as intended.",
+  "proof": "apply Iff.intro\n\u00b7 intros h i hi\n  have := List.get_of_mem (List.get_mem a.toList i hi)\n  exact h i hi\n\u00b7 intro h\n  apply List.all_iff_forall.mpr\n  intro x hx\n  obtain \u27e8i, h'\u27e9 := List.mem_iff_get.symm.mp hx\n  exact h i h' forg a.size-\u27e80, i, h'\u27e9"
+}

@@ -1,0 +1,18 @@
+The error comes from how Lean is parsing the lambda for List.all. In your code you wrote
+
+  a.toList.all (fun x => n > x)
+
+but the error message shows something like
+
+  a.toList.all fun x => decide (n > x)
+
+which indicates that Lean wasn’t sure where the function argument ends. In Lean 4 you must enclose the lambda in parentheses so that it is passed as a single argument to all. (Also note that the markers like “-- << CODE START >>” are not valid Lean syntax, but since you only want the fixed version of the function implementation, we ignore them.)
+
+A fixed version of the isGreater function is:
+
+--------------------------------------------------
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  a.toList.all (fun x => decide (n > x))
+--------------------------------------------------
+
+This ensures that the lambda (fun x => decide (n > x)) is correctly treated as the argument to the all function. (If your > operator returns Bool instead of a Prop, you can drop decide and just write (fun x => n > x).)

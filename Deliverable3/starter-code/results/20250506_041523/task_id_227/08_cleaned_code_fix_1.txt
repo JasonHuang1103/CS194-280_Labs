@@ -1,0 +1,4 @@
+let m := if a ≤ b then a else b
+  if m ≤ c then m else c
+
+This version avoids using the non-existent Int.min and should compile without error.

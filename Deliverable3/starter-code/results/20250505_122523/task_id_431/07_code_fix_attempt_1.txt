@@ -1,0 +1,6 @@
+The error occurs because Lean’s Array type doesn’t have an any? method. You can convert the array to a list (which has the any method) and then use it. Here’s the fixed version of the function implementation only:
+
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  a.toList.any (λ x => (b.toList.contains x))
+
+This converts both arrays to lists and then uses List.any and List.contains, which are available in Lean 4.

@@ -1,0 +1,18 @@
+apply Iff.intro
+· intro h
+  induction a using List.induction_on
+  · simp at h
+  · simp at h
+    cases h
+    · sorry
+    · apply List.any_eq_true.1
+      sorry
+· intro ⟨i, j, hi, hj, h_eq⟩
+  induction a using List.induction_on
+  · simp
+  · simp
+    by_cases c : a.head = b[j]!
+    · simp only [c]
+      apply List.any_eq_true.2
+      sorry
+    · sorry

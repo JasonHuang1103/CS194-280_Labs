@@ -1,0 +1,4 @@
+{
+  "code": "a.any (fun x => b.any (fun y => x = y))",
+  "proof": "constructor\n\u00b7 intro \u27e8i, j, hi, hj, h_eq\u27e9\n  have hb : b.any (fun y => a[i]! = y) = true := by\n    apply (array_any_iff b (fun y => a[i]! = y)).mpr\n    exact \u27e8j, hj, h_eq\u27e9\n  apply (array_any_iff a (fun x => b.any (fun y => x = y))).mpr\n  exact \u27e8i, hi, hb\u27e9\n\u00b7 intro H\n  rcases (array_any_iff a (fun x => b.any (fun y => x = y))).mp H with \u27e8i, hi, h_inner\u27e9\n  rcases (array_any_iff b (fun y => a[i]! = y)).mp h_inner with \u27e8j, hj, h_eq\u27e9\n  exact \u27e8i, j, hi, hj, h_eq\u27e9"
+}

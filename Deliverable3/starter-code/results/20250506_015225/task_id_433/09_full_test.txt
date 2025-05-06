@@ -1,0 +1,7 @@
+Lean Error: lean_playground/TempTest.lean:18:40: error: unsolved goals
+case mk
+n : ℤ
+xs : List ℤ
+⊢ (∀ i < { toList := xs }.size, n > { toList := xs }[i]!) ↔
+    Array.foldl (fun acc x => acc && decide (n > x)) true { toList := xs } = true
+lean_playground/TempTest.lean:22:0: error: unexpected token '·'; expected command

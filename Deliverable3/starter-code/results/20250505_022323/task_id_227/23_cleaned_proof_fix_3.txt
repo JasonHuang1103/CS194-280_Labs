@@ -1,0 +1,29 @@
+split
+{ 
+  apply And.intro
+  { 
+    apply le_trans (Int.le_min (min a b) c)
+    exact Int.le_min_left a b
+  }
+  {
+    apply And.intro
+    { 
+      apply le_trans (Int.le_min (min a b) c)
+      exact Int.le_min_right a b
+    }
+    { 
+      exact Int.le_min_right (min a b) c
+    }
+  }
+}
+{
+  cases min_choice a b with
+  | inl h => 
+    cases min_choice (min a b) c with
+    | inl hc => exact Or.inl hc
+    | inr hc => exact Or.inr (Or.inr hc)
+  | inr h =>
+    cases min_choice (min a b) c with
+    | inl hc => exact Or.inr (Or.inl hc)
+    | inr hc => exact Or.inr (Or.inr hc)
+}

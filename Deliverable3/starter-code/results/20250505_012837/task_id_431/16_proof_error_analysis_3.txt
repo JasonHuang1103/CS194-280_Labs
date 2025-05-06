@@ -1,0 +1,61 @@
+The code compiles fine when the theorem is stated correctly. (The implementation is sound; indeed, when the method returns true there is some common element, and when it returns false there isn’t.) What happens here is that the tactic “proof” is not doing what you think it is.
+
+Let’s look at the error message:
+
+  error: unsolved goals  
+  case mp …  
+  ⋮  
+  error: unexpected token '·'; expected command
+
+There are two separate (but related) issues in your proof script:
+
+1. The tactic command “apply Iff.intro” produces two subgoals: one for the “→” direction and one for the “←” direction. In your script you then try to give the proofs for each case using bullet markers (the “·” characters). However, Lean 4 is not accepting the bullet markers in the position you put them. (This is what the “unexpected token '·'” error is about.) In Lean 4 you have to be careful with bullet syntax and indentation when you immediately “apply” a lemma that creates subgoals.
+
+2. Even if the bullets were parsed correctly, the subproofs you wrote are not “attached” to the correct subgoal in a way that Lean 4 can see. In other words, by writing
+
+  apply Iff.intro  
+  · intro ..., …  
+  · intro ..., …  
+
+Lean does not know that the “·” lines are supposed to be the proofs of the two directions. (Different versions and flavors of Lean have slightly different rules for bullet syntax and tactic blocks.) In Lean 4 it is often safer to use a “begin … end” block with explicit “split” (or “apply Iff.intro” followed immediately by a nested block for each case) or to use indentation that makes the structure clear.
+
+So the “unsolved goals” complaint is simply because Lean did not find any complete proof for one or both of the two directions of the ↔.
+
+A good direction for fixing the issue is to rewrite the proof so that the two cases are given in a block structure that Lean 4 accepts. For example, you could write something like this:
+
+------------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  a.any (λ x => b.any (λ y => x = y))
+
+-- Theorem: If the method returns true, there exists at least one common element between the two arrays;
+-- if the method returns false, there are no common elements between the two arrays.
+def hasCommonElement_spec (a : Array Int) (b : Array Int) (result : Bool) : Prop :=
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  hasCommonElement_spec a b (hasCommonElement a b) :=
+by
+  unfold hasCommonElement hasCommonElement_spec
+  apply Iff.intro
+  · -- Forward direction: if there exists i, j such that … then a.any ... = true
+    intro ⟨i, j, hi, hj, h_eq⟩
+    rw [Array.any_eq_true]
+    use i, hi
+    rw [Array.any_eq_true]
+    use j, hj, h_eq
+  · -- Backward direction: if a.any ... = true then there exists a common element.
+    intro h
+    rw [Array.any_eq_true] at h
+    obtain ⟨i, hi, inner⟩ := h
+    rw [Array.any_eq_true] at inner
+    obtain ⟨j, hj, h_eq⟩ := inner
+    exact ⟨i, j, hi, hj, h_eq⟩
+------------------------------------------------------------
+
+Notice that by writing “by” and then indenting the two bullet blocks immediately after “apply Iff.intro”, we help Lean 4 parse the structure correctly. (Alternatively, you can use “begin … end” blocks with “split” instead of “apply Iff.intro”.)
+
+In summary, the error is not with the mathematical content at all but with the tactic script: Lean 4 is complaining because it does not recognize the “·” bullet markers in that particular syntactic position (and hence reports “unsolved goals”), so you need to fix the layout/formatting of the tactic proof.

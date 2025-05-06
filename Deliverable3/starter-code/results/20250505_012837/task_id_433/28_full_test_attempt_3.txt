@@ -1,0 +1,17 @@
+Lean Error: lean_playground/TempTest.lean:7:2: error: function expected at
+  List.all ?m.125 ?m.1380
+term has type
+  Bool
+lean_playground/TempTest.lean:7:37: error: application type mismatch
+  List.all ?m.125 a.toList
+argument
+  a.toList
+has type
+  List ℤ : Type
+but is expected to have type
+  ?m.11 → Bool : Type ?u.10
+lean_playground/TempTest.lean:9:55: error: unexpected token 'to'; expected command
+lean_playground/TempTest.lean:23:8: error: tactic 'introN' failed, insufficient number of binders
+n : ℤ
+a : Array ℤ
+⊢ (∀ i < a.size, n > a[i]!) ↔ sorry n a = true

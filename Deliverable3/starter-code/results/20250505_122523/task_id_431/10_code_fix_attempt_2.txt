@@ -1,0 +1,16 @@
+Below is the fixed version of the hasCommonElement function. The issue was with the method call syntax for contains. You need to parenthesize b.toList so that the method call is interpreted correctly. In other words, instead of writing
+
+  b.toList.contains x
+
+you should write
+
+  (b.toList).contains x
+
+Here’s the corrected implementation:
+
+------------------------------------------------
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  (a.toList).any (fun x => (b.toList).contains x)
+------------------------------------------------
+
+This change ensures that the contains method is applied to the list obtained from b correctly and the code compiles without error.

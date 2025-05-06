@@ -1,0 +1,130 @@
+We want to build a function that receives two integers a and b and returns the smaller one. When a equals b, returning either value is acceptable. We must also provide a theorem stating that the returned value (call it result) satisfies two properties:
+ – It is less than or equal to a and b.
+ – It is equal to either a or b.
+
+Below is our step‐by‐step reasoning:
+
+───────────────────────────── 
+Step 1. Understand the Function Specification
+
+• Our function myMin : Int → Int → Int must compare a and b.  
+• If a is less than or equal to b, then a is “the minimum.”  
+• Otherwise (if a > b) the minimum is b.  
+• In the case a = b the “if” branch (a <= b) applies so we will return a. (Recall that the “if” test is “a <= b”, which returns true in the equal case because ≤ is reflexive.)
+
+───────────────────────────── 
+Step 2. Break the Problem into Parts
+
+• PART A: Implementation  
+ – We can use Lean’s conditional “if … then … else …” construct.
+ – Thus our function implementation will look like  
+  if a <= b then a else b  
+• PART B: Specification and Proof  
+ – The specification predicate myMin_spec a b result must say:
+  (result ≤ a ∧ result ≤ b) ∧ (result = a ∨ result = b)
+ – To prove that our implementation satisfies the specification we will do a case analysis on the condition (a ≤ b) that occurs in the implementation.
+
+───────────────────────────── 
+Step 3. Consider Input Types and Edge Cases
+
+• Our inputs are integers (of type Int).  
+• Edge cases include:
+ – a = b (in which case our “if” test is true so we return a – which is acceptable)
+ – When a < b or b < a.  
+• In every case, note that the “if … then … else …” returns either a or b.
+
+───────────────────────────── 
+Step 4. Plan the Proof Techniques
+
+• Since our implementation is defined by an “if … then … else …” we can use Lean’s “split_ifs” tactic (or manual cases using “by_cases”) to split the proof into two cases.
+• In the “if (a <= b)” case the result is a; then:
+ – We need to show a ≤ a (true by reflexivity) and a ≤ b (which is exactly the hypothesis from the if branch).
+ – Also, a = a holds (so we can choose the “or” case “result = a”).
+• In the “else” case (when a ≤ b is false) we know by the properties of ≤ on integers that b < a. In that branch the output is b; then:
+ – We need to show b ≤ a (which holds because b < a implies b ≤ a) and b ≤ b (true by reflexivity).
+ – And b = b is trivial.
+• Our proof will begin by “unfolding” our definitions to expose the “if … then … else …” and then use a “split_ifs” or “cases” tactic.
+
+───────────────────────────── 
+Step 5. Note Similar Patterns from Examples
+
+• In many examples in Lean’s documentation (as seen above) one “splits” on an if–then–else.  
+• The pattern we use is very similar to how one proves a conditional specification using cases based on the decision procedure (for example, many proofs about “min” functions use the same idea).
+
+───────────────────────────── 
+Detailed Plan for the Implementation and Proof
+
+1. Implementation:
+ Define the function myMin as follows:
+  def myMin (a : Int) (b : Int) : Int :=
+   if a <= b then a else b
+
+2. Theorem Specification:
+ We already have a predicate definition myMin_spec, which states:
+  myMin_spec a b result  := (result ≤ a ∧ result ≤ b) ∧ (result = a ∨ result = b)
+
+3. Proof Strategy:
+ In theorem myMin_spec_satisfied, we must show:
+  myMin_spec a b (myMin a b)
+ The strategy is:
+  a. Unfold the definitions (or simplify) so that the “if … then … else …” is visible.
+  b. Use split_ifs (or a manual case split) to separate the two cases:
+   • Case 1: Assume (a ≤ b) – then the returned result is a.
+    – Prove that a ≤ a (by le_refl) and a ≤ b (directly from the assumption).
+    – Prove that a = a holds (choose the left “or”).
+   • Case 2: Assume ¬(a ≤ b) – then we know b < a from the properties of ordering on Int.
+    – Then result = b.
+    – Prove that b ≤ a (using b < a implies b ≤ a) and b ≤ b (by le_refl).
+    – Prove that b = b holds.
+  c. Conclude by reassembling the two cases, which each satisfy the specification.
+
+───────────────────────────── 
+Detailed Final Plan (Pseudo‐Lean Code)
+
+Implementation:
+---------------------------------
+import Mathlib
+import Aesop
+
+def myMin (a : Int) (b : Int) : Int :=
+  if a ≤ b then a else b
+
+Specification predicate (as given):
+---------------------------------
+def myMin_spec (a : Int) (b : Int) (result : Int) : Prop :=
+  (result ≤ a ∧ result ≤ b) ∧
+  (result = a ∨ result = b)
+
+Proof:
+---------------------------------
+theorem myMin_spec_satisfied (a : Int) (b : Int) :
+  myMin_spec a b (myMin a b) := by
+  -- Unfold the definitions to see the if-statement.
+  unfold myMin myMin_spec
+  split  -- This splits the conjunction into two goals.
+  -- For the first part: result ≤ a ∧ result ≤ b.
+  { split
+    -- Now, we use a case split on the if condition.
+    split_ifs with h
+    -- Case: if h : (a ≤ b) holds, then myMin = a.
+    { exact ⟨le_refl a, h⟩ }
+    -- Case: else, so ¬(a ≤ b); then myMin = b.
+    { -- Here we know b < a by properties of Int.
+      have h₁ : b < a := lt_of_not_ge h
+      exact ⟨le_of_lt h₁, le_refl b⟩ } }
+  -- Next, for the second part: result = a ∨ result = b.
+  { split_ifs with h
+    -- Case: if (a ≤ b) then myMin = a so use left branch.
+    { exact Or.inl rfl }
+    -- Otherwise, myMin = b so use right branch.
+    { exact Or.inr rfl } }
+
+───────────────────────────── 
+Conclusion
+
+By following the above plan we:
+ – Define myMin using an “if” based on the condition (a ≤ b).  
+ – Prove by splitting on the if-condition that in one branch the result is a and in the other branch it is b.  
+ – In both cases, we verify that the result is less than or equal to each input and that the result equals one of them.
+
+This completes our detailed plan for both the implementation of the function and the accompanying proof.

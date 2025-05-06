@@ -1,0 +1,31 @@
+The core problem is that Lean is mis‐interpreting the lambda expression that you supply to List.all. In your definition
+
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    (a.toList).all (fun x => decide (n > x))
+
+Lean sometimes “loses” the lambda’s intended scope unless you use enough parentheses. (This is a typical pitfall in Lean 4 when passing lambdas as arguments.) In other words, without explicit parentheses, Lean might parse
+
+  a.toList.all fun x => decide (n > x)
+
+as trying to apply fun x => decide (n > x) to something other than the expected argument. (The error message “function expected at ... term has type Bool” is telling you that Lean ended up with a Bool value where it was expecting a function.)
+
+The comment in your code even hints at this: 
+  -- This tells Lean that the argument to .all is the entire lambda (fun x => decide (n > x)), and then it works as intended.
+
+Thus what is happening is that without the extra parentheses, Lean’s parser gets confused about which part of the code is the argument to List.all. This in turn causes subsequent errors (for example, the “unexpected token ‘to’; expected command” and unsolved goals later) because the definitions are mis‐parsed.
+
+A direction for fixing this is to explicitly group the lambda so that Lean sees it as a complete argument. For example, writing
+
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    (a.toList).all (fun x => decide (n > x))
+
+or even
+
+  def isGreater (n : Int) (a : Array Int) : Bool :=
+    (a.toList).all (λ x => decide (n > x))
+
+ensures that the lambda is parsed correctly as the argument to all. (Note that in Lean 4 both fun and λ are acceptable syntax, but the key is to ensure the grouping is clear.)
+
+Once the lambda is grouped correctly, the isGreater_spec_satisfied theorem’s proof no longer has the parsing issues that cause Lean to complain. (There may be further adjustments needed depending on your overall development, but this error is solely due to the ambiguous lambda application.)
+
+In summary, the error originates from incorrect parsing of the lambda passed to List.all. Grouping the lambda argument properly tells Lean that the entire function (fun x => decide (n > x)) is the argument to .all, which will resolve the type and syntax mismatches you're seeing.

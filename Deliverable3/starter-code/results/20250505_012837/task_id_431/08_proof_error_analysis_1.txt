@@ -1,0 +1,33 @@
+Below is one explanation of the error. In short, the proof “rewrites” using the lemma Array.any_eq_true so that the equivalence it must prove becomes one between two (almost identical) existential‐statements—but the two sides are written in different “styles” (one uses the “bound” notation “∃ i < a.size, …” and the other an “ordinary” existential “∃ i, ∃ (h : i < a.size), …”). Lean is then left with a goal whose quantifiers are “mismatched” so that, when the rewriting happens, some of the implicit proofs (namely, the bounds proofs for “a[i]!”) are not discharged.
+
+Let’s break this down:
+
+1. The specification is written as
+
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+In Lean when you write “∃ i j, …” the “i < a.size” is treated (via notation) as a “bound” attached to the variable. By contrast, Array.any_eq_true is stated in Mathlib in a style where the existential quantifiers come with explicit proof arguments. In other words, one side of the equivalence becomes something like
+
+  ∃ (i : Nat), i < a.size ∧ …      (“∃ i < a.size, …”)
+
+while the rewrites that come from Array.any_eq_true end up expecting something in the form
+
+  ∃ (i : Nat) (h : i < a.size), …
+
+Even though these two formulations are (morally) equivalent, Lean’s automation finds itself with a goal
+  (∃ i < a.size, ∃ x < b.size, a[i]! = b[x]!) ↔ ∃ i, ∃ (h : i < a.size), ∃ i₁, ∃ (h₁ : i₁ < b.size), a[i] = b[i₁]
+which is “not solved” (and written in a way that shows the quantifiers arranged differently). The error message “unsolved goals” thus tells us that after the unfolding and simp work the goal has been put in this “mismatched existential” form that no tactic yet knows how to automatically reconcile.
+
+2. Even more, the safe indexing “a[i]!” (and similarly b[j]!) is “unfolded” when you call simp. That causes Lean to generate variants where the safe index has been replaced by an ordinary one but together with an extra proof of bounds. Although these versions are equivalent to the original, the way they “unfold” does not exactly match what Array.any_eq_true gives.
+
+3. Finally, there is the error “unexpected identifier; expected command” on what appears to be the beginning of the second sub-proof. (Sometimes when a goal isn’t solved, further lines get mis‐parsed.) In our case the conflicting or “unsolved” goal coming from the rewriting leads Lean to complain when it later sees a bullet (·).
+
+The reason for the error is that the proof attempts to use Array.any_eq_true to bridge the gap between the definition of hasCommonElement and its specification. However, the version of Array.any_eq_true available (or the way Lean unfolds Array.any) yields an existential statement written with explicit proof arguments (∃ (h : i < a.size), …) while the specification is phrased using the “∃ i < a.size” notation. Lean is not automatically “fusing” these two styles, so it ends up with a goal that it cannot solve.
+
+A direction for fixing the issue is to remedy the mismatch in styles. For example, one might prove (or import) a lemma that says something like:
+
+  (∃ i, i < a.size ∧ P a i) ↔ (∃ i < a.size, P a i)
+
+so that the two sides of the goal can be rewritten into exactly the same form. Alternatively, you could prove the theorem “from scratch” without relying on Array.any_eq_true, by directly unfolding the definitions and explicitly dealing with the bounds proofs. In a nutshell, the remedy is to use a version (or prove a bridge lemma) that “aligns” the existential quantifiers – making the “bound” notation and the “explicit proof argument” version of the existential statement match in type and structure.
+
+In summary, the error is caused by the mismatch between how the existential quantifiers (and the safe indexing operator “!”) are represented when you unfold and rewrite the definitions versus how they appear in your specification. Aligning these representations (by rewriting, by adding a bridge lemma, or by rephrasing the specification) should fix the issue.

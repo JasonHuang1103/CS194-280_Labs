@@ -1,0 +1,6 @@
+simp
+apply And.intro
+· rfl
+· intro i
+  intro hi
+  simp

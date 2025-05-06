@@ -1,0 +1,9 @@
+```lean
+Iff.intro
+  (fun ⟨i, j, hi, hj, h_eq⟩ =>
+    Array.any_eq_true.mpr ⟨i, hi, Array.any_eq_true.mpr ⟨j, hj, by rw [h_eq]⟩⟩)
+  (fun h =>
+    let ⟨i, hi, h_any⟩ := Array.any_eq_true.mp h
+    let ⟨j, hj, h_eq⟩ := Array.any_eq_true.mp h_any
+    ⟨i, j, hi, hj, by rw [h_eq]⟩)
+```

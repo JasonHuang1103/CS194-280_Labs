@@ -1,0 +1,13 @@
+split
+· split
+  · by_cases h : a ≤ b
+    · simp [h]
+    · simp [h, not_le] at h
+      exact le_of_lt h
+  · by_cases h : a ≤ b
+    · simp [h]
+    · simp [h, not_le] at h
+      apply le_refl
+· by_cases h : a ≤ b
+  · simp [h]
+  · simp [h]

@@ -1,0 +1,23 @@
+by_cases h : a ≤ min b c
+· rw if_pos h
+  split
+  · split
+    · exact le_rfl
+    · apply le_trans h
+      exact min_le_left b c
+    · apply le_trans h
+      exact min_le_right b c
+  · left
+    rfl
+· rw if_neg h
+  split
+  · split
+    · apply le_of_not_le h
+    · exact min_le_left b c
+    · exact min_le_right b c
+  · right
+    cases le_total b c with hb hc
+    · left
+      rw min_eq_left hb
+    · right
+      rw min_eq_right hc

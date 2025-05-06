@@ -1,0 +1,96 @@
+Below is our step‐by‐step reasoning, followed by a detailed plan for both implementing the function and proving the specification.
+
+──────────────────────────────
+Step 1. Understanding the function’s purpose
+
+• The function isDivisibleBy11 takes an integer n and returns a Boolean.  
+• It should return true exactly when n is divisible by 11, i.e. when the remainder when dividing n by 11 is 0.
+
+──────────────────────────────
+Step 2. Breaking the problem into subproblems
+
+(a) Implementation:  
+ – We need to compute (n % 11) and then check whether it equals 0.  
+ – Lean provides a built‐in modulo operator (%) for Int.  
+ – For the Boolean check, we use the equality operator “==” on integers.
+
+(b) Specification:  
+ – The property is defined by isDivisibleBy11_spec which states that  
+   n % 11 = 0 ↔ (result from isDivisibleBy11).  
+ – Our implementation should satisfy that the returned Boolean true is equivalent to “n % 11 = 0.”
+
+(c) Proof:  
+ – After unfolding the definitions, our goal becomes:  
+   n % 11 = 0 ↔ (n % 11 == 0)  
+ – In Lean, there is generally a lemma that relates the Boolean equality “a == b” with the propositional equality “a = b.”  
+ – For integers, a lemma such as Int.beq_eq (or a similar decidable equality lemma) will help us prove the equivalence.
+ – The proof will essentially “unfold” definitions and then apply the appropriate lemma.
+
+──────────────────────────────
+Step 3. Considering input types, edge cases, and behavior
+
+• Input type is Int (which can be positive, negative, or zero).  
+• For n = 0 the function should return true (0 is divisible by every non-zero integer).  
+• Lean’s definition of % works for negative numbers too, so the check holds in all cases.
+
+──────────────────────────────
+Step 4. Choosing proof techniques
+
+• Our proof will be by simplification.  
+• We begin by unfolding the definitions of isDivisibleBy11 and isDivisibleBy11_spec.  
+• We then apply a lemma (for instance, Int.beq_eq) that states for all a, b : Int,  
+  a = b ↔ a == b.  
+• This directly yields the equivalence needed.
+
+──────────────────────────────
+Step 5. Noting similar patterns
+
+• Checking divisibility by a number frequently uses the pattern: (n % divisor) == 0.  
+• The specification being an “if and only if” makes the proof straightforward after unfolding.  
+• Similar proofs in Lean often “unfold” the definition and then use a lemma relating Boolean equality to propositional equality.
+
+──────────────────────────────
+Plan Summary
+
+1. Implementation  
+ • Define isDivisibleBy11 to compute: (n % 11 == 0).
+
+2. Specification  
+ • State that isDivisibleBy11_spec n result is the proposition “n % 11 = 0 ↔ result.”
+
+3. Proof  
+ • In theorem isDivisibleBy11_spec_satisfied, start by unfolding the definitions; the goal becomes:  
+   n % 11 = 0 ↔ (n % 11 == 0).  
+ • Apply (or rewrite using) a lemma that relates Boolean equality with propositional equality for Int (e.g., Int.beq_eq).
+
+──────────────────────────────
+Below is the complete Lean 4 code emerging from this plan.
+
+-------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def isDivisibleBy11 (n : Int) : Bool :=
+  -- We check if the remainder when dividing n by 11 equals 0.
+  n % 11 == 0
+
+-- Specification: the result is true if and only if n is divisible by 11.
+def isDivisibleBy11_spec (n : Int) (result : Bool) : Prop :=
+  n % 11 = 0 ↔ result
+
+-- Theorem: Our implementation meets the specification.
+theorem isDivisibleBy11_spec_satisfied (n : Int) :
+  isDivisibleBy11_spec n (isDivisibleBy11 n) := by
+  -- Unfold definitions (our goal becomes: n % 11 = 0 ↔ (n % 11 == 0))
+  unfold isDivisibleBy11 isDivisibleBy11_spec
+  -- Apply the lemma that links propositional equality to Boolean equality.
+  -- The following lemma, often available in Lean’s standard library for decidable equality,
+  -- states that for integers, a = b ↔ a == b.
+  apply Int.beq_eq
+
+-------------------------------------------------
+
+In this proof, after unfolding we use the lemma Int.beq_eq to establish the desired equivalence.
+
+This detailed plan covers both the implementation of isDivisibleBy11 and the proof that it satisfies its specification.

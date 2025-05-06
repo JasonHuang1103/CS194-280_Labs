@@ -1,0 +1,89 @@
+Below is a detailed plan for solving the problem, including both the Lean implementation of the myMin function and the corresponding proof showing that it meets the specification.
+
+──────────────────────────────
+Step 1. Implementation of myMin
+
+• We need a function myMin : Int → Int → Int that returns the smaller of two integers.
+• A straightforward way is to use an if-then-else construct:
+  - If a ≤ b then the minimum is a.
+  - Otherwise, the minimum is b.
+• In Lean 4 we can write:
+  if a ≤ b then a else b
+
+──────────────────────────────
+Step 2. Stating the Specification
+
+• The property myMin_spec requires two conditions:
+  1. The computed result is less than or equal to each input (i.e. result ≤ a and result ≤ b).
+  2. The result equals either a or b (i.e. result = a ∨ result = b).
+• We state this as a predicate on a, b, and the result.
+
+──────────────────────────────
+Step 3. Proving the Specification
+
+The theorem myMin_spec_satisfied should show that myMin_spec a b (myMin a b) holds for all a, b.
+
+Plan for the proof:
+1. Unfold the definitions of myMin and myMin_spec so that we can see the if-then-else definition and the specification.
+2. Perform a case split on the condition (a ≤ b) used in the if construct:
+  a) Case when a ≤ b:
+   • Then myMin a b reduces to a.
+   • Show that a is less than or equal to itself, and also a ≤ b because we assumed it.
+   • Also, note that a = a, which satisfies the second part of the specification.
+  b) Case when ¬ (a ≤ b) (i.e. a > b):
+   • Then myMin a b reduces to b.
+   • Show that b is less than or equal to itself, and since a > b, we can deduce b ≤ a is true.
+   • Also, b = b, satisfying the required equality condition.
+3. Combine the results of the two cases with the tactic split.
+
+──────────────────────────────
+Step 4. Writing the Code and Proof
+
+The Lean code would be structured as follows:
+
+-------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def myMin (a : Int) (b : Int) : Int :=
+  if a ≤ b then a else b
+
+-- Specification: The result is less than or equal to both a and b; and it equals one of them.
+def myMin_spec (a : Int) (b : Int) (result : Int) : Prop :=
+  (result ≤ a ∧ result ≤ b) ∧
+  (result = a ∨ result = b)
+
+theorem myMin_spec_satisfied (a : Int) (b : Int) :
+  myMin_spec a b (myMin a b) := by
+  unfold myMin myMin_spec
+  split
+  · -- Prove that the result is less than or equal to a and b
+    split
+    · -- Case: when a ≤ b (result = a) ; when ¬ (a ≤ b) (result = b)
+      by_cases h : a ≤ b
+      · -- In the case a ≤ b, result = a, so a ≤ a and, by assumption, a ≤ b.
+        simp [if_pos h]
+        exact ⟨le_refl a, h⟩
+      · -- In the case ¬ (a ≤ b): then result = b and b ≤ b and b ≤ a since a > b.
+        simp [if_neg h]
+        exact ⟨(le_of_lt (Int.lt_of_not_ge h)), le_refl b⟩
+  · -- Prove that result equals either a or b
+    by_cases h : a ≤ b
+    · simp [if_pos h]; left; rfl
+    · simp [if_neg h]; right; rfl
+
+-------------------------
+
+──────────────────────────────
+Summary of Key Steps
+
+1. Use the if-then-else structure in Lean to implement the function.
+2. Clearly state the specification requiring the result to be less than or equal to both inputs and equal to one of them.
+3. In the theorem proof:
+  • Unfold the definitions to work with the actual implementation.
+  • Perform a case split on the condition used in the if statement.
+  • For each case, prove that both parts of the specification hold.
+4. Combine the results to finish the proof.
+
+This plan covers the essentials for both the implementation and the correctness proof of the minimum function in Lean 4.

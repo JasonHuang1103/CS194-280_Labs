@@ -1,0 +1,4 @@
+{
+  "code": "if n % 11 = 0 then true else false",
+  "proof": "split_ifs\n\u00b7 exact Iff.rfl\n\u00b7 simp"
+}

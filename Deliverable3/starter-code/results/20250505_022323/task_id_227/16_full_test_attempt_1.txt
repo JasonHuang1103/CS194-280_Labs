@@ -1,0 +1,2 @@
+Lean Error: lean_playground/TempTest.lean:22:17: error: invalid field notation, identifier or numeral expected
+lean_playground/TempTest.lean:39:2: error: no goals to be solved

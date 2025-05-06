@@ -1,0 +1,4 @@
+{
+  "code": "if a < 0 then\n  b > 0\nelse if a > 0 then\n  b < 0\nelse\n  false",
+  "proof": "split_ifs\ncase h_1 =>\n  constructor\n  \u00b7 intro h\n    cases h with\n    | inl _ => assumption\n    | inr _ => contradiction\n  \u00b7 intro h\n    left; constructor; assumption\ncase h_2 =>\n  constructor\n  \u00b7 intro h\n    cases h with\n    | inl _ => contradiction\n    | inr h => assumption\n  \u00b7 intro h\n    right; constructor; assumption\ncase h_3 =>\n  constructor\n  \u00b7 intro h\n    cases h with\n    | inl h => cases h.1\n    | inr h => cases h.1\n  \u00b7 simp"
+}

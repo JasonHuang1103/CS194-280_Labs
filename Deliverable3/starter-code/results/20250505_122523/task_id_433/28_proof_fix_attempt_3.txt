@@ -1,0 +1,9 @@
+apply Iff.intro
+· intros h i hi
+  have := List.get_of_mem (List.get_mem a.toList i hi)
+  exact h i hi
+· intro h
+  apply List.all_iff_forall.mpr
+  intro x hx
+  obtain ⟨i, h'⟩ := List.mem_iff_get.symm.mp hx
+  exact h i h' forg a.size-⟨0, i, h'⟩

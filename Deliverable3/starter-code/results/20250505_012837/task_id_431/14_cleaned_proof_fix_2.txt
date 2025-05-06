@@ -1,0 +1,12 @@
+apply Iff.intro
+· intro ⟨i, j, hi, hj, h_eq⟩
+  rw [Array.any_eq_true]
+  use i, hi
+  rw [Array.any_eq_true]
+  use j, hj, h_eq
+· intro h
+  rw [Array.any_eq_true] at h
+  obtain ⟨i, hi, inner⟩ := h
+  rw [Array.any_eq_true] at inner
+  obtain ⟨j, hj, h_eq⟩ := inner
+  exact ⟨i, j, hi, hj, h_eq⟩

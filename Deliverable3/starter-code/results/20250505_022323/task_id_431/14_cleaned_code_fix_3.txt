@@ -1,0 +1,3 @@
+Array.any a (fun x => Array.any b (fun y => x == y))
+
+This version contains only valid Lean code for the definition of hasCommonElement.

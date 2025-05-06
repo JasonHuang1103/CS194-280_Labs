@@ -1,0 +1,5 @@
+Lean Error: lean_playground/TempTest.lean:18:52: error: unsolved goals
+a b : ℤ
+⊢ a < 0 ∧ b > 0 ∨ a > 0 ∧ b < 0 ↔ (decide (a < 0) && decide (b > 0) || decide (a > 0) && decide (b < 0)) = true
+lean_playground/TempTest.lean:21:10: error: 'hasOppositeSign_spec_satisfied' has already been declared
+lean_playground/TempTest.lean:32:26: error: unexpected token ','; expected command

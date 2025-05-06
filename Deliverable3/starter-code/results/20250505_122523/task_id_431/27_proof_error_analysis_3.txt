@@ -1,0 +1,46 @@
+Below is a detailed explanation of what’s going wrong.
+
+1. In your definition of hasCommonElement you write
+
+  (a.toList).any (fun x => (b.toList).contains x)
+
+Lean complains:
+  “function expected at
+   a.toList.any fun x => b.toList.contains x
+  term has type Bool”
+
+The problem here is not with the idea behind your definition but with how Lean is parsing it. When you write
+
+  a.toList.any (fun x => b.toList.contains x)
+
+Lean needs to know that you are applying the any function (which has type List α → (α → Bool) → Bool) to the list a.toList and the predicate. However, if the parentheses are not exactly where Lean expects them, it may “see” something else – in this case it looks like you tried to “apply” a toList.any to an argument and then use “fun x => …” in a way that ends up having a Bool where a function is expected. In short, the operator precedence is not what you intended. (This is why you see errors like “function expected” even though the intended code works when you add extra parentheses or use the fully qualified version such as List.any a.toList (fun x => List.contains (b.toList) x).)
+
+2. Next, inside your proof you use
+
+  simp only [List.any, List.contains, List.mem_iff_nthLe]
+
+and then later you do things like
+
+  obtain ⟨x, h_mem_x⟩ := List.mem_iff_nthLe.mpr ⟨i, hi, rfl⟩
+
+The error messages include:
+  error: unknown constant 'List.mem_iff_nthLe'
+
+There is no standard lemma called List.mem_iff_nthLe in the current mathlib (or the default Lean 4 core library). (There is a similar lemma in Lean 3 and earlier versions of mathlib, but it is either renamed or relocated in Lean 4.) As a result, your simp step “made no progress”, and Lean does not know how to relate list membership to “nthLe”. (In mathlib4 you may have to use a different lemma or prove the needed fact yourself.)
+
+3. There is also an error like “unexpected token ','; expected command” which is a secondary consequence: when Lean sees the badly parsed expression or tries to process your “rcases … with ⟨ … ⟩” lines, it gets thrown off by the syntax. In Lean proofs, if an earlier expression is misparsed then subsequent tokens might be misinterpreted as “unexpected” even though you intended something different.
+
+Summary and Suggested Fixes:
+
+• The root cause is that the method call in hasCommonElement is not grouped in such a way as to tell Lean that you are applying any to a list and a predicate. One remedy is to write it using the fully qualified name with its arguments explicitly, for example:
+
+  def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+   List.any (a.toList) (fun x => List.contains (b.toList) x)
+
+or else be extra careful with your parentheses when using dot notation.
+
+• In your proof, the use of List.mem_iff_nthLe causes Lean to complain because it is undefined. You need either to import or define the appropriate lemma relating list membership with the nthLe predicate. Alternatively, you could try to avoid this simp step (or replace it with lemmas that exist in your current context).
+
+Addressing these two points (the syntactic grouping in the definition and the reference to an undefined lemma in the proof) should resolve the errors you see.
+
+This detailed explanation shows that nothing “magical” is wrong with the idea of your theorem—the issues come from a mis-parsed syntax (leading, for example, to Lean expecting a function but getting a Bool) and referencing a constant that is not available.

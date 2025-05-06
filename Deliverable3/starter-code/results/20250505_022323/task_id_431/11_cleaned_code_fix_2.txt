@@ -1,0 +1,3 @@
+Array.any a (fun x => Array.any b (fun y => x == y))
+
+This change replaces "x = y" with "x == y", so that the lambdas return Boolean values as expected by Array.any.

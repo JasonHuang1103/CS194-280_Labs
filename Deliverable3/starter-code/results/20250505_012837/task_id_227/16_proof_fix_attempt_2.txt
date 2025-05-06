@@ -1,0 +1,10 @@
+```
+unfold minOfThree minOfThree_spec
+split
+· intro h
+  simp [h]
+· intro h
+  simp [h]
+· intro h
+  simp [h]
+```

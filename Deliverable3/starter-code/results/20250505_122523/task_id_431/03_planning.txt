@@ -1,0 +1,142 @@
+Below is a detailed plan for both implementing the function and proving that it meets its specification.
+
+─────────────────────────────  
+1. Overview
+
+We must implement a function
+
+  hasCommonElement : Array Int → Array Int → Bool
+
+which returns true exactly when there is at least one element x that occurs in both arrays. (Notice that if either array is empty then there is no such element.)
+
+The specification is given by the predicate
+
+  hasCommonElement_spec a b result : Prop :=
+   (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+The goal is to show that our implementation satisfies the specification, i.e.,
+
+  hasCommonElement_spec a b (hasCommonElement a b)
+
+─────────────────────────────  
+2. Implementation Plan
+
+A straightforward implementation uses the machinery already in Lean’s Array library:
+
+a. For each element x in array a, check if b.contains x holds.
+
+b. Use the built‐in function Array.any? which takes a predicate and returns true if there is at least one element in the array satisfying the predicate.
+
+c. Thus, we can define
+
+  hasCommonElement a b := a.any? (λ x => b.contains x)
+
+d. Note that b.contains x internally checks whether there is an index j in b with b[j]! = x. This matches our specification well.
+
+─────────────────────────────  
+3. Proof Strategy
+
+The theorem to prove is:
+
+  theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+    hasCommonElement_spec a b (hasCommonElement a b)
+
+We proceed by unfolding the definitions and showing a two-way equivalence:
+
+A. "→" (soundness direction):  
+   Assume an index i in a is such that b.contains (a[i]!). By the definition of Array.contains, there exists some index j such that j < b.size and b[j]! = a[i]!. Therefore, there exist i and j satisfying the specification.  
+   
+B. "←" (completeness direction):  
+   Assume that ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!. In particular, take the x = a[i]!. Then by the definition of Array.contains, b.contains x is true. Since x is an element of a, the use of a.any? then yields true.  
+
+Key technical points:
+ 1. Use the fact that Array.any? p is defined by “∃ x ∈ a, p x”.  
+ 2. Use a lemma (or simply the definition) that for any array b,  
+  b.contains x ↔ ∃ j, j < b.size ∧ b[j]! = x.
+
+One may need to prove or refer to such a lemma in Lean. In many cases, this lemma is already present in the library, or it can be easily proved by unfolding Array.contains.
+
+─────────────────────────────  
+4. Step-by-Step Outline for the Proof Script
+
+Step 1. Unfold the definitions of hasCommonElement and hasCommonElement_spec.
+
+Step 2. Rewrite hasCommonElement a b as  
+  a.any? (λ x => b.contains x)  
+and recall that  
+  a.any? (λ x => b.contains x) ↔ (∃ x ∈ a, b.contains x).
+
+Step 3. Replace “b.contains x” by its unfolding:  
+  b.contains x ↔ ∃ j, j < b.size ∧ b[j]! = x.
+
+Step 4. Combine the existential quantifiers to conclude that  
+  a.any? (λ x => b.contains x) ↔ ∃ i, i < a.size ∧ ∃ j, j < b.size ∧ a[i]! = b[j]!.
+
+Step 5. Conclude the bidirectional equivalence with “↔” as required by the specification.
+
+─────────────────────────────  
+5. Writing the Code in Lean
+
+Given the plan, the final code would be structured as follows: 
+
+─────────────────────────────  
+-- Lean 4 Code (Plan Outline)
+
+import Mathlib
+import Aesop
+
+-- Implementation
+def hasCommonElement (a : Array Int) (b : Array Int) : Bool :=
+  -- Use Array.any? to check the predicate that an element from a is contained in b.
+  a.any? (λ x => b.contains x)
+
+-- Theorem: If the method returns true, there exists at least one common element between the two arrays, 
+-- and if there is at least one common element then the method returns true.
+def hasCommonElement_spec (a : Array Int) (b : Array Int) (result : Bool) : Prop :=
+  (∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!) ↔ result
+
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  hasCommonElement_spec a b (hasCommonElement a b) :=
+by
+  -- Unfold the definitions of our function and our specification
+  unfold hasCommonElement hasCommonElement_spec
+  -- Rewrite the definition of Array.any?
+  have h1 : a.any? (λ (x : Int) => b.contains x) ↔ ∃ (x : Int), x ∈ a ∧ b.contains x := by
+    -- This is the definition of any?
+    rw [Array.any?_eq]  -- Assuming Array.any?_eq is available in your environment
+  rw [h1]
+  -- Unfold b.contains: we use the fact that b.contains x ↔ ∃ (j : Nat), j < b.size ∧ b[j]! = x.
+  apply Iff.intro
+  { -- → Direction: Assume ∃ x ∈ a such that b.contains x.
+    rintro ⟨x, hx, hContain⟩
+    -- Unfold the definition of b.contains
+    obtain ⟨j, hj, hEq⟩ := (Array.contains_iff _ _).mp hContain
+    -- Now we need to relate x ∈ a with the existence of an index i with a[i] = x.
+    obtain ⟨i, hi, rfl⟩ := (Array.mem_iff _ _).mp hx
+    exact ⟨i, j, hi, hj, hEq⟩ },
+  { -- ← Direction: Assume ∃ i j such that a[i] = b[j].
+    rintro ⟨i, j, hi, hj, hEq⟩
+    -- From a[i] = b[j] we conclude that a[i] ∈ a.
+    let x := a[i]!
+    have hx : x ∈ a := (Array.mem_iff _ _).mpr ⟨i, hi, rfl⟩
+    -- Use the definition of b.contains for x: since b[j]! = x, clearly b.contains x holds.
+    have hContain : b.contains x :=
+      (Array.contains_iff _ _).mpr ⟨j, hj, hEq⟩
+    exact ⟨x, hx, hContain⟩ } 
+
+─────────────────────────────  
+6. Key Points and Dependencies
+
+• Note that in the proof above I refer to lemmas such as Array.any?_eq, Array.contains_iff, and Array.mem_iff.  
+ If these are not directly available you might need to prove them manually by unfolding the definitions of Array.any?, Array.contains, and membership (∈).  
+• The overall structure is to first convert our Boolean function to an equivalent existential condition and then use the definition of membership in an array.
+
+─────────────────────────────  
+7. Conclusion
+
+The plan consists of:
+ 1. Implementing the common element check by testing if any element in array a is contained in b.
+ 2. Proving the implementation by showing that the use of Array.any? and Array.contains is equivalent to ∃ i j with the required properties.
+ 3. Unfolding the definitions and applying basic lemmas about membership.
+
+Following these steps produces a working implementation of the function and a proof that it meets the specification.

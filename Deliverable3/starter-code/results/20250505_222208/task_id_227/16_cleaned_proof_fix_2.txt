@@ -1,0 +1,10 @@
+apply And.intro
+  · apply And.intro
+    · exact Int.le_trans (min_le_left a b) (min_le_left (a ⊓ b) c)
+    · exact Int.le_trans (min_le_right a b) (min_le_left (a ⊓ b) c)
+  · exact min_le_right (a ⊓ b) c
+  · cases lt_or_eq_of_le (min_le_left a b) with
+    | inl hlt => exact Or.inl rfl
+    | inr heq => rw [heq] at *; cases lt_or_eq_of_le (min_le_right a b) with
+      | inl hlt => exact Or.inr (Or.inl rfl)
+      | inr heq => exact Or.inr (Or.inr heq)

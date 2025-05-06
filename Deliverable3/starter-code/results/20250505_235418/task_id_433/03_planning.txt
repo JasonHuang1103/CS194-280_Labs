@@ -1,0 +1,145 @@
+Below is our complete plan with detailed explanation.
+
+──────────────────────────────
+Step 1. Understanding the Function
+
+The problem is to write a Lean 4 function, isGreater, that takes an integer n and an array a of integers and returns true exactly when “n is strictly greater than every element of a.” In other words, we want:
+
+  result = true ⟺ (∀ i, i < a.size → n > a[i]!).
+
+That is, if even one element of a is greater than or equal to n, the function should return false.
+
+──────────────────────────────
+Step 2. Breakdown into Subproblems
+
+A. Implementation:  
+ 1. We must iterate over all elements of the array a.  
+ 2. Check that for every element x the predicate n > x holds.  
+ 3. Return true if and only if n is greater than every element.
+
+There are at least two natural ways to do this:
+ • Use a built-in higher‐order function such as Array.all? (if available).
+ • Write a recursive/iterative function (or use foldl) that “and”s together the test for each element.
+
+B. Specification Proof:  
+We wish to prove the theorem isGreater_spec_satisfied. That is, we want to show:
+  (∀ i, i < a.size → n > a[i]!) ↔ isGreater n a.
+
+This proof essentially shows that our implementation exactly captures the intended semantics. The two directions are:
+
+ (⇒) If every element satisfies n > a[i]!, then isGreater returns true.  
+ (⇐) If isGreater returns true, then every element satisfies n > a[i]!  
+A common approach is to use a lemma about Array.all? which establishes that “a.all? p = true” is equivalent to “∀ i, i < a.size → p (a[i]!)” (or “∀ x ∈ a, p x”).
+
+──────────────────────────────
+Step 3. Consideration of Input Types, Edge Cases, and Expected Behavior
+
+• The input n is an integer and a is an array of integers.  
+• Edge Case: The array could be empty. In that case, the empty universal property holds vacuously and the function should return true.  
+• In nonempty cases, the function must check every element.  
+• The implementation must not crash on any input (and the problem tells us a is non-null).
+
+──────────────────────────────
+Step 4. Proof Techniques to Consider
+
+For the correctness proof of isGreater_spec_satisfied, we can use:
+ • Unfolding the definitions of isGreater and isGreater_spec.
+ • A lemma (or an induction) on arrays that relates “a.all? p = true” with ∀ i, i < a.size → p (a[i]!).
+
+If Lean’s Mathlib already provides a suitable lemma (for instance, something like Array.all?_forall or Array.forall_iff), we can use that. If not, a short induction over the array indices (or on the structure of the array) would suffice.
+
+──────────────────────────────
+Step 5. Similar Patterns and Hints from Documentation
+
+In the provided examples, you may have seen how replicate (or recursive functions) are defined and how the conversion of a recursive function to a “fold-like” form works. Similarly, using Array.all?, you “fold” the property over all elements. In many functional programming libraries the Boolean function “all” is defined by:
+  all p [] = true  
+  all p (x :: xs) = p x ∧ all p xs
+
+Thus, the equivalence ∀ x in the list, p x, corresponds exactly to all p list = true.
+
+You can apply the same reasoning here using Lean’s Array abstraction.
+
+──────────────────────────────
+Overall Plan
+
+Implementation Plan:
+1. Use the built-in function Array.all? to check the predicate for every element.
+  Definition: def isGreater (n : Int) (a : Array Int) : Bool :=
+    a.all? (fun x => n > x)
+  This definition naturally returns true for an empty array (vacuous truth) and returns true if and only if every element satisfies n > x.
+
+Proof Plan:
+1. Unfold the definitions of isGreater and isGreater_spec.
+2. Reduce the goal to showing:
+  (∀ i, i < a.size → n > a[i]!) ↔ a.all? (fun x => n > x)
+3. Either invoke a library lemma (if available) that says exactly this equivalence or prove it by induction on the length of a.
+  • Base: For a.empty, show that both sides are true.
+  • Inductive step: Assume the equivalence holds for an array a of length k. For an array of length k+1 (obtained by appending one element y), we show:
+    ((∀ i, i < (a.push y).size → n > (a.push y)[i]!) ↔ (a.all? (fun x => n > x) && n > y))
+  Using the definition of Array.all? (or using a fold), this step is straightforward.
+4. Conclude that the specification is met by our function.
+
+──────────────────────────────
+Final Template with Detailed Plan Comments
+
+Below is the Lean template (with our comments in the {{code}}/{{proof}} markers replaced by our planned code and proofs):
+
+------------------------------------------------------------
+import Mathlib
+import Aesop
+
+-- Implementation
+def isGreater (n : Int) (a : Array Int) : Bool :=
+  -- We use the built-in Array.all? that returns true exactly when
+  -- every element x in the array satisfies the predicate.
+  a.all? (fun x => n > x)
+
+
+-- Theorem: If the result is true, then n is greater than all elements in the array;
+-- If the result is false, then there exists at least one element in the array 
+-- that is greater than or equal to n.
+def isGreater_spec (n : Int) (a : Array Int) (result : Bool) : Prop :=
+  (∀ i, i < a.size → n > a[i]!) ↔ result
+
+theorem isGreater_spec_satisfied (n : Int) (a : Array Int) :
+  isGreater_spec n a (isGreater n a) := by
+  -- We unfold the definition of isGreater and isGreater_spec.
+  unfold isGreater isGreater_spec
+  -- Now our goal becomes proving:
+  -- (∀ i, i < a.size → n > a[i]!) ↔ a.all? (λ x, n > x)
+  --
+  -- At this point one can use an existing library lemma that relates Array.all? with the
+  -- universal property over an array. For example, if Mathlib provided “Array.all?_forall”,
+  -- one could write:
+  --
+  -- exact Array.all?_iff (fun x => n > x) a
+  --
+  -- In the absence of such a lemma, we proceed by a simple argument (by induction on a.size).
+  --
+  -- [Proof Sketch:]
+  -- • For an empty array, both sides are trivially true.
+  -- • For a non-empty array, unfolding the definition of all? shows that:
+  --      a.all? (λ x, n > x) = (n > head) && (tail.all? (λ x, n > x)),
+  --   while
+  --      (∀ i, i < a.size → n > a[i]!) splits into:
+  --         n > head ∧ (∀ i, i < tail.size → n > tail[i]!).
+  -- Using the induction hypothesis, these two are equivalent.
+  --
+  -- For brevity in this script, we assume the lemma Array.all?_iff is available.
+  --
+  -- [If a lemma is not available, one may complete the proof along the lines of the above sketch.]
+  --
+  -- Here we invoke the lemma (or mimic its effect):
+  sorry  -- Replace sorry with the detailed induction proof as needed.
+
+------------------------------------------------------------
+
+──────────────────────────────
+Conclusion
+
+We have broken down the problem into two main parts:
+ 1. The implementation of isGreater using Array.all? to capture the notion that n is greater than every element in a.
+ 2. The proof, by unfolding definitions and using either an existing lemma or an induction argument, shows that our implementation meets the specification—that is,
+  (∀ i, i < a.size → n > a[i]!) ↔ isGreater n a.
+
+This plan explains how we attack the problem step-by-step; the actual Lean proof may either refer to a library lemma (if available) or carry out the inductive argument.

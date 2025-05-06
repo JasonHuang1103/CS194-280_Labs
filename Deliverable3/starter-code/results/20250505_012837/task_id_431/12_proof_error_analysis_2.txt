@@ -1,0 +1,59 @@
+The issue isn’t that your “mathematical” proof is wrong at all—it’s that Lean is “confused” by your tactic block’s formatting, so that you never actually discharge the two subgoals coming from the use of Iff.intro. In other words, Lean complains that certain proof goals remain “unsolved” and then later “unexpected token ‘·’” appears because the bullet syntax isn’t being interpreted as starting a new tactic block.
+
+Let’s explain in detail:
+
+1. When you write
+
+  apply Iff.intro
+
+Lean splits the goal into two parts (one for each direction of the ↔). After that command the tactic state has two goals. In your script you then start the two proofs by writing
+
+  · intro ⟨i, j, hi, hj, h_eq⟩
+    ...  
+  · intro h
+    ...  
+
+2. In Lean 4 the “bullet” style that uses the character “·” (or other bullet symbols) must be used with care. In your file the bullet token is not being accepted where you expect because the tactic block is not formatted exactly as Lean anticipates. (Sometimes using a Unicode “·” instead of a “•” or simply misindentation leads to a similar “unexpected token” message.) In your case, Lean reports a token “·” when it expected a command. In addition, the two subgoals coming from Iff.intro are never actually closed because the bullets do not “attend” them in the proper structure.
+
+3. This is why you see errors like:
+
+  ⊢ (∃ i j, …) → (a.any … = true)
+  and
+  ⊢ (a.any … = true) → ∃ i j, …  
+
+and then the unexpected token error when Lean tries to parse the “·” bullet. In short, your proof’s tactics never “hook up” to the subgoals.
+
+4. To fix this you should structure the proof so that Lean knows you are giving proofs for both directions. You can do that in several ways:
+ – Use the standard tactic block with “begin … end” and ensure that the subproofs are indented properly.
+ – Omit bullet markers altogether and “case split” on the equivalence explicitly.
+ – If you wish to use bullets, be sure to use the correct bullet character (often “•” rather than “·”) and that the indentation is acceptable to Lean 4.
+
+For example, one way to rewrite the proof might be:
+
+------------------------------------------------------------
+theorem hasCommonElement_spec_satisfied (a : Array Int) (b : Array Int) :
+  hasCommonElement_spec a b (hasCommonElement a b) :=
+by
+  -- Unfold definitions:
+  unfold hasCommonElement hasCommonElement_spec
+  apply Iff.intro
+  · -- Forward direction: from ∃ i j, .. prove a.any … = true
+    intro ⟨i, j, hi, hj, h_eq⟩
+    rw [Array.any_eq_true]
+    use i, hi
+    rw [Array.any_eq_true]
+    use j, hj, h_eq
+  · -- Backward direction: from a.any ... = true deduce ∃ i j, … 
+    intro h
+    rw [Array.any_eq_true] at h
+    obtain ⟨i, hi, inner⟩ := h
+    rw [Array.any_eq_true] at inner
+    obtain ⟨j, hj, h_eq⟩ := inner
+    exact ⟨i, j, hi, hj, h_eq⟩
+------------------------------------------------------------
+
+In this version make sure that your bullets (here “·”) are accepted by your Lean 4 environment or, if not, replace them with alternative structuring (for example, with “begin … end” blocks or explicit “by” for each subgoal).
+
+5. Once the tactics are structured in a way that Lean accepts them, your proof will “attack” both subgoals and the unsolved goal error will go away.
+
+So the root cause is not a logical error in your method or specification—it is a formatting/syntax issue with the tactic block (using bullet markers in a way that Lean 4’s parser does not accept). Adjusting the proof’s layout (or using alternative bullet characters that Lean expects) is the way to fix the error.

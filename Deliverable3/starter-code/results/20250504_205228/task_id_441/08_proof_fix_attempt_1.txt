@@ -1,0 +1,11 @@
+The error in your proof occurs because you are trying to unfold `cubeSurfaceArea` in a goal that is already simplified enough for applying `rfl`. You don't need to unfold both `cubeSurfaceArea` and `cubeSurfaceArea_spec` explicitly. Here's the corrected proof:
+
+```lean
+theorem cubeSurfaceArea_spec_satisfied (size : Int):
+  cubeSurfaceArea_spec size (cubeSurfaceArea size) := by
+  -- << CORRECTED PROOF START >>
+  rfl
+  -- << CORRECTED PROOF END >>
+```
+
+By using `rfl` directly, we can recognize that both sides of the equation are definitionally equal, thereby eliminating the errors related to unnecessary unfolding.

@@ -1,0 +1,4 @@
+Lean Error: lean_playground/TempTest.lean:17:28: error: unsolved goals
+x : ℕ
+⊢ x = x
+lean_playground/TempTest.lean:20:10: error: 'ident_spec_satisfied' has already been declared

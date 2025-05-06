@@ -1,0 +1,27 @@
+```lean
+constructor
+· intro h
+  cases h
+  · apply lt_of_lt_of_le _ (mul_pos h.left (Int.zero_le_of_nat b)).le; assumption
+  · apply lt_of_lt_of_le _ (mul_pos h.right (Int.zero_le_of_nat a)).le; assumption
+· intro h
+  cases lt_trichotomy a 0 with ha ha
+  · cases lt_trichotomy b 0 with hb hb
+    · exfalso
+      have : a * b > 0 := mul_pos ha.left hb.left
+      linarith
+    · cases hb
+      · exfalso
+        simp only [hb, mul_zero, lt_irrefl] at h
+      · left; exact ⟨ha.left, hb.right⟩
+  · cases ha
+    · exfalso
+      simp only [ha, zero_mul, lt_irrefl] at h
+    · cases lt_trichotomy b 0 with hb hb
+      · right; exact ⟨ha.right, hb.left⟩
+      · exfalso
+        simp only [hb, mul_zero, lt_irrefl] at h
+      · exfalso
+        have : a * b > 0 := mul_pos ha.right hb.right
+        linarith
+```

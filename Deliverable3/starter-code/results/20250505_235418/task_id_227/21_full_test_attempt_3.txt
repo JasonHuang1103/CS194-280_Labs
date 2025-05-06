@@ -1,0 +1,13 @@
+Lean Error: lean_playground/TempTest.lean:19:46: error: unsolved goals
+case pos
+a b c : ℤ
+h : a ≤ b ⊓ c
+⊢ ((if a ≤ b ⊓ c then a else b ⊓ c) ≤ a ∧ (if a ≤ b ⊓ c then a else b ⊓ c) ≤ b ∧ (if a ≤ b ⊓ c then a else b ⊓ c) ≤ c) ∧
+    ((if a ≤ b ⊓ c then a else b ⊓ c) = a ∨ (if a ≤ b ⊓ c then a else b ⊓ c) = b ∨ (if a ≤ b ⊓ c then a else b ⊓ c) = c)
+
+case neg
+a b c : ℤ
+h : ¬a ≤ b ⊓ c
+⊢ ((if a ≤ b ⊓ c then a else b ⊓ c) ≤ a ∧ (if a ≤ b ⊓ c then a else b ⊓ c) ≤ b ∧ (if a ≤ b ⊓ c then a else b ⊓ c) ≤ c) ∧
+    ((if a ≤ b ⊓ c then a else b ⊓ c) = a ∨ (if a ≤ b ⊓ c then a else b ⊓ c) = b ∨ (if a ≤ b ⊓ c then a else b ⊓ c) = c)
+lean_playground/TempTest.lean:23:0: error: unexpected identifier; expected command

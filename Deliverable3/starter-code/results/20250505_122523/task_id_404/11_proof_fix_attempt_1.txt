@@ -1,0 +1,9 @@
+```lean
+split
+· split_ifs
+  · exact ⟨le_refl a, h⟩
+  · exact ⟨not_le.mp h, le_refl b⟩
+· split_ifs
+  · left; rfl
+  · right; rfl
+```

@@ -1,0 +1,19 @@
+```lean
+  unfold hasCommonElement hasCommonElement_spec
+  apply Iff.intro
+  · -- Prove the direction: if hasCommonElement a b is true, then ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!
+    intro h
+    simp only [Array.any_eq_true] at h
+    obtain ⟨i, hi, h_inner⟩ := h
+    simp only [Array.any_eq_true] at h_inner
+    obtain ⟨j, hj, h_eq⟩ := h_inner
+    exact ⟨i, j, hi, hj, h_eq⟩
+
+  · -- Prove the direction: if ∃ i j, i < a.size ∧ j < b.size ∧ a[i]! = b[j]!, then hasCommonElement a b is true
+    intro h
+    simp only [Array.any_eq_true]
+    obtain ⟨i, j, hi, hj, h_eq⟩ := h
+    use i, hi
+    simp only [Array.any_eq_true]
+    use j, hj, h_eq
+```

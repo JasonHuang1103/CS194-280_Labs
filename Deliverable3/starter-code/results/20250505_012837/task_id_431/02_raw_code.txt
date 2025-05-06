@@ -1,0 +1,3 @@
+```lean
+a.any (λ x => b.any (λ y => x = y))
+```

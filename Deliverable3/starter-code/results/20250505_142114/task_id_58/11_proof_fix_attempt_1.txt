@@ -1,0 +1,11 @@
+```lean
+simp [Bool.and_eq_true, Bool.or_eq_true]
+constructor
+· intro h
+  cases h
+  · left; exact h
+  · right; exact h
+· intros h
+  rw [or_comm]
+  exact h
+```

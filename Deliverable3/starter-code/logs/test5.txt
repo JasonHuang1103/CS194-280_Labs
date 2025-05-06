@@ -1,0 +1,75 @@
+Starting test of 2 tasks: task_id_0, task_id_58
+
+==================================================
+Processing task task_id_0...
+Reading problem description and code template from tasks/task_id_0...
+Problem description length: 310 characters
+Reading unit tests...
+Unit tests length: 69 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_003634
+Processing task: task_id_0 (Task index: 0)
+[2025-05-05 00:36:43,830] [INFO] [real_accelerator.py:239:get_accelerator] Setting ds_accelerator to mps (auto detect)
+RAG setup failed: Failed to import transformers.trainer because of the following error (look up to see its traceback):
+cannot import name 'IncEx' from 'pydantic.main' (/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/pydantic/main.py). Continuing without RAG.
+Response saved to results/20250505_003634/task_id_0/01_planning.txt
+Response saved to results/20250505_003634/task_id_0/02_raw_code.txt
+Response saved to results/20250505_003634/task_id_0/03_cleaned_code.txt
+Response saved to results/20250505_003634/task_id_0/04_code_test.txt
+Proof RAG retrieval failed: cannot access local variable 'embedding_database_file' where it is not associated with a value
+Response saved to results/20250505_003634/task_id_0/05_raw_proof.txt
+Response saved to results/20250505_003634/task_id_0/06_cleaned_proof.txt
+Response saved to results/20250505_003634/task_id_0/07_full_test.txt
+Response saved to results/20250505_003634/task_id_0/08_final_solution.txt
+Solution generated in 175.12 seconds
+Generated code length: 1 characters
+Generated proof length: 3 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+
+==================================================
+Processing task task_id_58...
+Reading problem description and code template from tasks/task_id_58...
+Problem description length: 700 characters
+Reading unit tests...
+Unit tests length: 462 characters
+Running main workflow to generate solution...
+Starting workflow run with timestamp: 20250505_003634
+Processing task: task_id_58 (Task index: 1)
+RAG setup failed: Failed to import transformers.trainer because of the following error (look up to see its traceback):
+cannot import name 'IncEx' from 'pydantic.main' (/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/pydantic/main.py). Continuing without RAG.
+Response saved to results/20250505_003634/task_id_58/01_planning.txt
+Response saved to results/20250505_003634/task_id_58/02_raw_code.txt
+Response saved to results/20250505_003634/task_id_58/03_cleaned_code.txt
+Response saved to results/20250505_003634/task_id_58/04_code_test.txt
+Proof RAG retrieval failed: cannot access local variable 'embedding_database_file' where it is not associated with a value
+Response saved to results/20250505_003634/task_id_58/05_raw_proof.txt
+Response saved to results/20250505_003634/task_id_58/06_cleaned_proof.txt
+Response saved to results/20250505_003634/task_id_58/07_full_test.txt
+Response saved to results/20250505_003634/task_id_58/08_final_solution.txt
+Solution generated in 53.61 seconds
+Generated code length: 36 characters
+Generated proof length: 4 characters
+Loading Lean template and inserting generated solution...
+Executing Lean code with implementation only (proof=sorry)...
+Implementation test result: PASS
+Executing Lean code with implementation and proof...
+Full solution test result: PASS
+✅ Implementation passes unit tests
+✅ Proof is correct
+Testing Summary:
+Task task_id_0:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 175.12035489082336 seconds
+---
+Task task_id_58:
+  Passes Unit Tests: True
+  Proof is Correct: True
+  Runtime: 53.609513998031616 seconds
+---

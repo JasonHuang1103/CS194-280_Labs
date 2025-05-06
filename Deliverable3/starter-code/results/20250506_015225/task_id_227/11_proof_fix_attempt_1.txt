@@ -1,0 +1,33 @@
+```
+split
+· split
+  · split
+    · by_cases h₁ : a ≤ b
+      · by_cases h₂ : a ≤ c
+        · exact h₂
+        · exact le_of_not_le (not_le.mp h₂)
+      · by_cases h₃ : b ≤ c
+        · exact h₃
+        · exact le_of_not_le (not_le.mp h₃)
+    · by_cases h₄ : a ≤ b
+      · by_cases h₅ : a ≤ c
+        · exact h₄
+        · exact le_of_not_le (not_le.mp h₅)
+      · by_cases h₆ : b ≤ c
+        · exact le_of_not_le (not_le.mp (not_le.mp h₄))
+        · exact h₆
+    · by_cases h₇ : a ≤ b
+      · by_cases h₈ : a ≤ c
+        · exact le_of_not_le (not_le.mp (not_le.mp h₈))
+        · exact h₈
+      · by_cases h₉ : b ≤ c
+        · exact le_of_not_le (not_le.mp (not_le.mp h₇))
+        · exact h₉
+· by_cases h : a ≤ b
+  · by_cases h' : a ≤ c
+    · left; rfl
+    · right; right; rfl
+  · by_cases h'' : b ≤ c
+    · right; left; rfl
+    · right; right; rfl
+```

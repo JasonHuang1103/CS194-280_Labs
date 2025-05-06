@@ -1,0 +1,13 @@
+```
+split_ifs
+case pos (h : a ≤ b) =>
+  constructor
+  · exact ⟨le_refl a, h⟩
+  · left; rfl
+case neg (h : ¬ a ≤ b) =>
+  constructor
+  · exact ⟨Int.le_of_lt (by
+      have h' : b < a := Int.lt_of_not_ge h
+      exact h'), le_refl b⟩
+  · right; rfl
+```

@@ -1,0 +1,4 @@
+```lean
+simp
+exact Iff.refl _
+```

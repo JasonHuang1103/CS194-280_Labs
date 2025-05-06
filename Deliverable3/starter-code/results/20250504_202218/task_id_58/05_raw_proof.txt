@@ -1,0 +1,29 @@
+```lean
+theorem hasOppositeSign_spec_satisfied (a : Int) (b : Int) :
+  hasOppositeSign_spec a b (hasOppositeSign a b) := by
+  unfold hasOppositeSign hasOppositeSign_spec
+  -- Split based on the result of (a < 0 && b > 0) || (a > 0 && b < 0)
+  cases h : (a < 0 && b > 0) || (a > 0 && b < 0) with
+  | false =>
+    apply Iff.intro
+    . intro h'
+      cases h' <;> simp_all [and_self]
+    . intro h'
+      rw [Bool.or_eq_false] at h
+      cases h
+      . have h₁ : ¬(a < 0), from mt (and.left) h_left
+        have h₂ : ¬(b > 0), from mt (and.right) h_left
+        exact h'
+      . have h₃ : ¬(a > 0), from mt (and.left) h_right
+        have h₄ : ¬(b < 0), from mt (and.right) h_right
+        exact h'
+  | true =>
+    apply Iff.intro
+    . intro _
+      simp only [True.intro]
+    . intro h'
+      rw [Bool.or_eq_true]
+      cases h' with
+      | inl h₁ => exact Or.inl h₁
+      | inr h₂ => exact Or.inr h₂
+```

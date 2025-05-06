@@ -1,0 +1,4 @@
+{
+  "code": "Array.any a (fun x => Array.any b (fun y => x == y))\n\nThis version contains only valid Lean code for the definition of hasCommonElement.",
+  "proof": "apply Iff.intro\n\u00b7 intro h\n  obtain \u27e8i, h1, j, h2, hij\u27e9 := Array.any_eq_bex.mp h\n  exact \u27e8i, j, h1, h2, hij\u27e9\n\u00b7 intro \u27e8i, j, hi, hj, h_eq\u27e9\n  apply Array.any_eq_bex.mpr\n  exact \u27e8i, hi, j, hj, h_eq\u27e9"
+}

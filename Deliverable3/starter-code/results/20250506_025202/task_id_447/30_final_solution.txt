@@ -1,0 +1,4 @@
+{
+  "code": "a.map (fun x => x * x * x)",
+  "proof": "split\nexact Array.map_length (fun x => x * x * x) a\nintros i hi\nrw Array.get_map\nrefl"
+}
